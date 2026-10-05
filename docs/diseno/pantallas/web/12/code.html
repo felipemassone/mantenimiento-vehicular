@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Libreta de service</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<style>
+    @layer base {
+      html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #F6F4EF;
+        font-family: 'Public Sans', sans-serif;
+        color: #1B2430;
+      }
+    }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Public Sans', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#F6F4EF] text-[#1B2430] min-h-screen flex flex-col font-sans antialiased">
+<!-- Barra superior -->
+<header class="w-full bg-[#FFFFFF] border-b border-[#E3DFD6] h-16 sticky top-0 z-50">
+<div class="max-w-[1440px] h-full mx-auto px-8 flex items-center justify-between">
+<!-- Logo + Nombre -->
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-[#0B3D91] flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[#F2B705] text-[22px]">build</span>
+</div>
+<span class="text-[17px] font-semibold text-[#1B2430] tracking-tight">Libreta de service</span>
+</div>
+<!-- Menú derecho -->
+<div class="flex items-center gap-8 h-full">
+<div class="relative flex items-center h-full">
+<a class="text-[14px] font-medium text-[#1B2430] py-5" href="#">Mis vehículos</a>
+<span class="absolute bottom-0 left-0 right-0 h-[2px] bg-[#F2B705]"></span>
+</div>
+<button aria-label="Perfil FM" class="w-10 h-10 rounded-full bg-[#EFECE5] flex items-center justify-center text-[14px] font-semibold text-[#1B2430] border border-[#E3DFD6] select-none" type="button">
+          FM
+        </button>
+</div>
+</div>
+</header>
+<!-- Contenido central -->
+<main class="w-full flex-1 py-8">
+<div class="max-w-[720px] mx-auto px-4 md:px-0">
+<!-- Encabezado con Volver y Título -->
+<div class="mb-4">
+<a class="inline-flex items-center gap-1.5 text-[14px] font-medium text-[#1B2430] hover:text-[#0B3D91] transition-colors mb-3" href="#">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span>
+<span>Volver</span>
+</a>
+<h1 class="text-[22px] leading-[28px] font-semibold text-[#1B2430] tracking-tight">
+          Ford Ka 2014
+        </h1>
+</div>
+<!-- Tarjeta de Kilometraje -->
+<div class="w-full bg-[#FFFFFF] rounded-[14px] border border-[#E3DFD6] p-5 mb-6">
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+<div>
+<div class="text-[13px] leading-[18px] text-[#5A6472]">
+              Kilometraje actual
+            </div>
+<div class="text-[28px] leading-[34px] font-semibold text-[#1B2430] [font-variant-numeric:tabular-nums] tracking-tight mt-0.5">
+              62.400 km
+            </div>
+<div class="text-[13px] leading-[18px] text-[#5A6472] mt-1">
+              Actualizado el 14/03/2026
+            </div>
+</div>
+<button class="h-12 px-5 rounded-[10px] bg-[#FFFFFF] border border-[#8A8F98] text-[#1B2430] text-[14px] font-medium hover:bg-[#F6F4EF] transition-colors inline-flex items-center justify-center self-start sm:self-auto flex-shrink-0" type="button">
+            Actualizar kilometraje
+          </button>
+</div>
+</div>
+<!-- Sección Mantenimiento -->
+<div class="mb-3">
+<h2 class="text-[17px] leading-[24px] font-semibold text-[#1B2430]">
+          Mantenimiento
+        </h2>
+<p class="text-[14px] leading-[20px] text-[#5A6472] mt-0.5">
+          1 ítem a confirmar. Lo supusimos porque el auto se cargó con más kilómetros que el intervalo.
+        </p>
+</div>
+<!-- Lista de filas agrupadas -->
+<div class="w-full bg-[#FFFFFF] rounded-[14px] border border-[#E3DFD6] overflow-hidden mb-4">
+<!-- Fila 1: Aceite y filtro -->
+<div class="p-4 sm:px-5 flex items-center justify-between gap-3">
+<div class="min-w-0 pr-2">
+<div class="text-[15px] font-medium text-[#1B2430] leading-tight">
+              Aceite y filtro de aceite
+            </div>
+<div class="text-[13px] leading-[18px] text-[#5A6472] mt-1 [font-variant-numeric:tabular-nums]">
+              Cambiar · venció a los 60.000 km
+            </div>
+</div>
+<div class="flex-shrink-0">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#FEE4E2] text-[#B42318] text-[13px] font-medium [font-variant-numeric:tabular-nums]">
+<span class="material-symbols-outlined text-[16px] leading-none">error</span>
+              Vencido
+            </span>
+</div>
+</div>
+<div class="w-full h-[1px] bg-[#E3DFD6]"></div>
+<!-- Fila 2: Amortiguadores -->
+<div class="p-4 sm:px-5 flex items-center justify-between gap-3">
+<div class="min-w-0 pr-2">
+<div class="text-[15px] font-medium text-[#1B2430] leading-tight">
+              Amortiguadores
+            </div>
+<div class="text-[13px] leading-[18px] text-[#5A6472] mt-1 [font-variant-numeric:tabular-nums]">
+              Revisar · faltan 600 km o vence el 15/04/2026
+            </div>
+</div>
+<div class="flex-shrink-0">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#FFEDD5] text-[#9A3412] text-[13px] font-medium [font-variant-numeric:tabular-nums]">
+<span class="material-symbols-outlined text-[16px] leading-none">warning</span>
+              Próximo
+            </span>
+</div>
+</div>
+<div class="w-full h-[1px] bg-[#E3DFD6]"></div>
+<!-- Fila 3: Líquido de frenos -->
+<div class="p-4 sm:px-5 flex items-center justify-between gap-3">
+<div class="min-w-0 pr-2">
+<div class="text-[15px] font-medium text-[#1B2430] leading-tight">
+              Líquido de frenos
+            </div>
+<div class="text-[13px] leading-[18px] text-[#5A6472] mt-1 [font-variant-numeric:tabular-nums]">
+              Cambiar · supuesto a los 45.000 km
+            </div>
+</div>
+<div class="flex-shrink-0 flex items-center gap-3">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#EDEBFA] text-[#4B3FA3] text-[13px] font-medium border border-dashed border-[#8C82D6] [font-variant-numeric:tabular-nums]">
+<span class="material-symbols-outlined text-[16px] leading-none">help</span>
+              A confirmar
+            </span>
+<a class="text-[13px] font-medium text-[#0B3D91] hover:underline" href="#">
+              Confirmar dato
+            </a>
+</div>
+</div>
+<div class="w-full h-[1px] bg-[#E3DFD6]"></div>
+<!-- Fila 4: Pastillas de freno delanteras -->
+<div class="p-4 sm:px-5 flex items-center justify-between gap-3">
+<div class="min-w-0 pr-2">
+<div class="text-[15px] font-medium text-[#1B2430] leading-tight">
+              Pastillas de freno delanteras
+            </div>
+<div class="text-[13px] leading-[18px] text-[#5A6472] mt-1 [font-variant-numeric:tabular-nums]">
+              Revisar · faltan 12.600 km
+            </div>
+</div>
+<div class="flex-shrink-0">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#E5F2EA] text-[#1E6B43] text-[13px] font-medium [font-variant-numeric:tabular-nums]">
+<span class="material-symbols-outlined text-[16px] leading-none">check_circle</span>
+              Al día
+            </span>
+</div>
+</div>
+<div class="w-full h-[1px] bg-[#E3DFD6]"></div>
+<!-- Fila 5: Neumáticos -->
+<div class="p-4 sm:px-5 flex items-center justify-between gap-3">
+<div class="min-w-0 pr-2">
+<div class="text-[15px] font-medium text-[#1B2430] leading-tight">
+              Neumáticos
+            </div>
+<div class="text-[13px] leading-[18px] text-[#5A6472] mt-1 [font-variant-numeric:tabular-nums]">
+              Revisar · faltan 12.600 km
+            </div>
+</div>
+<div class="flex-shrink-0">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#E5F2EA] text-[#1E6B43] text-[13px] font-medium [font-variant-numeric:tabular-nums]">
+<span class="material-symbols-outlined text-[16px] leading-none">check_circle</span>
+              Al día
+            </span>
+</div>
+</div>
+</div>
+<!-- Botón principal al final alineado a la derecha -->
+<div class="flex justify-end pb-12">
+<button class="h-12 px-6 rounded-[10px] bg-[#0B3D91] hover:bg-[#08306F] text-[#FFFFFF] text-[14px] font-medium transition-colors inline-flex items-center justify-center" type="button">
+          Registrar trabajo
+        </button>
+</div>
+</div>
+</main>
+</body></html>

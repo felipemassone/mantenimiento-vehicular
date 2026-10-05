@@ -3,10 +3,11 @@
 ## Cómo usarlos
 
 1. En Stitch, botón de la paleta → **Empezar con tu diseño** → cargá `app/DESIGN.md` (o pegá su contenido). Hacelo **una sola vez por proyecto** y verificá que Stitch muestre "Libreta de service" como sistema activo.
-2. Un prompt por pantalla, en el orden de este archivo. Cada uno indica si va en **Aplicación** (celular) o **Web** (escritorio).
+2. Un prompt por pantalla, en el orden de este archivo. Cada uno indica si va en **Aplicación** (celular) o **Web** (escritorio). Stitch fija el tipo de dispositivo por proyecto: las pantallas Web (9 a 12) van en un **proyecto nuevo** creado en modo Web, con el mismo DESIGN.md importado. Además, esos prompts empiezan aclarando el tamaño de escritorio.
 3. Si Stitch ofrece varios modos de generación, usá el de mayor calidad.
 4. Copiá **solo el bloque del prompt**, sin el título.
-5. Si una pantalla sale con algo de la lista "No hacer" del DESIGN.md (degradados, ilustraciones, emojis, textos en inglés), pedile la corrección puntual en el mismo hilo: "Sacá la ilustración del encabezado y alineá el título a la izquierda".
+5. Stitch reinterpreta el DESIGN.md al importarlo (en la prueba cambió el fondo y el azul por variantes propias y descartó la sección "Do's and Don'ts"). Por eso cada prompt termina con una línea que fija los colores exactos y las prohibiciones principales: no la borres.
+6. Si una pantalla sale con algo de la lista "No hacer" del DESIGN.md (degradados, ilustraciones, emojis, textos en inglés), pedile la corrección puntual en el mismo hilo: "Sacá la ilustración del encabezado y alineá el título a la izquierda".
 
 Los prompts describen **contenido y disposición**, no estilo: el estilo ya lo pone el DESIGN.md. Por eso no dicen "moderno", "limpio" ni "elegante".
 
@@ -30,6 +31,9 @@ Botón principal a lo ancho: "Ingresar".
 Debajo, en texto secundario: "¿No tenés cuenta?" y el enlace "Crear cuenta".
 
 Sin imágenes, sin ilustración, sin mensaje de bienvenida.
+
+Colores exactos: fondo #F6F4EF, texto #1B2430, botón principal y enlaces #0B3D91, oro #F2B705 solo en el ícono del logo. Sin degradados, ilustraciones, fotos ni emojis.
+Títulos y botones con mayúscula solo en la primera palabra ("Agregar vehículo", no "Agregar Vehículo"). No agregues textos, avisos, subtítulos ni notas al pie que no estén en este pedido. En las pantallas internas (las que tienen flecha "Volver"), la barra superior no lleva el botón de cuenta.
 ```
 
 ## 2. Crear cuenta — Aplicación
@@ -52,6 +56,9 @@ Título: "Revisá tu correo".
 Texto: "Te mandamos un enlace a felipe.massone@gmail.com. Abrilo para activar tu cuenta. Si no lo ves, fijate en la carpeta de correo no deseado."
 Botón secundario: "Reenviar enlace".
 Enlace: "Volver a ingresar".
+
+Colores exactos: fondo #F6F4EF, texto #1B2430, botón principal y enlaces #0B3D91, oro #F2B705 solo en el ícono del logo. Sin degradados, ilustraciones, fotos ni emojis.
+Títulos y botones con mayúscula solo en la primera palabra ("Agregar vehículo", no "Agregar Vehículo"). No agregues textos, avisos, subtítulos ni notas al pie que no estén en este pedido. En las pantallas internas (las que tienen flecha "Volver"), la barra superior no lleva el botón de cuenta.
 ```
 
 ## 3. Recuperar contraseña — Aplicación
@@ -71,6 +78,9 @@ Título: "Elegí una contraseña nueva".
 Campo "Contraseña nueva" con la ayuda "Mínimo 8 caracteres."
 Campo "Repetí la contraseña".
 Botón principal a lo ancho: "Guardar contraseña".
+
+Colores exactos: fondo #F6F4EF, texto #1B2430, botón principal y enlaces #0B3D91, oro #F2B705 solo en el ícono del logo. Sin degradados, ilustraciones, fotos ni emojis.
+Títulos y botones con mayúscula solo en la primera palabra ("Agregar vehículo", no "Agregar Vehículo"). No agregues textos, avisos, subtítulos ni notas al pie que no estén en este pedido. En las pantallas internas (las que tienen flecha "Volver"), la barra superior no lleva el botón de cuenta.
 ```
 
 ## 4. Mis vehículos — Aplicación
@@ -91,6 +101,9 @@ Mismo encabezado.
 Texto alineado a la izquierda: "Todavía no cargaste ningún vehículo." y debajo, en texto secundario: "Cargá tu auto y te decimos qué mantenimiento le toca."
 Botón principal: "Agregar vehículo".
 Sin ilustración.
+
+Colores exactos: fondo #F6F4EF, texto #1B2430, botón principal y enlaces #0B3D91, oro #F2B705 solo en el ícono del logo. Sin degradados, ilustraciones, fotos ni emojis.
+Títulos y botones con mayúscula solo en la primera palabra ("Agregar vehículo", no "Agregar Vehículo"). No agregues textos, avisos, subtítulos ni notas al pie que no estén en este pedido. En las pantallas internas (las que tienen flecha "Volver"), la barra superior no lleva el botón de cuenta.
 ```
 
 ## 5. Agregar vehículo — Aplicación
@@ -116,6 +129,9 @@ Campo "Año" con el valor "2019".
 Campo "Kilometraje actual" con el valor "41.000" y el sufijo "km".
 Enlace "Elegir un modelo de la lista".
 Botón principal al pie: "Agregar vehículo".
+
+Colores exactos: fondo #F6F4EF, texto #1B2430, botón principal y enlaces #0B3D91, oro #F2B705 solo en el ícono del logo. Sin degradados, ilustraciones, fotos ni emojis.
+Títulos y botones con mayúscula solo en la primera palabra ("Agregar vehículo", no "Agregar Vehículo"). No agregues textos, avisos, subtítulos ni notas al pie que no estén en este pedido. En las pantallas internas (las que tienen flecha "Volver"), la barra superior no lleva el botón de cuenta.
 ```
 
 ## 6. Ficha del vehículo — Aplicación
@@ -141,6 +157,9 @@ Sección "Mantenimiento", ordenada de lo más urgente a lo menos urgente. Cada �
 Encima de la lista, una línea en texto secundario: "1 ítem a confirmar. Lo supusimos porque el auto se cargó con más kilómetros que el intervalo."
 
 Botón principal al pie, a lo ancho: "Registrar trabajo".
+
+Colores exactos: fondo #F6F4EF, texto #1B2430, botón principal y enlaces #0B3D91, oro #F2B705 solo en el ícono del logo. Sin degradados, ilustraciones, fotos ni emojis.
+Títulos y botones con mayúscula solo en la primera palabra ("Agregar vehículo", no "Agregar Vehículo"). No agregues textos, avisos, subtítulos ni notas al pie que no estén en este pedido. En las pantallas internas (las que tienen flecha "Volver"), la barra superior no lleva el botón de cuenta.
 ```
 
 ## 7. Actualizar kilometraje — Aplicación
@@ -154,6 +173,9 @@ Campo "Kilometraje actual" con el valor "61.900" y el sufijo "km".
 El campo muestra un error: borde rojo y el mensaje "No puede ser menor a 62.400 km, la última lectura."
 Botón principal a lo ancho: "Guardar".
 Botón secundario a lo ancho: "Cancelar".
+
+Colores exactos: fondo #F6F4EF, texto #1B2430, botón principal y enlaces #0B3D91, oro #F2B705 solo en el ícono del logo. Sin degradados, ilustraciones, fotos ni emojis.
+Títulos y botones con mayúscula solo en la primera palabra ("Agregar vehículo", no "Agregar Vehículo"). No agregues textos, avisos, subtítulos ni notas al pie que no estén en este pedido. En las pantallas internas (las que tienen flecha "Volver"), la barra superior no lleva el botón de cuenta.
 ```
 
 ## 8. Mi cuenta y eliminar cuenta — Aplicación
@@ -174,11 +196,15 @@ Título: "¿Eliminar tu cuenta?"
 Texto: "Se van a borrar tus 2 vehículos, sus trabajos registrados y los comprobantes. No se puede deshacer."
 Campo "Ingresá tu contraseña para confirmar".
 Botón secundario "Cancelar" y botón rojo "Eliminar cuenta", uno al lado del otro.
+
+Colores exactos: fondo #F6F4EF, texto #1B2430, botón principal y enlaces #0B3D91, oro #F2B705 solo en el ícono del logo. Sin degradados, ilustraciones, fotos ni emojis.
+Títulos y botones con mayúscula solo en la primera palabra ("Agregar vehículo", no "Agregar Vehículo"). No agregues textos, avisos, subtítulos ni notas al pie que no estén en este pedido. En las pantallas internas (las que tienen flecha "Volver"), la barra superior no lleva el botón de cuenta.
 ```
 
 ## 9. Administración: modelos — Web
 
 ```
+Pantalla de escritorio de 1440 × 900 px, no de celular.
 Panel de administración del catálogo de mantenimiento, en escritorio.
 
 Barra lateral izquierda de 240 px con fondo gris cálido: arriba el logo "Libreta de service" con la palabra "Administración" debajo; secciones "Modelos" (activa, con una línea oro de 2 px a la izquierda) y "Usuarios" (en gris, con la etiqueta "Próximamente"). Al pie de la barra: el correo felipe.massone@gmail.com y el enlace "Ir a Mis vehículos".
@@ -193,27 +219,35 @@ Filas:
 - Chevrolet · Onix · 2013–2019 · chip "Publicado · versión 2", y al lado un chip gris "Borrador · versión 3" · 12 · 04/10/2026
 - Peugeot · 208 · 2013–2020 · chip "Borrador · versión 1" · 0 · 03/10/2026
 Cada fila tiene a la derecha el enlace "Ver plan".
+
+Colores exactos: fondo #F6F4EF, texto #1B2430, botón principal y enlaces #0B3D91, oro #F2B705 solo en el ícono del logo. Sin degradados, ilustraciones, fotos ni emojis.
+Títulos y botones con mayúscula solo en la primera palabra ("Agregar vehículo", no "Agregar Vehículo"). No agregues textos, avisos, subtítulos ni notas al pie que no estén en este pedido. En las pantallas internas (las que tienen flecha "Volver"), la barra superior no lleva el botón de cuenta.
 ```
 
 ## 10. Administración: nuevo modelo — Web
 
 ```
+Pantalla de escritorio de 1440 × 900 px, no de celular.
 Mismo panel de administración con la barra lateral de la pantalla anterior.
 
 Contenido, en un formulario de 560 px de ancho alineado a la izquierda:
 Migas de pan: "Modelos / Nuevo modelo".
 Título: "Nuevo modelo".
-Campo "Marca" que combina buscador y lista, con el valor "Renault" y debajo de la lista la opción "Crear la marca «Renault»".
+Campo "Marca" que combina buscador y lista, cerrado, con el valor "Renault".
 Campo "Modelo" con el valor "Sandero".
 Dos campos en la misma fila: "Desde el año" con 2015 y "Hasta el año" con 2022. Ayuda debajo: "Dejá vacío 'Hasta' si se sigue fabricando."
 Aviso en línea rojo debajo de los años: "Ya existe Renault Sandero para 2013–2019. Los años no se pueden superponer."
 Botones al pie: principal "Crear modelo" y secundario "Cancelar".
 Texto secundario al pie: "Al crearlo, el modelo queda con un plan vacío en borrador."
+
+Colores exactos: fondo #F6F4EF, texto #1B2430, botón principal y enlaces #0B3D91, oro #F2B705 solo en el ícono del logo. Sin degradados, ilustraciones, fotos ni emojis.
+Títulos y botones con mayúscula solo en la primera palabra ("Agregar vehículo", no "Agregar Vehículo"). No agregues textos, avisos, subtítulos ni notas al pie que no estén en este pedido. En las pantallas internas (las que tienen flecha "Volver"), la barra superior no lleva el botón de cuenta.
 ```
 
 ## 11. Administración: plan de mantenimiento — Web
 
 ```
+Pantalla de escritorio de 1440 × 900 px, no de celular.
 Mismo panel de administración con la barra lateral.
 
 Encabezado:
@@ -236,11 +270,15 @@ La columna Tipo usa dos etiquetas chicas: "Cambiar" y "Revisar".
 Cada fila tiene a la derecha íconos de editar y quitar.
 La fila "Líquido de frenos" está en modo edición: los campos de km y meses se ven como campos editables, con los botones "Guardar" y "Cancelar".
 Debajo de la tabla, el botón secundario "Agregar ítem".
+
+Colores exactos: fondo #F6F4EF, texto #1B2430, botón principal y enlaces #0B3D91, oro #F2B705 solo en el ícono del logo. Sin degradados, ilustraciones, fotos ni emojis.
+Títulos y botones con mayúscula solo en la primera palabra ("Agregar vehículo", no "Agregar Vehículo"). No agregues textos, avisos, subtítulos ni notas al pie que no estén en este pedido. En las pantallas internas (las que tienen flecha "Volver"), la barra superior no lleva el botón de cuenta.
 ```
 
 ## 12. Mis vehículos y ficha en escritorio — Web
 
 ```
+Pantalla de escritorio de 1440 × 900 px, no de celular.
 Las pantallas del propietario vistas en una computadora.
 
 Barra superior a lo ancho: logo "Libreta de service" a la izquierda; a la derecha "Mis vehículos" (activa, subrayada con una línea oro de 2 px) y el botón redondo con las iniciales "FM".
@@ -248,4 +286,7 @@ Barra superior a lo ancho: logo "Libreta de service" a la izquierda; a la derech
 El contenido es una columna central de 720 px sobre el fondo papel, con el mismo contenido que en el celular: la ficha del Ford Ka 2014 con el kilometraje "62.400 km", "Actualizado el 14/03/2026", el botón "Actualizar kilometraje" y la sección "Mantenimiento" con las cinco filas de ítems y sus chips (Vencido, Próximo, A confirmar con borde punteado, Al día, Al día), con los mismos textos que la ficha del celular.
 El botón "Registrar trabajo" queda alineado a la derecha, al final de la lista.
 Los laterales quedan vacíos: sin paneles extra, sin gráficos.
+
+Colores exactos: fondo #F6F4EF, texto #1B2430, botón principal y enlaces #0B3D91, oro #F2B705 solo en el ícono del logo. Sin degradados, ilustraciones, fotos ni emojis.
+Títulos y botones con mayúscula solo en la primera palabra ("Agregar vehículo", no "Agregar Vehículo"). No agregues textos, avisos, subtítulos ni notas al pie que no estén en este pedido. En las pantallas internas (las que tienen flecha "Volver"), la barra superior no lleva el botón de cuenta.
 ```
