@@ -1,0 +1,184 @@
+// Traducción directa de la Figura 7 del informe (diagrama de entidad-relación).
+// Tablas y columnas con los nombres del diagrama; modelos en PascalCase.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum EstadoPlan {
+  borrador
+  publicado
+  reemplazado
+
+  @@map("estado_plan")
+}
+
+enum TipoItem {
+  reemplazo
+  inspeccion
+
+  @@map("tipo_item")
+}
+
+enum OrigenIntervencion {
+  registrada
+  supuesta_pendiente
+  supuesta_confirmada
+  supuesta_a_verificar
+
+  @@map("origen_intervencion")
+}
+
+model Usuario {
+  id        String       @id @db.Uuid
+  email     String       @unique @db.VarChar(254)
+  fechaAlta DateTime     @default(now()) @map("fecha_alta") @db.Timestamptz(6)
+  roles     UsuarioRol[]
+  vehiculos Vehiculo[]
+
+  @@map("usuario")
+}
+
+model Rol {
+  id       Int          @id @db.SmallInt
+  nombre   String       @unique @db.VarChar(30)
+  usuarios UsuarioRol[]
+
+  @@map("rol")
+}
+
+model UsuarioRol {
+  usuarioId       String   @map("usuario_id") @db.Uuid
+  rolId           Int      @map("rol_id") @db.SmallInt
+  fechaAsignacion DateTime @default(now()) @map("fecha_asignacion") @db.Timestamptz(6)
+  usuario         Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  rol             Rol      @relation(fields: [rolId], references: [id])
+
+  @@id([usuarioId, rolId])
+  @@map("usuario_rol")
+}
+
+model Vehiculo {
+  id             String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  usuarioId      String               @map("usuario_id") @db.Uuid
+  modeloId       Int?                 @map("modelo_id")
+  marcaLibre     String?              @map("marca_libre") @db.VarChar(60)
+  modeloLibre    String?              @map("modelo_libre") @db.VarChar(80)
+  anio           Int                  @db.SmallInt
+  fechaAlta      DateTime             @default(now()) @map("fecha_alta") @db.Timestamptz(6)
+  usuario        Usuario              @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  modelo         Modelo?              @relation(fields: [modeloId], references: [id])
+  lecturas       LecturaKilometraje[]
+  intervenciones Intervencion[]
+
+  @@index([usuarioId])
+  @@map("vehiculo")
+}
+
+model LecturaKilometraje {
+  id          BigInt   @id @default(autoincrement())
+  vehiculoId  String   @map("vehiculo_id") @db.Uuid
+  kilometraje Int
+  fecha       DateTime @db.Date
+  vehiculo    Vehiculo @relation(fields: [vehiculoId], references: [id], onDelete: Cascade)
+
+  @@index([vehiculoId, kilometraje])
+  @@map("lectura_kilometraje")
+}
+
+model Marca {
+  id      Int      @id @default(autoincrement())
+  nombre  String   @unique @db.VarChar(60)
+  modelos Modelo[]
+
+  @@map("marca")
+}
+
+model Modelo {
+  id        Int                 @id @default(autoincrement())
+  marcaId   Int                 @map("marca_id")
+  nombre    String              @db.VarChar(80)
+  anioDesde Int                 @map("anio_desde") @db.SmallInt
+  anioHasta Int?                @map("anio_hasta") @db.SmallInt
+  marca     Marca               @relation(fields: [marcaId], references: [id])
+  planes    PlanMantenimiento[]
+  items     ItemMantenimiento[]
+  vehiculos Vehiculo[]
+
+  @@index([marcaId])
+  @@map("modelo")
+}
+
+model PlanMantenimiento {
+  id               Int             @id @default(autoincrement())
+  modeloId         Int             @map("modelo_id")
+  version          Int             @db.SmallInt
+  estado           EstadoPlan
+  fechaPublicacion DateTime?       @map("fecha_publicacion") @db.Timestamptz(6)
+  modelo           Modelo          @relation(fields: [modeloId], references: [id])
+  intervalos       IntervaloPlan[]
+
+  @@unique([modeloId, version])
+  @@map("plan_mantenimiento")
+}
+
+model ItemMantenimiento {
+  id             Int             @id @default(autoincrement())
+  modeloId       Int             @map("modelo_id")
+  nombre         String          @db.VarChar(80)
+  tipo           TipoItem
+  modelo         Modelo          @relation(fields: [modeloId], references: [id])
+  intervalos     IntervaloPlan[]
+  intervenciones Intervencion[]
+
+  @@unique([modeloId, nombre])
+  @@map("item_mantenimiento")
+}
+
+model IntervaloPlan {
+  planId         Int               @map("plan_id")
+  itemId         Int               @map("item_id")
+  intervaloKm    Int               @map("intervalo_km")
+  intervaloMeses Int?              @map("intervalo_meses") @db.SmallInt
+  plan           PlanMantenimiento @relation(fields: [planId], references: [id], onDelete: Cascade)
+  item           ItemMantenimiento @relation(fields: [itemId], references: [id])
+
+  @@id([planId, itemId])
+  @@map("intervalo_plan")
+}
+
+model Intervencion {
+  id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  vehiculoId       String             @map("vehiculo_id") @db.Uuid
+  itemId           Int?               @map("item_id")
+  descripcionLibre String?            @map("descripcion_libre") @db.VarChar(200)
+  origen           OrigenIntervencion
+  fecha            DateTime?          @db.Date
+  kilometraje      Int
+  taller           String?            @db.VarChar(120)
+  costo            Decimal?           @db.Decimal(12, 2)
+  fechaRegistro    DateTime           @default(now()) @map("fecha_registro") @db.Timestamptz(6)
+  vehiculo         Vehiculo           @relation(fields: [vehiculoId], references: [id], onDelete: Cascade)
+  item             ItemMantenimiento? @relation(fields: [itemId], references: [id])
+  comprobante      Comprobante?
+
+  @@index([vehiculoId, itemId])
+  @@map("intervencion")
+}
+
+model Comprobante {
+  id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  intervencionId String       @unique @map("intervencion_id") @db.Uuid
+  rutaArchivo    String       @map("ruta_archivo") @db.VarChar(255)
+  tipoMime       String       @map("tipo_mime") @db.VarChar(20)
+  tamanoBytes    Int          @map("tamano_bytes")
+  fechaCarga     DateTime     @default(now()) @map("fecha_carga") @db.Timestamptz(6)
+  intervencion   Intervencion @relation(fields: [intervencionId], references: [id], onDelete: Cascade)
+
+  @@map("comprobante")
+}

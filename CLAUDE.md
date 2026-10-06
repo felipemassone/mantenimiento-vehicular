@@ -1,3 +1,5 @@
+@AGENTS.md
+
 # Plataforma Web de Mantenimiento Programado Vehicular
 
 La especificación de cada iteración está en `docs/superpowers/specs/`. El informe académico (fuera de este repositorio) define los requerimientos, los casos de uso y el modelo de datos: si el código se aparta de él, se corrige uno de los dos y se deja constancia.
