@@ -165,6 +165,8 @@ Flujos:
 - **CU-03 Recuperación:** el enlace de un solo uso lleva a `/auth/confirmar` y de ahí a la pantalla de contraseña nueva.
 - **CU-04 Eliminar cuenta:** se reverifica la contraseña antes de eliminar, y la eliminación del registro de autenticación arrastra todo lo demás en cascada. La limpieza de Storage se agrega en la Iteración 3.
 
+Enlaces del correo (*ajuste del plan 1B*): sin SMTP propio, Supabase no permite editar las plantillas. Con las plantillas por defecto el enlace vuelve con un código PKCE (`?code=`), que solo se puede canjear en el mismo navegador donde se pidió; con SMTP propio se usan plantillas en español con `token_hash`, que funcionan en cualquier dispositivo. `/auth/confirmar` acepta los dos formatos, así que pasar de uno a otro no requiere cambios de código.
+
 Correo:
 - Durante el desarrollo, el servidor de Supabase que viene por defecto (solo envía a las direcciones del equipo del proyecto).
 - Al desplegar, SMTP propio con **Resend**, desde un subdominio del dominio de Felipe. Es condición de cierre de la iteración.
