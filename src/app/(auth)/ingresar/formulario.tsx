@@ -1,10 +1,10 @@
 "use client";
 
-import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
 import { Aviso } from "@/components/aviso";
 import { Campo } from "@/components/campo";
+import { CampoContrasena } from "@/components/campo-contrasena";
 import { Button } from "@/components/ui/button";
 import { ingresar, reenviarConfirmacion, type EstadoFormulario } from "../acciones";
 
@@ -13,7 +13,6 @@ type Props = { enlaceInvalido: boolean; cuentaEliminada: boolean };
 export function FormularioIngresar({ enlaceInvalido, cuentaEliminada }: Props) {
   const [estado, enviar, enviando] = useActionState<EstadoFormulario, FormData>(ingresar, {});
   const [reenvio, reenviar, reenviando] = useActionState<EstadoFormulario, FormData>(reenviarConfirmacion, {});
-  const [ver, setVer] = useState(false);
 
   return (
     <section>
@@ -47,24 +46,13 @@ export function FormularioIngresar({ enlaceInvalido, cuentaEliminada }: Props) {
           inputMode="email"
           error={estado.errores?.email}
         />
-        <div className="relative">
-          <Campo
-            id="contrasena"
-            etiqueta="Contraseña"
-            nombre="contrasena"
-            tipo={ver ? "text" : "password"}
-            autoComplete="current-password"
-            error={estado.errores?.contrasena}
-          />
-          <button
-            type="button"
-            onClick={() => setVer((v) => !v)}
-            aria-label={ver ? "Ocultar contraseña" : "Mostrar contraseña"}
-            className="absolute right-3 top-[38px] p-1 text-muted-foreground"
-          >
-            {ver ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
-          </button>
-        </div>
+        <CampoContrasena
+          id="contrasena"
+          etiqueta="Contraseña"
+          nombre="contrasena"
+          autoComplete="current-password"
+          error={estado.errores?.contrasena}
+        />
         <div className="text-right">
           <Link href="/recuperar" className="text-sm text-primary underline underline-offset-4">
             Olvidé mi contraseña

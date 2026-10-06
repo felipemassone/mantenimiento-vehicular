@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { Aviso } from "@/components/aviso";
 import { Campo } from "@/components/campo";
+import { CampoContrasena } from "@/components/campo-contrasena";
 import { Button } from "@/components/ui/button";
 import { crearCuenta, reenviarConfirmacion, type EstadoFormulario } from "../acciones";
 
@@ -50,11 +51,10 @@ export function FormularioCrearCuenta() {
           inputMode="email"
           error={estado.errores?.email}
         />
-        <Campo
+        <CampoContrasena
           id="contrasena"
           etiqueta="Contraseña"
           nombre="contrasena"
-          tipo="password"
           autoComplete="new-password"
           ayuda="Mínimo 8 caracteres."
           error={estado.errores?.contrasena}
