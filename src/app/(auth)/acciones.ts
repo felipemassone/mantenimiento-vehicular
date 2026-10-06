@@ -1,7 +1,15 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { erroresDe, esquemaCrearCuenta, esquemaIngresar, type ErroresCampo } from "@/dominio/cuenta";
+import { exigirClaims } from "@/datos/sesion";
+import {
+  erroresDe,
+  esquemaCrearCuenta,
+  esquemaIngresar,
+  esquemaNuevaContrasena,
+  esquemaPedirEnlace,
+  type ErroresCampo,
+} from "@/dominio/cuenta";
 import { createClient } from "@/lib/supabase/server";
 
 export type EstadoFormulario = {
@@ -58,6 +66,28 @@ export async function ingresar(_previo: EstadoFormulario, datos: FormData): Prom
     if (error.code === "invalid_credentials") return { mensaje: "El correo o la contraseña no son válidos." };
     return { mensaje: ERROR_GENERAL };
   }
+  redirect("/vehiculos");
+}
+
+/** CU-03 pasos 1–2. Responde igual exista o no la cuenta (2a). */
+export async function pedirEnlace(_previo: EstadoFormulario, datos: FormData): Promise<EstadoFormulario> {
+  const r = esquemaPedirEnlace.safeParse({ email: datos.get("email") });
+  if (!r.success) return { errores: erroresDe(r.error) };
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(r.data.email);
+  if (error?.code === "over_email_send_rate_limit") return { mensaje: DEMASIADOS_CORREOS };
+  return { enviadoA: r.data.email };
+}
+
+/** CU-03 paso 4. La sesión la abrió el enlace del correo en /auth/confirmar. */
+export async function guardarContrasena(_previo: EstadoFormulario, datos: FormData): Promise<EstadoFormulario> {
+  await exigirClaims();
+  const r = esquemaNuevaContrasena.safeParse({ contrasena: datos.get("contrasena"), repetida: datos.get("repetida") });
+  if (!r.success) return { errores: erroresDe(r.error) };
+  const supabase = await createClient();
+  const { error } = await supabase.auth.updateUser({ password: r.data.contrasena });
+  if (error?.code === "same_password") return { errores: { contrasena: "Elegí una contraseña distinta de la anterior." } };
+  if (error) return { mensaje: ERROR_GENERAL };
   redirect("/vehiculos");
 }
 
