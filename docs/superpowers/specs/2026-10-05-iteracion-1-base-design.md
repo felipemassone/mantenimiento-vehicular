@@ -117,22 +117,25 @@ Todas las tablas del esquema público tienen RLS activado. Políticas:
 |---|---|---|
 | `VEHICULO`, `LECTURA_KILOMETRAJE`, `INTERVENCION`, `COMPROBANTE` | Dueño (`usuario_id = auth.uid()`, o a través de su vehículo) | Dueño |
 | `MARCA`, `MODELO` | Cualquier usuario autenticado | Administrador de catálogo |
-| `PLAN_MANTENIMIENTO`, `INTERVALO_PLAN`, `ITEM_MANTENIMIENTO` | Autenticados: solo planes `publicado` y sus intervalos e ítems. Administrador de catálogo: todo | Administrador de catálogo |
+| `PLAN_MANTENIMIENTO`, `INTERVALO_PLAN` | Autenticados: solo planes `publicado` y sus intervalos. Administrador de catálogo: todo | Administrador de catálogo |
+| `ITEM_MANTENIMIENTO` | Cualquier usuario autenticado: el historial puede referenciar ítems de un plan reemplazado (*ajuste del plan 1A*) | Administrador de catálogo |
 | `USUARIO`, `USUARIO_ROL` | La propia cuenta | Nadie en esta iteración; RF-21 llega en la Iteración 3 |
 | `ROL` | Autenticados | Nadie |
 
 El rol se consulta con una función `SECURITY DEFINER` `tiene_rol(nombre)`, para que las políticas no se llamen a sí mismas en recursión.
 
-**Ejecución "en nombre del usuario".** Una extensión de Prisma Client (`datos/cliente-usuario.ts`) recibe los *claims* del usuario y envuelve cada operación en una transacción que:
-1. ejecuta `SET LOCAL ROLE authenticated`;
-2. ejecuta `SELECT set_config('request.jwt.claims', <claims JSON>, true)`;
-3. ejecuta la consulta.
+**Ejecución "en nombre del usuario".** La función `conUsuario(claims, fn)` (`datos/cliente-usuario.ts`) abre una transacción interactiva de Prisma que:
+1. ejecuta `SELECT set_config('request.jwt.claims', <claims JSON>, true)`;
+2. ejecuta `SET LOCAL ROLE authenticated`;
+3. ejecuta `fn`, que puede hacer varias consultas: todas quedan en la misma transacción, con RLS aplicado.
+
+Se prefirió a una extensión que envuelve cada consulta suelta porque las operaciones de varios pasos (bloquear el vehículo, validar y guardar la lectura) tienen que ser atómicas (apartado 4.2). *Ajuste del plan 1A.*
 
 Los *claims* salen **siempre** del token verificado en el servidor (`supabase.auth.getClaims()`, con las claves de firma asimétricas del proyecto). Nunca salen de datos enviados por el navegador.
 
 **Conexiones:**
 - En ejecución, el pooler de Supabase en modo transacción; `SET LOCAL` y `set_config(..., true)` duran exactamente la transacción.
-- Para las migraciones, la conexión directa.
+- Para las migraciones y el seed, el pooler en modo sesión. La conexión directa de Supabase solo funciona por IPv6.
 
 **Excepción privilegiada (`datos/privilegiado.ts`):** conexión sin RLS y clave secreta de Supabase. Se usa solo para:
 - el seed;
@@ -194,8 +197,8 @@ Para la tesis final quedan el CAPTCHA, la verificación en dos pasos y el bloque
 
 ## 7. Datos iniciales (seed)
 
-- Roles: `propietario`, `administrador_catalogo`, `administrador_tecnico`.
-- Marca Ford y modelo Ka (años según el manual), con su plan versión 1 `publicado`, transcripto de la tabla "Programa de mantenimiento Ford - KA" de `KaGarantia2014-02.pdf` (págs. impresas 22–27). Cada ítem lleva su tipo (reemplazo o inspección), sus kilómetros y, solo si el manual los publica, sus meses. **Ante contradicciones del manual** (por ejemplo, el refrigerante: 3 años o 90.000 km en la tabla de líquidos, 10 años o 105.000 km en el programa) **se usa el intervalo más conservador**, y queda un comentario en el seed con ambas fuentes.
+- Roles: los tres se insertan en la migración inicial, porque el trigger de alta los necesita (*ajuste del plan 1A*).
+- Marca Ford y modelo Ka, años 2014–2014 (lo que respalda el manual; ampliar solo con verificación), con su plan versión 1 `publicado`, transcripto de la tabla "Programa de mantenimiento Ford - KA" de `KaGarantia2014-02.pdf` (págs. impresas 22–27). Cada ítem lleva su tipo (reemplazo o inspección), sus kilómetros y, solo si el manual los publica, sus meses. **Ante contradicciones del manual** (por ejemplo, el refrigerante: 3 años o 90.000 km en la tabla de líquidos, 10 años o 105.000 km en el programa) **se usa el intervalo más conservador**, y queda un comentario en el seed con ambas fuentes.
 - Roles `administrador_catalogo` y `administrador_tecnico` asignados al correo de Felipe, tomado de una variable de entorno y nunca escrito en el código.
 
 El seed es idempotente: se puede ejecutar varias veces sin duplicar datos.
