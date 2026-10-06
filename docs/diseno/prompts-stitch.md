@@ -24,7 +24,7 @@ Pantalla de inicio de sesión de una app para llevar el mantenimiento del auto.
 
 Arriba a la izquierda, el logo: un cuadrado azul de 32 px con una llave inglesa en oro, y al lado el nombre "Libreta de service".
 Título alineado a la izquierda: "Ingresar".
-Campo "Correo electrónico" con el valor felipe.massone@gmail.com.
+Campo "Correo electrónico" con el valor propietario@example.com.
 Campo "Contraseña" con el texto oculto y un botón de ojo para mostrarla.
 Enlace "Olvidé mi contraseña", alineado a la derecha, debajo del campo.
 Botón principal a lo ancho: "Ingresar".
@@ -53,7 +53,7 @@ Debajo: "¿Ya tenés cuenta?" y el enlace "Ingresar".
 Estado 2, después de enviar el formulario:
 Ícono de sobre de línea, chico, alineado a la izquierda.
 Título: "Revisá tu correo".
-Texto: "Te mandamos un enlace a felipe.massone@gmail.com. Abrilo para activar tu cuenta. Si no lo ves, fijate en la carpeta de correo no deseado."
+Texto: "Te mandamos un enlace a propietario@example.com. Abrilo para activar tu cuenta. Si no lo ves, fijate en la carpeta de correo no deseado."
 Botón secundario: "Reenviar enlace".
 Enlace: "Volver a ingresar".
 
@@ -185,7 +185,7 @@ Dos estados, uno al lado del otro.
 
 Estado 1, pantalla "Mi cuenta":
 Barra superior con flecha "Volver" y el título "Mi cuenta".
-Bloque con el correo "felipe.massone@gmail.com" y debajo "Propietario" en texto secundario.
+Bloque con el correo "propietario@example.com" y debajo "Propietario" en texto secundario.
 Lista de filas blancas separadas por líneas:
 - "Cambiar a Administración" con una flecha (solo aparece si la cuenta tiene ese rol).
 - "Cerrar sesión".
@@ -207,7 +207,7 @@ Títulos y botones con mayúscula solo en la primera palabra ("Agregar vehículo
 Pantalla de escritorio de 1440 × 900 px, no de celular.
 Panel de administración del catálogo de mantenimiento, en escritorio.
 
-Barra lateral izquierda de 240 px con fondo gris cálido: arriba el logo "Libreta de service" con la palabra "Administración" debajo; secciones "Modelos" (activa, con una línea oro de 2 px a la izquierda) y "Usuarios" (en gris, con la etiqueta "Próximamente"). Al pie de la barra: el correo felipe.massone@gmail.com y el enlace "Ir a Mis vehículos".
+Barra lateral izquierda de 240 px con fondo gris cálido: arriba el logo "Libreta de service" con la palabra "Administración" debajo; secciones "Modelos" (activa, con una línea oro de 2 px a la izquierda) y "Usuarios" (en gris, con la etiqueta "Próximamente"). Al pie de la barra: el correo propietario@example.com y el enlace "Ir a Mis vehículos".
 
 Contenido:
 Título "Modelos" a la izquierda y, en la misma línea a la derecha, el botón principal "Nuevo modelo".
