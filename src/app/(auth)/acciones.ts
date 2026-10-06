@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { erroresDe, esquemaCrearCuenta, type ErroresCampo } from "@/dominio/cuenta";
+import { erroresDe, esquemaCrearCuenta, esquemaIngresar, type ErroresCampo } from "@/dominio/cuenta";
 import { createClient } from "@/lib/supabase/server";
 
 export type EstadoFormulario = {
@@ -42,6 +42,23 @@ export async function reenviarConfirmacion(_previo: EstadoFormulario, datos: For
   const { error } = await supabase.auth.resend({ type: "signup", email });
   if (error) return { enviadoA: email, mensaje: "No pudimos reenviar el enlace. Esperá unos minutos y volvé a intentar." };
   return { enviadoA: email, mensaje: "Te mandamos un enlace nuevo." };
+}
+
+/** CU-02: valida las credenciales y abre la sesión. */
+export async function ingresar(_previo: EstadoFormulario, datos: FormData): Promise<EstadoFormulario> {
+  const r = esquemaIngresar.safeParse({ email: datos.get("email"), contrasena: datos.get("contrasena") });
+  if (!r.success) return { errores: erroresDe(r.error) };
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signInWithPassword({ email: r.data.email, password: r.data.contrasena });
+  if (error) {
+    // 2b: cuenta sin confirmar
+    if (error.code === "email_not_confirmed") return { sinConfirmar: r.data.email };
+    // 2a: no se indica cuál de los dos datos es incorrecto
+    if (error.code === "invalid_credentials") return { mensaje: "El correo o la contraseña no son válidos." };
+    return { mensaje: ERROR_GENERAL };
+  }
+  redirect("/vehiculos");
 }
 
 /** CU-02: cierra la sesión y revoca el token de actualización (RF-02). */
