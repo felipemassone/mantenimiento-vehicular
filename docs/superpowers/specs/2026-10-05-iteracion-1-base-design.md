@@ -179,7 +179,7 @@ Para la tesis final quedan el CAPTCHA, la verificación en dos pasos y el bloque
 
 | Pantalla | Casos de uso | Comportamiento |
 |---|---|---|
-| Mis vehículos | — | Tarjetas con marca, modelo, año y último kilometraje. Con un solo vehículo, abre su ficha directamente |
+| Mis vehículos | — | Tarjetas con marca, modelo, año y último kilometraje. La lista se muestra siempre (*ajuste del plan 1C*: abrir la ficha directamente dejaba sin acceso a «Agregar vehículo») |
 | Agregar vehículo | CU-05 | Marca, luego modelo y luego año, solo entre modelos con plan publicado; el año se valida contra el rango del modelo; kilometraje no negativo, guardado como primera lectura. "Mi modelo no figura" (3a) pide marca y modelo a mano y avisa que no se calculará su mantenimiento |
 | Ficha del vehículo | CU-07, CU-08 | Datos, última lectura y su fecha, y las acciones "Actualizar kilometraje", "Editar" y "Eliminar". Una lectura menor se rechaza indicando el mínimo admitido. Reserva el espacio del estado de mantenimiento, que llega en la Iteración 2 |
 | Mi cuenta | CU-02, CU-04 | Cerrar sesión; eliminar la cuenta, con advertencia y contraseña |
