@@ -1,6 +1,7 @@
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { ClaimsUsuario } from "./cliente-usuario";
+import { rolesDelUsuario } from "./cuenta";
 
 /** Claims del token verificado en el servidor (firma asimétrica). Null si no hay sesión válida. */
 export async function obtenerClaims(): Promise<ClaimsUsuario | null> {
@@ -19,5 +20,12 @@ export async function obtenerClaims(): Promise<ClaimsUsuario | null> {
 export async function exigirClaims(): Promise<ClaimsUsuario> {
   const claims = await obtenerClaims();
   if (!claims) redirect("/ingresar");
+  return claims;
+}
+
+/** Además de RLS: sin el rol, la página no existe para ese usuario. */
+export async function exigirRol(rol: "administrador_catalogo" | "administrador_tecnico"): Promise<ClaimsUsuario> {
+  const claims = await exigirClaims();
+  if (!(await rolesDelUsuario(claims)).includes(rol)) notFound();
   return claims;
 }
