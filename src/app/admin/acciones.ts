@@ -64,7 +64,7 @@ export async function sacarItem(modeloId: number, itemId: number): Promise<void>
 }
 
 /** CU-17. */
-export async function publicar(modeloId: number, _previo: EstadoAdmin): Promise<EstadoAdmin> {
+export async function publicar(modeloId: number): Promise<EstadoAdmin> {
   const claims = await admin();
   const r = await publicarPlan(claims, modeloId);
   if (!r.ok) return { errores: r.errores };
