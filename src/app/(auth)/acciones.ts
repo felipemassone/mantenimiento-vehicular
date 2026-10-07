@@ -1,6 +1,5 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { exigirClaims } from "@/datos/sesion";
 import {
@@ -23,12 +22,14 @@ export type EstadoFormulario = {
 const ERROR_GENERAL = "No pudimos completar la operación. Intentá de nuevo en unos minutos.";
 const DEMASIADOS_CORREOS = "Mandamos demasiados correos. Esperá unos minutos y volvé a intentar.";
 
-/** Enlace de vuelta del correo. Su origen tiene que estar en las Redirect URLs de Supabase. */
-async function enlaceDeVuelta(destino: "/vehiculos" | "/recuperar/nueva"): Promise<string> {
-  const h = await headers();
-  const host = h.get("x-forwarded-host") ?? h.get("host");
-  const protocolo = h.get("x-forwarded-proto") ?? (host?.startsWith("localhost") ? "http" : "https");
-  return `${protocolo}://${host}/auth/confirmar?next=${encodeURIComponent(destino)}`;
+/**
+ * Enlace de vuelta del correo. El origen sale de la configuración del servidor (APP_ORIGIN),
+ * nunca de los encabezados de la solicitud, que se pueden falsificar (envenenamiento del enlace).
+ * Además tiene que figurar en las Redirect URLs de Supabase.
+ */
+function enlaceDeVuelta(destino: "/vehiculos" | "/recuperar/nueva"): string {
+  const origen = process.env.APP_ORIGIN ?? "http://localhost:3000";
+  return `${origen}/auth/confirmar?next=${encodeURIComponent(destino)}`;
 }
 
 /** CU-01: crea la cuenta pendiente y Supabase envía el enlace de confirmación. */
@@ -40,7 +41,7 @@ export async function crearCuenta(_previo: EstadoFormulario, datos: FormData): P
   const { data, error } = await supabase.auth.signUp({
     email: r.data.email,
     password: r.data.contrasena,
-    options: { emailRedirectTo: await enlaceDeVuelta("/vehiculos") },
+    options: { emailRedirectTo: enlaceDeVuelta("/vehiculos") },
   });
   if (error) {
     if (error.code === "weak_password") {
@@ -63,7 +64,7 @@ export async function reenviarConfirmacion(_previo: EstadoFormulario, datos: For
   const { error } = await supabase.auth.resend({
     type: "signup",
     email,
-    options: { emailRedirectTo: await enlaceDeVuelta("/vehiculos") },
+    options: { emailRedirectTo: enlaceDeVuelta("/vehiculos") },
   });
   if (error) return { enviadoA: email, mensaje: "No pudimos reenviar el enlace. Esperá unos minutos y volvé a intentar." };
   return { enviadoA: email, mensaje: "Te mandamos un enlace nuevo." };
@@ -92,7 +93,7 @@ export async function pedirEnlace(_previo: EstadoFormulario, datos: FormData): P
   if (!r.success) return { errores: erroresDe(r.error) };
   const supabase = await createClient();
   const { error } = await supabase.auth.resetPasswordForEmail(r.data.email, {
-    redirectTo: await enlaceDeVuelta("/recuperar/nueva"),
+    redirectTo: enlaceDeVuelta("/recuperar/nueva"),
   });
   if (error?.code === "over_email_send_rate_limit") return { mensaje: DEMASIADOS_CORREOS };
   return { enviadoA: r.data.email };
