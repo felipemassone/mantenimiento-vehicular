@@ -22,6 +22,7 @@
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -62,6 +63,7 @@
   --input: #8a8f98;
   /* Azul: la acción principal de cada pantalla */
   --primary: #0b3d91;
+  --primary-hover: #08306f;
   --primary-foreground: #ffffff;
   --ring: #0b3d91;
   /* Botón secundario: blanco con borde */
