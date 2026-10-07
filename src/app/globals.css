@@ -1,26 +1,95 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* Tokens del DESIGN.md ("Libreta de service"). Ningún componente escribe colores a mano.
+   Sin modo oscuro en esta fase: queda como nota para la tesis final. */
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-public-sans);
+  --font-heading: var(--font-public-sans);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-oro: var(--oro);
+  --color-estado-vencido: var(--estado-vencido);
+  --color-estado-vencido-fondo: var(--estado-vencido-fondo);
+  --color-estado-proximo: var(--estado-proximo);
+  --color-estado-proximo-fondo: var(--estado-proximo-fondo);
+  --color-estado-al-dia: var(--estado-al-dia);
+  --color-estado-al-dia-fondo: var(--estado-al-dia-fondo);
+  --color-estado-confirmar: var(--estado-confirmar);
+  --color-estado-confirmar-fondo: var(--estado-confirmar-fondo);
+  --color-estado-confirmar-borde: var(--estado-confirmar-borde);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --radius: 0.625rem;
+  /* Papel, tinta y línea */
+  --background: #f6f4ef;
+  --foreground: #1b2430;
+  --card: #ffffff;
+  --card-foreground: #1b2430;
+  --popover: #ffffff;
+  --popover-foreground: #1b2430;
+  --muted: #efece5;
+  --muted-foreground: #5a6472;
+  --accent: #efece5;
+  --accent-foreground: #1b2430;
+  --border: #e3dfd6;
+  --input: #8a8f98;
+  /* Azul: la acción principal de cada pantalla */
+  --primary: #0b3d91;
+  --primary-foreground: #ffffff;
+  --ring: #0b3d91;
+  /* Botón secundario: blanco con borde */
+  --secondary: #ffffff;
+  --secondary-foreground: #1b2430;
+  --destructive: #b42318;
+  /* Oro: solo detalle de identidad */
+  --oro: #f2b705;
+  /* Semáforo de estado */
+  --estado-vencido: #b42318;
+  --estado-vencido-fondo: #fee4e2;
+  --estado-proximo: #9a3412;
+  --estado-proximo-fondo: #ffedd5;
+  --estado-al-dia: #1e6b43;
+  --estado-al-dia-fondo: #e5f2ea;
+  --estado-confirmar: #4b3fa3;
+  --estado-confirmar-fondo: #edebfa;
+  --estado-confirmar-borde: #8c82d6;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
 }
