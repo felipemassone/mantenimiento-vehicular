@@ -13,7 +13,6 @@ type Props = {
   sufijo?: string;
   autoComplete?: string;
   inputMode?: "text" | "numeric" | "email";
-  lista?: string;
 };
 
 /** Etiqueta arriba, campo de 48 px, ayuda o error debajo (DESIGN.md, Components). */
@@ -28,7 +27,6 @@ export function Campo({
   sufijo,
   autoComplete,
   inputMode,
-  lista,
 }: Props) {
   const idAyuda = `${id}-ayuda`;
   return (
@@ -44,7 +42,6 @@ export function Campo({
           defaultValue={valorInicial}
           autoComplete={autoComplete}
           inputMode={inputMode}
-          list={lista}
           aria-invalid={error ? true : undefined}
           aria-describedby={error || ayuda ? idAyuda : undefined}
           className={cn(

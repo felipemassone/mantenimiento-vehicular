@@ -21,6 +21,7 @@
 
 - **Mockup 09, columna "Última modificación":** el modelo de datos no guarda fechas de modificación (Figura 7). Se reemplaza por "Publicado el", que sale de `PLAN_MANTENIMIENTO.fecha_publicacion`.
 - **Mockup 10, "Crear la marca":** la marca se escribe en un campo con sugerencias (`<datalist>`) de las existentes; si no existe, se crea al guardar.
+  - *Ajuste en la verificación manual:* el `<datalist>` mostraba la flecha sin desplegar (Chrome filtra por lo escrito; en el celular no anda). Se reemplazó por un `<select>` con las marcas existentes más "Otra marca…", que abre un campo de texto.
 - **"Descartar borrador"** solo aparece si hay una versión publicada: un modelo nuevo no tiene a qué volver.
 
 ## Mapa de archivos
