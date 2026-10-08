@@ -16,7 +16,18 @@ type Props = {
 };
 
 /** Etiqueta arriba, campo de 48 px, ayuda o error debajo (DESIGN.md, Components). */
-export function Campo({ id, etiqueta, nombre, tipo = "text", ayuda, error, valorInicial, sufijo, autoComplete, inputMode }: Props) {
+export function Campo({
+  id,
+  etiqueta,
+  nombre,
+  tipo = "text",
+  ayuda,
+  error,
+  valorInicial,
+  sufijo,
+  autoComplete,
+  inputMode,
+}: Props) {
   const idAyuda = `${id}-ayuda`;
   return (
     <div className="space-y-1.5">
