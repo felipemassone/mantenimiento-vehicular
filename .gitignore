@@ -44,3 +44,8 @@ next-env.d.ts
 /src/generated/
 # Excepción: plantilla de variables sin valores
 !.env.example
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/

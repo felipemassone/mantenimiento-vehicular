@@ -6,7 +6,7 @@
 
 **Architecture:** Tres partes. **A (código, un PR):** origen de la aplicación para las vistas previas, prueba de punta a punta, integración continua con secretos y la configuración del despliegue. **B (infraestructura, la hace Felipe guiado):** proyecto de Supabase de producción, Vercel, protección de `main` y retiro de las claves heredadas. **C (cierre, un segundo PR):** recorrido en producción, README y cambios para el informe. Ese segundo PR recorre el camino completo de RNF-13 (PR → CI en verde → merge → despliegue automático) y sirve de prueba.
 
-**Tech Stack:** Playwright 1.63, GitHub Actions, Vercel (plan Hobby), Resend (SMTP), Supabase (dos proyectos: desarrollo y producción), Prisma 7.
+**Tech Stack:** Playwright 1.64, GitHub Actions, Vercel (plan Hobby), Resend (SMTP), Supabase (dos proyectos: desarrollo y producción), Prisma 7.
 
 **Spec:** `docs/superpowers/specs/2026-10-05-iteracion-1-base-design.md`, apartados 2 (infraestructura), 5 (correo), 8 (pruebas), 9 (integración continua) y 11 (criterio de terminado) · Informe: 6.1.2 ("Infraestructura y despliegue") y Tabla 6 (RNF-11, RNF-13).
 
@@ -170,7 +170,7 @@ function enlaceDeVuelta(destino: "/vehiculos" | "/recuperar/nueva"): string {
 - Consumes: pantallas de los planes 1B y 1C (textos exactos más abajo); `/auth/confirmar` acepta `token_hash` y `type`.
 - Produces: `npm run test:e2e`.
 
-- [ ] **Step 1: Instalar** — `npm install -D @playwright/test@^1.63.0` y `npx playwright install chromium`.
+- [ ] **Step 1: Instalar** — `npm install -D @playwright/test@1.64.0` y `npx playwright install chromium`.
 
 - [ ] **Step 2: Script y `.gitignore`** — en `package.json`, `scripts`: `"test:e2e": "playwright test"`. Al final de `.gitignore`:
 
