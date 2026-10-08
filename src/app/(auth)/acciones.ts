@@ -10,6 +10,7 @@ import {
   esquemaPedirEnlace,
   type ErroresCampo,
 } from "@/dominio/cuenta";
+import { origenDeLaApp } from "@/lib/origen";
 import { createClient } from "@/lib/supabase/server";
 
 export type EstadoFormulario = {
@@ -23,13 +24,12 @@ const ERROR_GENERAL = "No pudimos completar la operación. Intentá de nuevo en 
 const DEMASIADOS_CORREOS = "Mandamos demasiados correos. Esperá unos minutos y volvé a intentar.";
 
 /**
- * Enlace de vuelta del correo. El origen sale de la configuración del servidor (APP_ORIGIN),
+ * Enlace de vuelta del correo. El origen sale de la configuración del servidor (origenDeLaApp),
  * nunca de los encabezados de la solicitud, que se pueden falsificar (envenenamiento del enlace).
  * Además tiene que figurar en las Redirect URLs de Supabase.
  */
 function enlaceDeVuelta(destino: "/vehiculos" | "/recuperar/nueva"): string {
-  const origen = process.env.APP_ORIGIN ?? "http://localhost:3000";
-  return `${origen}/auth/confirmar?next=${encodeURIComponent(destino)}`;
+  return `${origenDeLaApp()}/auth/confirmar?next=${encodeURIComponent(destino)}`;
 }
 
 /** CU-01: crea la cuenta pendiente y Supabase envía el enlace de confirmación. */
