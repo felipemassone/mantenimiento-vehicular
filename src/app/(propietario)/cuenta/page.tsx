@@ -29,14 +29,14 @@ export default async function CuentaPagina() {
       <ul className="mt-6 divide-y divide-border overflow-hidden rounded-[14px] border border-border bg-card">
         {esAdmin && (
           <li>
-            <Link href="/admin" className="flex h-12 items-center justify-between px-4">
+            <Link href="/admin" className="flex h-12 items-center justify-between px-4 transition-colors hover:bg-muted">
               Cambiar a Administración <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
             </Link>
           </li>
         )}
         <li>
           <form action={cerrarSesion}>
-            <button type="submit" className="flex h-12 w-full items-center px-4 text-left">
+            <button type="submit" className="flex h-12 w-full items-center px-4 text-left transition-colors hover:bg-muted">
               Cerrar sesión
             </button>
           </form>
