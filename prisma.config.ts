@@ -1,7 +1,8 @@
 import { config } from "dotenv";
 import { defineConfig, env } from "prisma/config";
 
-config({ path: ".env.local", quiet: true });
+// ARCHIVO_ENTORNO=.env.produccion.local apunta la CLI y el seed a producción.
+config({ path: process.env.ARCHIVO_ENTORNO ?? ".env.local", quiet: true });
 
 export default defineConfig({
   schema: "prisma/schema.prisma",

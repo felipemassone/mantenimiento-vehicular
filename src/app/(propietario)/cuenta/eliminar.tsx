@@ -22,7 +22,7 @@ export function EliminarCuenta() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button type="button" className="flex h-12 w-full items-center px-4 text-left text-destructive">
+        <button type="button" className="flex h-12 w-full items-center px-4 text-left text-destructive transition-colors hover:bg-destructive/5">
           Eliminar mi cuenta
         </button>
       </DialogTrigger>

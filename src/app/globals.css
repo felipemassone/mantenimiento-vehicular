@@ -94,4 +94,9 @@
   html {
     @apply font-sans;
   }
+  /* Tailwind 4 deja los botones con el cursor por defecto: se recupera la mano. */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
 }

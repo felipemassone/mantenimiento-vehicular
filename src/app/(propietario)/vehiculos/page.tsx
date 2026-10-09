@@ -26,7 +26,7 @@ export default async function VehiculosPagina() {
             <li key={v.id}>
               <Link
                 href={`/vehiculos/${v.id}`}
-                className="flex items-center justify-between rounded-[14px] border border-border bg-card p-4"
+                className="flex items-center justify-between rounded-[14px] border border-border bg-card p-4 transition-colors hover:bg-muted"
               >
                 <span>
                   <span className="block text-[17px] font-semibold">{v.nombre}</span>
