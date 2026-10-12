@@ -14,6 +14,12 @@ describe("origenDeLaApp", () => {
     );
   });
 
+  it("si Vercel no da la URL de la rama (despliegue desde la CLI), usa la del despliegue", () => {
+    expect(origenDeLaApp({ VERCEL_URL: "mantenimiento-vehicular-abc123.vercel.app" })).toBe(
+      "https://mantenimiento-vehicular-abc123.vercel.app",
+    );
+  });
+
   it("sin ninguna de las dos, es el servidor local", () => {
     expect(origenDeLaApp({})).toBe("http://localhost:3000");
   });

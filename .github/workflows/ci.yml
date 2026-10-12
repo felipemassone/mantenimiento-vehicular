@@ -76,3 +76,35 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
+
+  # RNF-13: producción se despliega desde acá, solo en main y con los tres checks en verde.
+  # Vercel compila con sus variables de Production; no depende de su conexión con GitHub.
+  desplegar:
+    needs: [verificar, integracion, e2e]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: produccion
+      url: https://mantenimiento-vehicular-ten.vercel.app
+    env:
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: npx --yes vercel@63 deploy --prod --yes --token "$VERCEL_TOKEN"
+
+  # Vista previa de cada rama (informe, 6.1.2), contra el proyecto de Supabase de desarrollo.
+  vista-previa:
+    needs: verificar
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          url=$(npx --yes vercel@63 deploy --yes --token "$VERCEL_TOKEN")
+          echo "### Vista previa: $url" >> "$GITHUB_STEP_SUMMARY"
