@@ -5,6 +5,13 @@ const alias = { "@": fileURLToPath(new URL("./src", import.meta.url)) };
 
 export default defineConfig({
   test: {
+    // RNF-12: el motor de reglas mantiene al menos 80 % de cobertura.
+    coverage: {
+      provider: "v8",
+      include: ["src/dominio/motor.ts"],
+      reporter: ["text", "html"],
+      thresholds: { lines: 80, branches: 80, functions: 80, statements: 80 },
+    },
     projects: [
       {
         resolve: { alias },
