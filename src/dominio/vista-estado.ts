@@ -20,12 +20,13 @@ export function chipsDeItem(item: Pick<ItemConEstado, "estado" | "incertidumbre"
   return item.incertidumbre ? [chip(item.estado), chip(item.incertidumbre)] : [chip(item.estado)];
 }
 
-/** Mockup 04: "1 vencido", "2 próximos", "1 a confirmar" o "Todo al día". */
-export function chipsDeResumen(r: { vencidos: number; proximos: number; inciertos: number }): Chip[] {
+/** Mockup 04: "1 vencido", "2 próximos", "1 a confirmar", "1 a verificar" o "Todo al día". */
+export function chipsDeResumen(r: { vencidos: number; proximos: number; aConfirmar: number; aVerificar: number }): Chip[] {
   const chips: Chip[] = [];
   if (r.vencidos > 0) chips.push({ tipo: "vencido", texto: contar(r.vencidos, "vencido", "vencidos") });
   if (r.proximos > 0) chips.push({ tipo: "proximo", texto: contar(r.proximos, "próximo", "próximos") });
-  if (r.inciertos > 0) chips.push({ tipo: "a_confirmar", texto: `${r.inciertos} a confirmar` });
+  if (r.aConfirmar > 0) chips.push({ tipo: "a_confirmar", texto: `${r.aConfirmar} a confirmar` });
+  if (r.aVerificar > 0) chips.push({ tipo: "verificar_en_taller", texto: `${r.aVerificar} a verificar` });
   return chips.length > 0 ? chips : [{ tipo: "al_dia", texto: "Todo al día" }];
 }
 

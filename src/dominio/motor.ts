@@ -164,12 +164,18 @@ export function supuestosFaltantes(
   });
 }
 
-/** Chips de la lista de vehículos (mockup 04). */
-export function resumen(items: ItemConEstado[]): { vencidos: number; proximos: number; inciertos: number } {
+/** Chips de la lista de vehículos (mockup 04). Los inciertos se cuentan por marca, como en la ficha. */
+export function resumen(items: ItemConEstado[]): {
+  vencidos: number;
+  proximos: number;
+  aConfirmar: number;
+  aVerificar: number;
+} {
   return {
     vencidos: items.filter((i) => i.estado === "vencido").length,
     proximos: items.filter((i) => i.estado === "proximo").length,
-    inciertos: items.filter((i) => i.incertidumbre !== null).length,
+    aConfirmar: items.filter((i) => i.incertidumbre === "a_confirmar").length,
+    aVerificar: items.filter((i) => i.incertidumbre === "verificar_en_taller").length,
   };
 }
 

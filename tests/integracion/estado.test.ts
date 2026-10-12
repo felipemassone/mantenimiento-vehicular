@@ -133,7 +133,7 @@ describe("resumenesDeMisVehiculos (mockup 04)", () => {
         valor: { id: string };
       };
       const r = await resumenesDeMisVehiculos(claimsDe(u));
-      expect(r[ka.valor.id]).toEqual({ vencidos: 0, proximos: 0, inciertos: 6 });
+      expect(r[ka.valor.id]).toEqual({ vencidos: 0, proximos: 0, aConfirmar: 6, aVerificar: 0 });
       expect(r[libre.valor.id]).toBeNull();
     } finally {
       await borrarUsuarioPrueba(u);

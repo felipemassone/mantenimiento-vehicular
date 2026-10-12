@@ -101,11 +101,11 @@ calcularEstado(entrada: {
 
 supuestosFaltantes(entrada: { items; intervenciones; kmAlta }): { itemId: number; km: number }[]
 
-resumen(items: ItemConEstado[]): { vencidos: number; proximos: number; inciertos: number }
+resumen(items: ItemConEstado[]): { vencidos: number; proximos: number; aConfirmar: number; aVerificar: number }
 cambiosDeEstado(antes: ItemConEstado[], despues: ItemConEstado[]): { itemId: number; nombre: string; estado: Estado }[]
 ```
 
-`ItemConEstado` lleva estado, marca de incertidumbre, km y fecha de vencimiento, margen y el texto de la fila. Es el módulo sujeto al 80 % de cobertura (RNF-12). En `resumen`, `inciertos` cuenta los ítems con marca de incertidumbre, sea cual sea su estado (un supuesto vencido suma en vencidos y en inciertos, como en el mockup 04).
+`ItemConEstado` lleva estado, marca de incertidumbre, km y fecha de vencimiento, margen y el texto de la fila. Es el módulo sujeto al 80 % de cobertura (RNF-12). En `resumen`, `aConfirmar` y `aVerificar` cuentan los ítems con cada marca de incertidumbre, sea cual sea su estado (un supuesto vencido suma en vencidos y en su marca, como en el mockup 04). Van separados para que la lista diga lo mismo que la ficha: un ítem respondido con "No lo sé" es "a verificar", no "a confirmar".
 
 ### 4.2 Datos: `src/datos/estado.ts`
 
@@ -129,7 +129,7 @@ cambiosDeEstado(antes: ItemConEstado[], despues: ItemConEstado[]): { itemId: num
 
 | Pantalla | Diseño | Comportamiento |
 |---|---|---|
-| Mis vehículos | 04 | Cada tarjeta suma chips de resumen ("1 vencido", "1 próximo", "1 a confirmar") o "Todo al día". Los vehículos fuera del catálogo no llevan chips |
+| Mis vehículos | 04 | Cada tarjeta suma chips de resumen ("1 vencido", "1 próximo", "1 a confirmar", "1 a verificar") o "Todo al día". Los vehículos fuera del catálogo no llevan chips |
 | Ficha del vehículo | 06, 12, 14 | La sección "Mantenimiento" reemplaza el texto "Pronto vas a ver acá…". Línea "N ítems a confirmar…" si los hay. Las filas inciertas tienen borde punteado y el enlace "Confirmar dato". Sin el botón "Registrar trabajo" (CU-10, Iteración 3) |
 | Aviso de cambios (CU-08 paso 7) | 14 | Después de actualizar el kilometraje: "Con 75.300 km cambió el estado de N ítems: …". Las filas que cambiaron llevan la línea oro de 2 px a la izquierda (el indicador de fila seleccionada que admite el DESIGN.md). Se ve solo en esa respuesta, no al volver a entrar |
 | Confirmar datos (CU-06) | 13 | `/vehiculos/[id]/confirmar`. Una fila abierta a la vez: fecha + "Sí, se hizo"; "Fue en otro momento" (km + fecha); "No lo sé". Desde el alta, texto de introducción y "Más tarde" al pie |

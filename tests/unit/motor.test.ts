@@ -295,10 +295,10 @@ describe("supuestosFaltantes", () => {
 });
 
 describe("resumen", () => {
-  it("cuenta vencidos, próximos e inciertos (un supuesto vencido suma en los dos)", () => {
-    expect(resumen(calcularEstado(mezcla()))).toEqual({ vencidos: 1, proximos: 1, inciertos: 2 });
+  it("cuenta vencidos, próximos, a confirmar y a verificar (un supuesto vencido suma en los dos)", () => {
+    expect(resumen(calcularEstado(mezcla()))).toEqual({ vencidos: 1, proximos: 1, aConfirmar: 1, aVerificar: 1 });
     const supuestoVencido = calcularEstado(entrada({ kmAlta: 62_400, kmActual: 75_300, hoy: d("2026-10-12") }));
-    expect(resumen(supuestoVencido)).toEqual({ vencidos: 1, proximos: 0, inciertos: 1 });
+    expect(resumen(supuestoVencido)).toEqual({ vencidos: 1, proximos: 0, aConfirmar: 1, aVerificar: 0 });
   });
 });
 

@@ -23,18 +23,27 @@ describe("chipsDeItem (spec 3.3)", () => {
 
 describe("chipsDeResumen (mockup 04)", () => {
   it("cuenta con singular y plural", () => {
-    expect(chipsDeResumen({ vencidos: 1, proximos: 2, inciertos: 1 })).toEqual([
+    expect(chipsDeResumen({ vencidos: 1, proximos: 2, aConfirmar: 1, aVerificar: 0 })).toEqual([
       { tipo: "vencido", texto: "1 vencido" },
       { tipo: "proximo", texto: "2 próximos" },
       { tipo: "a_confirmar", texto: "1 a confirmar" },
     ]);
-    expect(chipsDeResumen({ vencidos: 3, proximos: 1, inciertos: 0 })).toEqual([
+    expect(chipsDeResumen({ vencidos: 3, proximos: 1, aConfirmar: 0, aVerificar: 0 })).toEqual([
       { tipo: "vencido", texto: "3 vencidos" },
       { tipo: "proximo", texto: "1 próximo" },
     ]);
   });
+  it("los que el dueño no supo responder cuentan aparte, como en la ficha", () => {
+    expect(chipsDeResumen({ vencidos: 0, proximos: 0, aConfirmar: 0, aVerificar: 2 })).toEqual([
+      { tipo: "verificar_en_taller", texto: "2 a verificar" },
+    ]);
+    expect(chipsDeResumen({ vencidos: 0, proximos: 0, aConfirmar: 3, aVerificar: 1 })).toEqual([
+      { tipo: "a_confirmar", texto: "3 a confirmar" },
+      { tipo: "verificar_en_taller", texto: "1 a verificar" },
+    ]);
+  });
   it("sin nada pendiente dice Todo al día", () => {
-    expect(chipsDeResumen({ vencidos: 0, proximos: 0, inciertos: 0 })).toEqual([{ tipo: "al_dia", texto: "Todo al día" }]);
+    expect(chipsDeResumen({ vencidos: 0, proximos: 0, aConfirmar: 0, aVerificar: 0 })).toEqual([{ tipo: "al_dia", texto: "Todo al día" }]);
   });
 });
 
