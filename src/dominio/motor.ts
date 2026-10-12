@@ -148,3 +148,33 @@ function porUrgencia(a: ItemConEstado, b: ItemConEstado): number {
 export function calcularEstado(entrada: EntradaMotor): ItemConEstado[] {
   return entrada.items.map((item) => evaluar(item, entrada)).sort(porUrgencia);
 }
+
+/** Spec 4.2: supuestos que el cálculo tiene que guardar (ítems sin ninguna ejecución). */
+export function supuestosFaltantes(
+  entrada: Pick<EntradaMotor, "items" | "intervenciones" | "kmAlta">,
+): { itemId: number; km: number }[] {
+  return entrada.items.flatMap((item) => {
+    if (entrada.intervenciones.some((e) => e.itemId === item.itemId)) return [];
+    const km = kmSupuesto(item.km, entrada.kmAlta);
+    return km === null ? [] : [{ itemId: item.itemId, km }];
+  });
+}
+
+/** Chips de la lista de vehículos (mockup 04). */
+export function resumen(items: ItemConEstado[]): { vencidos: number; proximos: number; inciertos: number } {
+  return {
+    vencidos: items.filter((i) => i.estado === "vencido").length,
+    proximos: items.filter((i) => i.estado === "proximo").length,
+    inciertos: items.filter((i) => i.incertidumbre !== null).length,
+  };
+}
+
+export type Cambio = { itemId: number; nombre: string; estado: Estado };
+
+/** CU-08 paso 7: ítems cuyo estado cambió entre dos cálculos, en el orden del segundo. */
+export function cambiosDeEstado(antes: ItemConEstado[], despues: ItemConEstado[]): Cambio[] {
+  const previo = new Map(antes.map((i) => [i.itemId, i.estado]));
+  return despues
+    .filter((i) => previo.get(i.itemId) !== i.estado)
+    .map(({ itemId, nombre, estado }) => ({ itemId, nombre, estado }));
+}

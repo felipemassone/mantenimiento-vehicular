@@ -25,7 +25,8 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run lint
-      - run: npm test
+      # Unitarias con el umbral de cobertura del motor (RNF-12)
+      - run: npm run test:cobertura
 
   # Integración y punta a punta usan el proyecto de Supabase de desarrollo.
   # Un PR desde un fork no recibe secretos: estos jobs se saltean.

@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { calcularEstado, kmSupuesto, sumarMeses, type EntradaMotor, type ItemDelPlan } from "@/dominio/motor";
+import {
+  calcularEstado,
+  cambiosDeEstado,
+  kmSupuesto,
+  resumen,
+  sumarMeses,
+  supuestosFaltantes,
+  type EntradaMotor,
+  type ItemDelPlan,
+} from "@/dominio/motor";
 
 const d = (s: string) => new Date(`${s}T00:00:00Z`);
 
@@ -235,5 +244,51 @@ describe("calcularEstado: orden por urgencia (RF-12)", () => {
   it("con el mismo margen, ordena por nombre", () => {
     const r = calcularEstado(entrada({ items: [pastillas, aceite], kmActual: 10_000 }));
     expect(r.map((i) => i.nombre)).toEqual(["Aceite y filtro de aceite", "Pastillas de freno delanteras"]);
+  });
+});
+
+describe("supuestosFaltantes", () => {
+  it("devuelve los supuestos de los ítems sin ninguna ejecución cuyo intervalo supera el alta", () => {
+    expect(
+      supuestosFaltantes({
+        items: [aceite, liquidoFrenos, correa],
+        intervenciones: [{ itemId: 2, origen: "registrada", km: 40_000, fecha: d("2025-05-01") }],
+        kmAlta: 62_400,
+      }),
+    ).toEqual([{ itemId: 1, km: 60_000 }]);
+  });
+
+  it("no repite un supuesto ya guardado", () => {
+    expect(
+      supuestosFaltantes({
+        items: [aceite],
+        intervenciones: [{ itemId: 1, origen: "supuesta_pendiente", km: 60_000, fecha: null }],
+        kmAlta: 62_400,
+      }),
+    ).toEqual([]);
+  });
+});
+
+describe("resumen", () => {
+  it("cuenta vencidos, próximos e inciertos (un supuesto vencido suma en los dos)", () => {
+    expect(resumen(calcularEstado(mezcla()))).toEqual({ vencidos: 1, proximos: 1, inciertos: 2 });
+    const supuestoVencido = calcularEstado(entrada({ kmAlta: 62_400, kmActual: 75_300, hoy: d("2026-10-12") }));
+    expect(resumen(supuestoVencido)).toEqual({ vencidos: 1, proximos: 0, inciertos: 1 });
+  });
+});
+
+describe("cambiosDeEstado (CU-08 paso 7)", () => {
+  it("devuelve solo los ítems cuyo estado cambió, con el estado nuevo", () => {
+    const base = { items: [aceite, correa], kmAlta: 62_400, hoy: d("2026-10-12") };
+    const antes = calcularEstado(entrada({ ...base, kmActual: 74_800 }));
+    const despues = calcularEstado(entrada({ ...base, kmActual: 75_300 }));
+    expect(cambiosDeEstado(antes, despues)).toEqual([
+      { itemId: 1, nombre: "Aceite y filtro de aceite", estado: "vencido" },
+    ]);
+  });
+
+  it("sin cambios, la lista queda vacía", () => {
+    const e = calcularEstado(mezcla());
+    expect(cambiosDeEstado(e, e)).toEqual([]);
   });
 });
