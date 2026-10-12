@@ -3,12 +3,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Aviso } from "@/components/aviso";
+import { ChipEstado } from "@/components/chip-estado";
 import { Button } from "@/components/ui/button";
+import { estadoDelVehiculo } from "@/datos/estado";
 import { exigirClaims } from "@/datos/sesion";
 import { obtenerVehiculo } from "@/datos/vehiculos";
 import { formatearFecha } from "@/dominio/fechas";
 import { formatearKm } from "@/dominio/kilometraje";
-import { formatearIntervalo } from "@/dominio/vehiculo";
+import { chipsDeItem, textoInciertos } from "@/dominio/vista-estado";
+import { cn } from "@/lib/utils";
 import { EliminarVehiculo } from "./eliminar";
 import { ActualizarKilometraje } from "./kilometraje";
 
@@ -17,7 +20,7 @@ export const metadata: Metadata = { title: "Ficha del vehículo · Libreta de se
 export default async function FichaVehiculoPagina({ params }: PageProps<"/vehiculos/[id]">) {
   const { id } = await params;
   const claims = await exigirClaims();
-  const v = await obtenerVehiculo(claims, id);
+  const [v, estado] = await Promise.all([obtenerVehiculo(claims, id), estadoDelVehiculo(claims, id)]);
   if (!v) notFound();
 
   const km = v.kilometraje === null ? "sin lecturas" : `${formatearKm(v.kilometraje)} km`;
@@ -43,19 +46,31 @@ export default async function FichaVehiculoPagina({ params }: PageProps<"/vehicu
         </div>
       </div>
 
-      <h2 className="mt-8 text-[17px] font-semibold">Plan del fabricante</h2>
-      {v.plan ? (
+      <h2 className="mt-8 text-[17px] font-semibold">Mantenimiento</h2>
+      {estado?.catalogado ? (
         <>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Pronto vas a ver acá el estado de cada ítem: al día, próximo o vencido.
-          </p>
-          <ul className="mt-3 divide-y divide-border overflow-hidden rounded-[14px] border border-border bg-card">
-            {v.plan.items.map((i) => (
-              <li key={i.nombre} className="px-4 py-3">
-                <p className="font-medium">{i.nombre}</p>
-                <p className="text-sm text-muted-foreground tabular-nums">
-                  {i.tipo === "reemplazo" ? "Cambiar" : "Revisar"} · {formatearIntervalo(i.km, i.meses)}
-                </p>
+          {textoInciertos(estado.items) && (
+            <p className="mt-1 text-sm text-muted-foreground">{textoInciertos(estado.items)}</p>
+          )}
+          {/* CU-09 / RF-12: ya vienen ordenados por urgencia desde el motor. */}
+          <ul className="mt-3 space-y-2">
+            {estado.items.map((i) => (
+              <li
+                key={i.itemId}
+                className={cn(
+                  "flex items-start justify-between gap-3 rounded-[14px] border bg-card p-4",
+                  i.incertidumbre ? "border-dashed border-estado-confirmar-borde" : "border-border",
+                )}
+              >
+                <div className="min-w-0">
+                  <p className="font-medium">{i.nombre}</p>
+                  <p className="text-sm text-muted-foreground tabular-nums">{i.detalle}</p>
+                </div>
+                <div className="flex shrink-0 flex-col items-end gap-1">
+                  {chipsDeItem(i).map((c) => (
+                    <ChipEstado key={c.tipo} {...c} />
+                  ))}
+                </div>
               </li>
             ))}
           </ul>

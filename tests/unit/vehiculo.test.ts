@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
   aniosDelModelo,
-  formatearIntervalo,
   nombreVehiculo,
   parsearVehiculo,
   validarAnioDelModelo,
@@ -71,12 +70,5 @@ describe("nombreVehiculo", () => {
   it("usa el catálogo o los datos libres", () => {
     expect(nombreVehiculo({ marca: "Ford", modelo: "Ka" })).toBe("Ford Ka");
     expect(nombreVehiculo({ marcaLibre: "Peugeot", modeloLibre: "208" })).toBe("Peugeot 208");
-  });
-});
-
-describe("formatearIntervalo", () => {
-  it("km y meses, lo que ocurra primero", () => {
-    expect(formatearIntervalo(15000, 12)).toBe("cada 15.000 km o 12 meses");
-    expect(formatearIntervalo(90000, null)).toBe("cada 90.000 km");
   });
 });
