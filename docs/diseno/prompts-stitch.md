@@ -1,4 +1,4 @@
-# Prompts para Google Stitch — Iteración 1
+# Prompts para Google Stitch
 
 ## Cómo usarlos
 
@@ -286,6 +286,75 @@ Barra superior a lo ancho: logo "Libreta de service" a la izquierda; a la derech
 El contenido es una columna central de 720 px sobre el fondo papel, con el mismo contenido que en el celular: la ficha del Ford Ka 2014 con el kilometraje "62.400 km", "Actualizado el 14/03/2026", el botón "Actualizar kilometraje" y la sección "Mantenimiento" con las cinco filas de ítems y sus chips (Vencido, Próximo, A confirmar con borde punteado, Al día, Al día), con los mismos textos que la ficha del celular.
 El botón "Registrar trabajo" queda alineado a la derecha, al final de la lista.
 Los laterales quedan vacíos: sin paneles extra, sin gráficos.
+
+Colores exactos: fondo #F6F4EF, texto #1B2430, botón principal y enlaces #0B3D91, oro #F2B705 solo en el ícono del logo. Sin degradados, ilustraciones, fotos ni emojis.
+Títulos y botones con mayúscula solo en la primera palabra ("Agregar vehículo", no "Agregar Vehículo"). No agregues textos, avisos, subtítulos ni notas al pie que no estén en este pedido. En las pantallas internas (las que tienen flecha "Volver"), la barra superior no lleva el botón de cuenta.
+```
+
+---
+
+# Iteración 2 — Estado de mantenimiento
+
+Van en el proyecto **Aplicación** (celular), con el mismo DESIGN.md. Las pantallas 4, 6 y 12 de la Iteración 1 ya muestran la lista de vehículos con sus chips y la ficha con el semáforo; estas dos completan lo que faltaba.
+
+**Datos de estas pantallas.** Un Ford Ka cargado con 62.400 km y sin trabajos registrados recibe un supuesto en cada ítem cuyo intervalo es menor que ese kilometraje (RF-09): los de 15.000 km quedan supuestos a los 60.000 y los de 45.000, a los 45.000. Los de 90.000 no se suponen. (En la pantalla 6 los ítems de 15.000 aparecen con datos reales porque se suponen trabajos ya registrados.)
+
+## 13. Confirmar supuestos — Aplicación
+
+```
+Dos estados de la misma pantalla, uno al lado del otro.
+
+Barra superior con flecha "Volver" y el título "Confirmar datos".
+
+Estado 1, recién agregado el vehículo:
+Texto: "Como cargaste el Ford Ka con 62.400 km, supusimos cuándo se hizo por última vez cada uno de estos trabajos. Confirmalo si lo sabés: así el cálculo usa también las fechas."
+Lista de filas blancas separadas por líneas. Cada fila tiene el nombre del trabajo y debajo, en texto secundario, el supuesto:
+- "Aceite y filtro de aceite" — "Supuesto a los 60.000 km".
+- "Pastillas de freno delanteras" — "Supuesto a los 60.000 km".
+- "Amortiguadores" — "Supuesto a los 60.000 km".
+- "Neumáticos" — "Supuesto a los 60.000 km".
+- "Líquido de frenos" — "Supuesto a los 45.000 km".
+- "Cintas de freno traseras" — "Supuesto a los 45.000 km".
+La primera fila está abierta y muestra, debajo del supuesto:
+Campo de fecha "¿Cuándo se hizo?" con el valor "10/03/2026".
+Botón principal "Sí, se hizo".
+Dos enlaces en una línea: "Fue en otro momento" y "No lo sé".
+Al pie de la pantalla, botón secundario a lo ancho: "Más tarde".
+
+Estado 2, la misma fila después de tocar "Fue en otro momento":
+Nombre "Aceite y filtro de aceite" y debajo "Supuesto a los 60.000 km".
+Campo "Kilometraje" con el valor "63.000" y el sufijo "km". El campo muestra un error: borde rojo y el mensaje "No puede superar 62.400 km, la lectura actual."
+Campo de fecha "Fecha" con el valor "02/05/2026".
+Botón principal "Guardar" y enlace "Cancelar".
+Las filas que siguen se ven cerradas, como en el estado 1.
+
+Colores exactos: fondo #F6F4EF, texto #1B2430, botón principal y enlaces #0B3D91, oro #F2B705 solo en el ícono del logo. Sin degradados, ilustraciones, fotos ni emojis.
+Títulos y botones con mayúscula solo en la primera palabra ("Agregar vehículo", no "Agregar Vehículo"). No agregues textos, avisos, subtítulos ni notas al pie que no estén en este pedido. En las pantallas internas (las que tienen flecha "Volver"), la barra superior no lleva el botón de cuenta.
+```
+
+## 14. Ficha después de actualizar el kilometraje — Aplicación
+
+```
+Ficha de un vehículo justo después de actualizar el kilometraje.
+
+Barra superior con flecha "Volver", el título "Ford Ka 2014" y a la derecha un botón de tres puntos.
+
+Bloque superior sobre el fondo, sin tarjeta:
+En texto secundario: "Kilometraje actual".
+El kilometraje en grande: "75.300 km".
+Debajo, en texto secundario: "Actualizado el 12/10/2026".
+Botón secundario: "Actualizar kilometraje".
+
+Aviso en línea con borde y fondo azul suave y un ícono de información: "Con 75.300 km cambió el estado de 1 ítem: Aceite y filtro de aceite, ahora vencido."
+
+Sección "Mantenimiento", ordenada de lo más urgente a lo menos urgente. Cada ítem es una fila blanca con el nombre, debajo la acción y el dato, y a la derecha el chip de estado:
+- "Aceite y filtro de aceite" — "Cambiar · venció a los 75.000 km" — chip "Vencido". Esta fila lleva a la izquierda una línea vertical de 2 px color oro, porque es la que cambió.
+- "Neumáticos" — "Revisar · faltan 900 km o vence el 02/05/2027" — chip "Próximo".
+- "Líquido de frenos" — "Cambiar · supuesto a los 45.000 km" — chip violeta "Verificar en taller". Esta fila tiene borde punteado violeta y, debajo, el enlace "Confirmar dato".
+- "Correa auxiliar" — "Cambiar · faltan 14.700 km o vence el 14/03/2031" — chip "Al día".
+- "Líquido de enfriamiento" — "Cambiar · faltan 14.700 km o vence el 14/03/2029" — chip "Al día".
+
+Sin botón al pie.
 
 Colores exactos: fondo #F6F4EF, texto #1B2430, botón principal y enlaces #0B3D91, oro #F2B705 solo en el ícono del logo. Sin degradados, ilustraciones, fotos ni emojis.
 Títulos y botones con mayúscula solo en la primera palabra ("Agregar vehículo", no "Agregar Vehículo"). No agregues textos, avisos, subtítulos ni notas al pie que no estén en este pedido. En las pantallas internas (las que tienen flecha "Volver"), la barra superior no lleva el botón de cuenta.
