@@ -7,7 +7,7 @@ import {
   resumenesDeMisVehiculos,
   supuestosDelVehiculo,
 } from "@/datos/estado";
-import { crearVehiculo } from "@/datos/vehiculos";
+import { crearVehiculo, registrarLectura } from "@/datos/vehiculos";
 import { prismaPrivilegiado as db } from "@/datos/privilegiado";
 import { sembrar } from "../../prisma/seed";
 import { borrarUsuarioPrueba, claimsDe, crearUsuarioPrueba } from "./ayudantes";
@@ -211,5 +211,34 @@ describe("confirmación de supuestos (CU-06)", () => {
       "supuesta_pendiente",
     );
     expect(await supuestosDelVehiculo(claimsDe(b), id)).toBeNull();
+  });
+});
+
+describe("alta y kilometraje con el motor (CU-05 paso 6, CU-08 paso 7)", () => {
+  it("el alta avisa si creó supuestos", async () => {
+    const usado = await crearVehiculo(claimsDe(a), { tipo: "catalogo", modeloId: kaId, anio: 2014 }, 62_400);
+    const nuevo = await crearVehiculo(claimsDe(a), { tipo: "catalogo", modeloId: kaId, anio: 2014 }, 500);
+    expect(usado.ok && usado.valor.conSupuestos).toBe(true);
+    expect(nuevo.ok && nuevo.valor.conSupuestos).toBe(false);
+    if (usado.ok) expect(await supuestosDe(usado.valor.id)).toBe(6);
+  });
+
+  it("actualizar el kilometraje devuelve los ítems que cambiaron de estado", async () => {
+    const id = await nuevoKa(a, 62_400);
+    const r = await registrarLectura(claimsDe(a), id, 75_300);
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.valor.cambios.map((c) => c.nombre).sort()).toEqual(
+      ["Aceite y filtro de aceite", "Amortiguadores", "Neumáticos", "Pastillas de freno delanteras"].sort(),
+    );
+    expect(r.valor.cambios.every((c) => c.estado === "vencido")).toBe(true);
+  });
+
+  it("una lectura menor sigue rechazándose con el mensaje de la aplicación", async () => {
+    const id = await nuevoKa(a, 62_400);
+    expect(await registrarLectura(claimsDe(a), id, 62_000)).toEqual({
+      ok: false,
+      errores: { kilometraje: "No puede ser menor a 62.400 km, la última lectura." },
+    });
   });
 });

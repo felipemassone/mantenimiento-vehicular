@@ -180,7 +180,7 @@ GitHub desactiva los workflows programados de un repositorio público tras 60 d�
 2. En producción, la ficha del Ka de Felipe muestra el estado de cada ítem ordenado por urgencia, y la confirmación de supuestos funciona desde el celular.
 3. El promedio de 20 consultas de estado en producción es menor a 500 ms medido en el servidor.
 4. El respaldo semanal corrió al menos una vez (a mano) y su archivo se verificó.
-5. El merge a `main` despliega solo en Vercel (pendiente de comprobar desde la reconexión con GitHub del 12/10).
+5. El merge a `main` despliega solo en Vercel (comprobado el 12/10/2026: el job `desplegar` del CI despliega producción después de los tres checks; la conexión Git de Vercel quedó apagada).
 6. Lo que cambie respecto del informe queda en `docs/cambios-para-el-informe.md`.
 
 ## 10. Fuera del alcance de esta iteración
