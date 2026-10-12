@@ -1,8 +1,8 @@
-import { Plus } from "lucide-react";
+import { ChevronRight, Plus } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { listarModelos } from "@/datos/catalogo";
+import { listarModelos, type FilaModelo } from "@/datos/catalogo";
 import { exigirRol } from "@/datos/sesion";
 import { formatearFecha } from "@/dominio/fechas";
 
@@ -22,8 +22,31 @@ export default async function ModelosPagina() {
           </Link>
         </Button>
       </div>
-      <div className="mt-6 overflow-x-auto rounded-[14px] border border-border bg-card">
-        <table className="w-full min-w-[640px] text-sm">
+      {/* En el celular, una tarjeta por modelo: la tabla escondía "Ver plan" fuera de la pantalla. */}
+      <ul className="mt-6 space-y-3 md:hidden">
+        {modelos.map((m) => (
+          <li key={m.id}>
+            <Link
+              href={`/admin/modelos/${m.id}`}
+              className="flex items-center justify-between gap-3 rounded-[14px] border border-border bg-card p-4 transition-colors hover:bg-muted"
+            >
+              <span className="min-w-0 space-y-1.5">
+                <span className="block text-[17px] font-semibold">
+                  {m.marca} {m.nombre}
+                </span>
+                <span className="block text-sm text-muted-foreground tabular-nums">
+                  {anios(m)} · {m.items} {m.items === 1 ? "ítem" : "ítems"}
+                  {m.publicado?.fecha && ` · publicado el ${formatearFecha(m.publicado.fecha)}`}
+                </span>
+                <EstadoPlan modelo={m} />
+              </span>
+              <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+            </Link>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-6 hidden overflow-x-auto rounded-[14px] border border-border bg-card md:block">
+        <table className="w-full text-sm">
           <thead className="text-left text-muted-foreground">
             <tr className="border-b border-border">
               <th className="px-4 py-3 font-medium">Marca</th>
@@ -40,22 +63,9 @@ export default async function ModelosPagina() {
               <tr key={m.id}>
                 <td className="whitespace-nowrap px-4 py-3">{m.marca}</td>
                 <td className="whitespace-nowrap px-4 py-3">{m.nombre}</td>
-                <td className="whitespace-nowrap px-4 py-3 tabular-nums">
-                  {m.anioHasta ? `${m.anioDesde}–${m.anioHasta}` : `desde ${m.anioDesde}`}
-                </td>
+                <td className="whitespace-nowrap px-4 py-3 tabular-nums">{anios(m)}</td>
                 <td className="px-4 py-3">
-                  <div className="flex flex-wrap gap-1">
-                    {m.publicado && (
-                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[13px] text-primary">
-                        Publicado · versión {m.publicado.version}
-                      </span>
-                    )}
-                    {m.borrador && (
-                      <span className="rounded-full bg-muted px-2 py-0.5 text-[13px] text-muted-foreground">
-                        Borrador · versión {m.borrador}
-                      </span>
-                    )}
-                  </div>
+                  <EstadoPlan modelo={m} />
                 </td>
                 <td className="px-4 py-3 tabular-nums">{m.items}</td>
                 <td className="whitespace-nowrap px-4 py-3 tabular-nums">
@@ -72,5 +82,26 @@ export default async function ModelosPagina() {
         </table>
       </div>
     </section>
+  );
+}
+
+function anios(m: FilaModelo): string {
+  return m.anioHasta ? `${m.anioDesde}–${m.anioHasta}` : `desde ${m.anioDesde}`;
+}
+
+function EstadoPlan({ modelo }: { modelo: FilaModelo }) {
+  return (
+    <span className="flex flex-wrap gap-1">
+      {modelo.publicado && (
+        <span className="whitespace-nowrap rounded-full bg-primary/10 px-2 py-0.5 text-[13px] text-primary">
+          Publicado · versión {modelo.publicado.version}
+        </span>
+      )}
+      {modelo.borrador && (
+        <span className="whitespace-nowrap rounded-full bg-muted px-2 py-0.5 text-[13px] text-muted-foreground">
+          Borrador · versión {modelo.borrador}
+        </span>
+      )}
+    </span>
   );
 }

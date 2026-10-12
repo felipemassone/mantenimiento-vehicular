@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Libreta de service
 
-## Getting Started
+Plataforma web de mantenimiento programado vehicular. Proyecto del Seminario de Práctica de
+Analista en Software (Universidad Siglo 21).
 
-First, run the development server:
+Producción: https://mantenimiento-vehicular-ten.vercel.app
+
+## Stack
+
+Next.js 16 (App Router, Server Actions) · React 19 · TypeScript estricto · Tailwind 4 y
+shadcn/ui · Prisma 7 · Supabase (PostgreSQL y Auth) · Zod 4 · Vitest · Playwright ·
+GitHub Actions · Vercel · Resend.
+
+## Arquitectura
+
+- `src/app`: presentación (páginas y Server Actions). No importa Prisma.
+- `src/dominio`: reglas sin dependencias de frameworks.
+- `src/datos`: único acceso a la base. Toda operación pasa por `conUsuario(claims, fn)`, que
+  abre una transacción con el rol `authenticated` y los claims del usuario, así que la
+  seguridad a nivel de fila de PostgreSQL se aplica siempre (RNF-04). `privilegiado.ts` es la
+  única excepción (seed, eliminar cuenta y pruebas).
+- ESLint hace cumplir estas reglas.
+
+## Correr en local
+
+1. `npm install`
+2. Copiar `.env.example` a `.env.local` y completarlo con el proyecto de Supabase de
+   desarrollo (las dos URL del pooler: la directa es solo IPv6).
+3. `npx prisma migrate deploy` y `npx prisma db seed`
+4. `npm run dev` → http://localhost:3000
+
+## Pruebas
+
+| Comando | Qué corre |
+|---|---|
+| `npm test` | Unitarias (dominio) |
+| `npm run test:integracion` | Integración contra Supabase de desarrollo: RLS, restricciones, trigger y publicación del plan |
+| `npm run test:e2e` | Punta a punta con Playwright, en un celular emulado |
+
+La prueba de punta a punta crea una cuenta con una dirección de prueba de Resend
+(`delivered+…@resend.dev`) y la elimina al final.
+
+## Despliegue (RNF-13)
+
+- `main` solo acepta cambios por pull request con `verificar` (tipos, lint y unitarias),
+  `integracion` y `e2e` en verde y con la rama al día, también para administradores.
+- Cada cambio en `main` se despliega a producción en Vercel. El build aplica las migraciones
+  pendientes (`prisma migrate deploy`) y compila; si no compila, no se despliega (RNF-11).
+- Cada rama tiene su vista previa en Vercel, contra el proyecto de Supabase de desarrollo.
+- Funciones en São Paulo (`gru1`), junto a la base.
+- Correo propio con Resend desde un subdominio verificado (SPF, DKIM y DMARC).
+
+Para correr la CLI de Prisma o el seed contra producción, con un `.env.produccion.local`:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+ARCHIVO_ENTORNO=.env.produccion.local npx prisma db seed
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

@@ -28,6 +28,14 @@
 - **RNF-13:** a `main` solo se llega por PR con los checks `verificar`, `integracion` y `e2e` en verde y la rama al día (`strict`). También rige para los administradores. Vercel despliega producción en cada cambio de `main`, y `next build` falla si no compila (RNF-11).
 - **Fuera de este plan, para avisar:** RNF-08 (respaldo semanal, cuatro copias) no lo cubre el plan gratuito de Supabase. Se propone para la Iteración 2: un job semanal de GitHub Actions con `pg_dump` de producción, cifrado con una frase secreta y guardado 28 días. Cifrado, porque los artefactos de un repositorio público los puede descargar cualquiera.
 
+## Ajustes durante la ejecución
+
+- **Dominio:** `mantenimiento-vehicular.vercel.app` estaba tomado; Vercel asignó `mantenimiento-vehicular-ten.vercel.app` y quedó ese. Donde este plan dice el primero, vale el segundo (`APP_ORIGIN`, Site URL y Redirect URLs de producción).
+- **Variables en Vercel:** se cargaron como variables del equipo vinculadas al proyecto; las que llevan credenciales (`SUPABASE_SECRET_KEY`, `DATABASE_URL`, `DIRECT_URL`) como *Secret*.
+- **Comparación del esquema (Task 6, Step 8):** `prisma migrate diff` no puede leer la base por la clave foránea hacia `auth.users`; se comparó producción contra desarrollo con el catálogo de PostgreSQL (239 elementos, iguales salvo finales de línea en dos funciones).
+- **Verificación en el celular (Task 9):** los diálogos quedaban tapados por el teclado y la administración escondía columnas y acciones; se anclaron los diálogos arriba en pantallas angostas y la administración pasó a tarjetas en el celular.
+- **Prueba inestable:** "dos lecturas simultáneas" falló una vez de ~8 contra Supabase de desarrollo. Se investiga al arrancar la Iteración 2 y se suma un trigger que rechace lecturas menores.
+
 ## Mapa de archivos
 
 | Archivo | Responsabilidad |
