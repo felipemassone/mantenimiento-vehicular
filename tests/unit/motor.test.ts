@@ -185,3 +185,55 @@ describe("calcularEstado: supuestos (RF-09)", () => {
     expect(r.detalle).toBe("Cambiar · venció a los 75.000 km");
   });
 });
+
+const liquidoFrenos: ItemDelPlan = { itemId: 2, nombre: "Líquido de frenos", tipo: "reemplazo", km: 45_000, meses: 24 };
+const correa: ItemDelPlan = { itemId: 3, nombre: "Correa auxiliar", tipo: "reemplazo", km: 90_000, meses: 60 };
+
+/** Un ítem en cada situación: vencido, próximo, verificar, a confirmar y al día. */
+function mezcla(): EntradaMotor {
+  return entrada({
+    items: [correa, pastillas, aceite, filtroAire, liquidoFrenos],
+    intervenciones: [
+      { itemId: 1, origen: "registrada", km: 35_000, fecha: d("2026-09-01") }, // aceite: vence a los 50.000
+      { itemId: 2, origen: "registrada", km: 9_000, fecha: d("2026-09-01") }, // frenos: faltan 4.000 de 45.000
+      { itemId: 4, origen: "supuesta_pendiente", km: 45_000, fecha: null }, // pastillas: a confirmar
+      { itemId: 5, origen: "supuesta_a_verificar", km: 30_000, fecha: null }, // filtro: verificar en taller
+    ],
+    kmAlta: 1_000,
+    kmActual: 50_000,
+    hoy: d("2026-10-12"),
+  });
+}
+
+describe("calcularEstado: orden por urgencia (RF-12)", () => {
+  it("vencidos, próximos, verificar en taller, a confirmar y al día", () => {
+    expect(calcularEstado(mezcla()).map((i) => i.nombre)).toEqual([
+      "Aceite y filtro de aceite",
+      "Líquido de frenos",
+      "Filtro de aire",
+      "Pastillas de freno delanteras",
+      "Correa auxiliar",
+    ]);
+  });
+
+  it("dentro de un grupo, primero el de menos margen", () => {
+    const r = calcularEstado(
+      entrada({
+        items: [liquidoFrenos, aceite],
+        intervenciones: [
+          { itemId: 1, origen: "registrada", km: 35_000, fecha: d("2026-09-01") }, // vence a los 50.000
+          { itemId: 2, origen: "registrada", km: 6_000, fecha: d("2026-09-01") }, // vence a los 51.000
+        ],
+        kmActual: 52_000,
+        hoy: d("2026-10-12"),
+      }),
+    );
+    expect(r.map((i) => i.estado)).toEqual(["vencido", "vencido"]);
+    expect(r.map((i) => i.nombre)).toEqual(["Aceite y filtro de aceite", "Líquido de frenos"]);
+  });
+
+  it("con el mismo margen, ordena por nombre", () => {
+    const r = calcularEstado(entrada({ items: [pastillas, aceite], kmActual: 10_000 }));
+    expect(r.map((i) => i.nombre)).toEqual(["Aceite y filtro de aceite", "Pastillas de freno delanteras"]);
+  });
+});

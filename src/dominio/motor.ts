@@ -131,7 +131,20 @@ function evaluar(item: ItemDelPlan, entrada: EntradaMotor): ItemConEstado {
   };
 }
 
-/** CU-14: estado de cada ítem del plan. */
+/** Spec 3.4: vencidos, próximos, verificar en taller, a confirmar y al día. */
+function rango(item: ItemConEstado): number {
+  if (item.estado === "vencido") return 0;
+  if (item.estado === "proximo") return 1;
+  if (item.incertidumbre === "verificar_en_taller") return 2;
+  if (item.incertidumbre === "a_confirmar") return 3;
+  return 4;
+}
+
+function porUrgencia(a: ItemConEstado, b: ItemConEstado): number {
+  return rango(a) - rango(b) || a.margen - b.margen || a.nombre.localeCompare(b.nombre, "es");
+}
+
+/** CU-14: estado de cada ítem del plan, ordenado por urgencia (RF-12). */
 export function calcularEstado(entrada: EntradaMotor): ItemConEstado[] {
-  return entrada.items.map((item) => evaluar(item, entrada));
+  return entrada.items.map((item) => evaluar(item, entrada)).sort(porUrgencia);
 }
