@@ -7,7 +7,9 @@ import {
   type ItemConEstado,
   type ItemDelPlan,
 } from "@/dominio/motor";
+import { validarConfirmacion, validarCorreccion } from "@/dominio/supuestos";
 import { conUsuario, type ClaimsUsuario, type TxUsuario } from "./cliente-usuario";
+import type { Resultado } from "./vehiculos";
 
 export type EstadoVehiculo = { catalogado: boolean; kmActual: number; items: ItemConEstado[] };
 export type ResumenEstado = ReturnType<typeof resumen>;
@@ -86,5 +88,101 @@ export async function resumenesDeMisVehiculos(
       salida[id] = e?.catalogado ? resumen(e.items) : null;
     }
     return salida;
+  });
+}
+
+export type SupuestoPendiente = {
+  itemId: number;
+  nombre: string;
+  km: number;
+  origen: "supuesta_pendiente" | "supuesta_a_verificar";
+};
+
+const SIN_SUPUESTO: Resultado<never> = {
+  ok: false,
+  errores: { formulario: "Ese dato ya no está para confirmar. Volvé a la ficha del vehículo." },
+};
+const PENDIENTES = ["supuesta_pendiente", "supuesta_a_verificar"] as const;
+
+/** CU-06 paso 1: supuestos sin confirmar del plan vigente, en el orden del motor. */
+export async function supuestosDelVehiculo(
+  claims: ClaimsUsuario,
+  vehiculoId: string,
+  ahora: Date = new Date(),
+): Promise<{ kmActual: number; supuestos: SupuestoPendiente[] } | null> {
+  if (!UUID.test(vehiculoId)) return null;
+  return conUsuario(claims, async (tx) => {
+    const e = await calcularEnTx(tx, vehiculoId, fechaDeHoy(ahora));
+    if (!e) return null;
+    const filas = await tx.intervencion.findMany({
+      where: { vehiculoId, origen: { in: [...PENDIENTES] } },
+      select: { itemId: true, kilometraje: true, origen: true },
+    });
+    const porItem = new Map(filas.map((f) => [f.itemId, f]));
+    const supuestos = e.items.flatMap((i) => {
+      const f = porItem.get(i.itemId);
+      return f ? [{ itemId: i.itemId, nombre: i.nombre, km: f.kilometraje, origen: f.origen as SupuestoPendiente["origen"] }] : [];
+    });
+    return { kmActual: e.kmActual, supuestos };
+  });
+}
+
+async function actualizarSupuesto(
+  tx: TxUsuario,
+  vehiculoId: string,
+  itemId: number,
+  data: { origen: "supuesta_confirmada" | "supuesta_a_verificar"; kilometraje?: number; fecha?: Date },
+): Promise<Resultado<null>> {
+  const r = await tx.intervencion.updateMany({ where: { vehiculoId, itemId, origen: { in: [...PENDIENTES] } }, data });
+  return r.count === 1 ? { ok: true, valor: null } : SIN_SUPUESTO;
+}
+
+async function kmActualDe(tx: TxUsuario, vehiculoId: string): Promise<number | null> {
+  const ultima = await tx.lecturaKilometraje.findFirst({ where: { vehiculoId }, orderBy: { kilometraje: "desc" } });
+  return ultima?.kilometraje ?? null;
+}
+
+/** CU-06 paso 2: confirma el supuesto con su fecha. */
+export async function confirmarSupuesto(
+  claims: ClaimsUsuario,
+  vehiculoId: string,
+  itemId: number,
+  fecha: unknown,
+  ahora: Date = new Date(),
+): Promise<Resultado<null>> {
+  const v = validarConfirmacion({ fecha, hoy: fechaDeHoy(ahora) });
+  if (!v.ok) return v;
+  if (!UUID.test(vehiculoId)) return SIN_SUPUESTO;
+  return conUsuario(claims, (tx) => actualizarSupuesto(tx, vehiculoId, itemId, { origen: "supuesta_confirmada", fecha: v.fecha }));
+}
+
+/** CU-06 2a: reemplaza el supuesto por el km y la fecha reales. */
+export async function corregirSupuesto(
+  claims: ClaimsUsuario,
+  vehiculoId: string,
+  itemId: number,
+  km: unknown,
+  fecha: unknown,
+  ahora: Date = new Date(),
+): Promise<Resultado<null>> {
+  if (!UUID.test(vehiculoId)) return SIN_SUPUESTO;
+  return conUsuario(claims, async (tx) => {
+    const kmActual = await kmActualDe(tx, vehiculoId);
+    if (kmActual === null) return SIN_SUPUESTO;
+    const v = validarCorreccion({ km, fecha, kmActual, hoy: fechaDeHoy(ahora) });
+    if (!v.ok) return v;
+    return actualizarSupuesto(tx, vehiculoId, itemId, { origen: "supuesta_confirmada", kilometraje: v.km, fecha: v.fecha });
+  });
+}
+
+/** CU-06 2b: "No lo sé". */
+export async function marcarAVerificar(claims: ClaimsUsuario, vehiculoId: string, itemId: number): Promise<Resultado<null>> {
+  if (!UUID.test(vehiculoId)) return SIN_SUPUESTO;
+  return conUsuario(claims, async (tx) => {
+    const r = await tx.intervencion.updateMany({
+      where: { vehiculoId, itemId, origen: "supuesta_pendiente" },
+      data: { origen: "supuesta_a_verificar" },
+    });
+    return r.count === 1 ? { ok: true, valor: null } : SIN_SUPUESTO;
   });
 }

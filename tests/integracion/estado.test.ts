@@ -1,5 +1,12 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { estadoDelVehiculo, resumenesDeMisVehiculos } from "@/datos/estado";
+import {
+  confirmarSupuesto,
+  corregirSupuesto,
+  estadoDelVehiculo,
+  marcarAVerificar,
+  resumenesDeMisVehiculos,
+  supuestosDelVehiculo,
+} from "@/datos/estado";
 import { crearVehiculo } from "@/datos/vehiculos";
 import { prismaPrivilegiado as db } from "@/datos/privilegiado";
 import { sembrar } from "../../prisma/seed";
@@ -118,5 +125,91 @@ describe("resumenesDeMisVehiculos (mockup 04)", () => {
     } finally {
       await borrarUsuarioPrueba(u);
     }
+  });
+});
+
+describe("confirmación de supuestos (CU-06)", () => {
+  async function kaConSupuestos(usuario: string) {
+    const id = await nuevoKa(usuario, 62_400);
+    const s = await supuestosDelVehiculo(claimsDe(usuario), id);
+    const aceite = s!.supuestos.find((x) => x.nombre === "Aceite y filtro de aceite")!;
+    return { id, aceite };
+  }
+  const itemDe = async (u: string, id: string, itemId: number) =>
+    (await estadoDelVehiculo(claimsDe(u), id))!.items.find((i) => i.itemId === itemId)!;
+
+  it("lista los 6 supuestos con su km y la lectura actual", async () => {
+    const { id, aceite } = await kaConSupuestos(a);
+    const s = await supuestosDelVehiculo(claimsDe(a), id);
+    expect(s?.kmActual).toBe(62_400);
+    expect(s?.supuestos).toHaveLength(6);
+    expect(aceite).toMatchObject({ km: 60_000, origen: "supuesta_pendiente" });
+  });
+
+  it("confirmar guarda la fecha y saca la marca (paso 3)", async () => {
+    const { id, aceite } = await kaConSupuestos(a);
+    expect(await confirmarSupuesto(claimsDe(a), id, aceite.itemId, "2026-03-10")).toEqual({ ok: true, valor: null });
+    const fila = await db.intervencion.findFirstOrThrow({ where: { vehiculoId: id, itemId: aceite.itemId } });
+    expect(fila).toMatchObject({ origen: "supuesta_confirmada", kilometraje: 60_000, fecha: new Date("2026-03-10T00:00:00Z") });
+    expect(await itemDe(a, id, aceite.itemId)).toMatchObject({ incertidumbre: null, fechaVence: new Date("2027-03-10T00:00:00Z") });
+    expect((await supuestosDelVehiculo(claimsDe(a), id))?.supuestos).toHaveLength(5);
+  });
+
+  it("confirmar dos veces no pisa la fecha ya confirmada", async () => {
+    const { id, aceite } = await kaConSupuestos(a);
+    await confirmarSupuesto(claimsDe(a), id, aceite.itemId, "2026-03-10");
+    const r = await confirmarSupuesto(claimsDe(a), id, aceite.itemId, "2026-04-01");
+    expect(r.ok).toBe(false);
+    const fila = await db.intervencion.findFirstOrThrow({ where: { vehiculoId: id, itemId: aceite.itemId } });
+    expect(fila.fecha).toEqual(new Date("2026-03-10T00:00:00Z"));
+  });
+
+  it("rechaza una fecha futura (2d) sin cambiar nada", async () => {
+    const { id, aceite } = await kaConSupuestos(a);
+    const r = await confirmarSupuesto(claimsDe(a), id, aceite.itemId, "2099-01-01");
+    expect(r).toEqual({ ok: false, errores: { fecha: "La fecha no puede ser posterior a hoy." } });
+    expect((await db.intervencion.findFirstOrThrow({ where: { vehiculoId: id, itemId: aceite.itemId } })).origen).toBe(
+      "supuesta_pendiente",
+    );
+  });
+
+  it("corregir reemplaza km y fecha y queda confirmado (2a)", async () => {
+    const { id, aceite } = await kaConSupuestos(a);
+    expect(await corregirSupuesto(claimsDe(a), id, aceite.itemId, "58.000", "2026-02-01")).toEqual({ ok: true, valor: null });
+    expect(await db.intervencion.findFirstOrThrow({ where: { vehiculoId: id, itemId: aceite.itemId } })).toMatchObject({
+      origen: "supuesta_confirmada",
+      kilometraje: 58_000,
+      fecha: new Date("2026-02-01T00:00:00Z"),
+    });
+  });
+
+  it("corregir con km mayor a la lectura actual se rechaza (2d)", async () => {
+    const { id, aceite } = await kaConSupuestos(a);
+    expect(await corregirSupuesto(claimsDe(a), id, aceite.itemId, "63000", "2026-02-01")).toEqual({
+      ok: false,
+      errores: { km: "No puede superar 62.400 km, la lectura actual." },
+    });
+  });
+
+  it('"No lo sé" lo marca para verificar en el taller (2b) y se puede confirmar después', async () => {
+    const { id, aceite } = await kaConSupuestos(a);
+    expect(await marcarAVerificar(claimsDe(a), id, aceite.itemId)).toEqual({ ok: true, valor: null });
+    expect((await itemDe(a, id, aceite.itemId)).incertidumbre).toBe("verificar_en_taller");
+    expect(await confirmarSupuesto(claimsDe(a), id, aceite.itemId, "2026-03-10")).toEqual({ ok: true, valor: null });
+  });
+
+  it("otro usuario no puede confirmar, corregir ni marcar supuestos ajenos", async () => {
+    const { id, aceite } = await kaConSupuestos(a);
+    for (const r of [
+      await confirmarSupuesto(claimsDe(b), id, aceite.itemId, "2026-03-10"),
+      await corregirSupuesto(claimsDe(b), id, aceite.itemId, "1000", "2026-03-10"),
+      await marcarAVerificar(claimsDe(b), id, aceite.itemId),
+    ]) {
+      expect(r.ok).toBe(false);
+    }
+    expect((await db.intervencion.findFirstOrThrow({ where: { vehiculoId: id, itemId: aceite.itemId } })).origen).toBe(
+      "supuesta_pendiente",
+    );
+    expect(await supuestosDelVehiculo(claimsDe(b), id)).toBeNull();
   });
 });
