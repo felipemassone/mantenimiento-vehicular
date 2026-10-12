@@ -5,6 +5,7 @@ import { Aviso } from "@/components/aviso";
 import { planDeTrabajo } from "@/datos/catalogo";
 import { exigirRol } from "@/datos/sesion";
 import { AgregarItem } from "./agregar-item";
+import { COLUMNAS_ITEM } from "./columnas";
 import { FilaItem } from "./fila-item";
 import { AccionesPlan } from "./publicar";
 
@@ -64,29 +65,26 @@ export default async function PlanPagina({ params }: PageProps<"/admin/modelos/[
         )}
       </div>
 
-      <div className="mt-6 overflow-x-auto rounded-[14px] border border-border bg-card">
-        <table className="w-full min-w-[640px] text-sm">
-          <thead className="text-left text-muted-foreground">
-            <tr className="border-b border-border">
-              <th className="px-4 py-3 font-medium">Ítem</th>
-              <th className="px-4 py-3 font-medium">Tipo</th>
-              <th className="px-4 py-3 font-medium">Cada (km)</th>
-              <th className="px-4 py-3 font-medium">Cada (meses)</th>
-              <th className="px-4 py-3" />
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {items.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="px-4 py-6 text-muted-foreground">
-                  Todavía no hay ítems. Agregá el primero.
-                </td>
-              </tr>
-            ) : (
-              items.map((i) => <FilaItem key={i.itemId} modeloId={id} item={i} />)
-            )}
-          </tbody>
-        </table>
+      {/* Grilla en vez de tabla: en el celular cada ítem se apila y sus acciones quedan a la vista. */}
+      <div className="mt-6 rounded-[14px] border border-border bg-card text-sm">
+        <div
+          className={`hidden gap-4 border-b border-border px-4 py-3 font-medium text-muted-foreground md:grid ${COLUMNAS_ITEM}`}
+        >
+          <span>Ítem</span>
+          <span>Tipo</span>
+          <span>Cada (km)</span>
+          <span>Cada (meses)</span>
+          <span />
+        </div>
+        {items.length === 0 ? (
+          <p className="px-4 py-6 text-muted-foreground">Todavía no hay ítems. Agregá el primero.</p>
+        ) : (
+          <ul className="divide-y divide-border">
+            {items.map((i) => (
+              <FilaItem key={i.itemId} modeloId={id} item={i} />
+            ))}
+          </ul>
+        )}
       </div>
       <div className="mt-4">
         <AgregarItem modeloId={id} />
