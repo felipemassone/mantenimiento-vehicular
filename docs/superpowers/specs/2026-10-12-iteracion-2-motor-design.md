@@ -46,7 +46,7 @@ En este orden:
 
 1. La intervención `registrada` o `supuesta_confirmada` de ese ítem con mayor kilometraje: referencia con km y fecha.
 2. Si no hay, el supuesto `supuesta_pendiente` o `supuesta_a_verificar`: referencia **solo con km** (incierta).
-3. Si no hay nada y el km de alta **supera** el intervalo en km: se crea el supuesto en `floor(km_alta / intervalo) × intervalo` (si el alta cae justo en un múltiplo, el supuesto queda en ese múltiplo) y se usa como en el punto 2.
+3. Si no hay nada y el km de alta **supera** el intervalo en km: se crea el supuesto en el múltiplo del intervalo inmediatamente anterior al km de alta (*ajuste del plan 2A:* el múltiplo es el **estrictamente** anterior, como dice RF-09 con "inmediatamente anterior": con un alta de 45.000 y un intervalo de 15.000 el supuesto queda en 30.000, no en 45.000; suponer "recién hecho" era el error caro y daba resultados opuestos para el primer múltiplo y los siguientes) y se usa como en el punto 2.
 4. Si no hay nada y el km de alta no supera el intervalo: km 0 y la fecha de alta del vehículo.
 
 ### 3.2 Próximo vencimiento

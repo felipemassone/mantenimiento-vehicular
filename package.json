@@ -10,6 +10,7 @@
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run --project unit",
+    "test:cobertura": "vitest run --project unit --coverage",
     "test:integracion": "vitest run --project integracion",
     "test:e2e": "playwright test",
     "postinstall": "prisma generate"
@@ -38,6 +39,7 @@
     "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^5.0.4",
     "dotenv": "^18.0.5",
     "eslint": "^9",
     "eslint-config-next": "16.3.8",
