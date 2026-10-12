@@ -16,7 +16,7 @@
 - Las fechas son días calendario representados como medianoche UTC, igual que las columnas `DATE` y que `fechaDeHoy()` de `src/dominio/fechas.ts`.
 - Textos en español rioplatense; kilómetros con `formatearKm` (es-AR) y fechas con `formatearFecha` (dd/mm/aaaa).
 - Umbral de "próximo a vencer": el 10 % del intervalo, incluido el borde (RF-08).
-- Supuesto (RF-09): se compara contra el kilometraje de alta y solo cuando lo **supera**; se ubica en `floor(km_alta / intervalo) × intervalo`.
+- Supuesto (RF-09): se compara contra el kilometraje de alta y solo cuando lo **supera**; se ubica en el múltiplo estrictamente anterior (ajuste de la revisión final).
 - Un ítem incierto (supuesto pendiente o a verificar) se calcula solo por km y nunca se muestra "al día": si el cálculo da al día, lo reemplaza su chip de incertidumbre.
 - Cobertura mínima del 80 % en líneas, ramas, funciones y sentencias de `src/dominio/motor.ts` (RNF-12), exigida por el job `verificar`.
 

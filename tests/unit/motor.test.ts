@@ -32,8 +32,9 @@ describe("kmSupuesto (RF-09)", () => {
     expect(kmSupuesto(15_000, 62_400)).toBe(60_000);
     expect(kmSupuesto(45_000, 62_400)).toBe(45_000);
   });
-  it("si el alta cae justo en un múltiplo, el supuesto queda ahí", () => {
-    expect(kmSupuesto(15_000, 45_000)).toBe(45_000);
+  it("si el alta cae justo en un múltiplo, el supuesto queda en el anterior (RF-09: inmediatamente anterior)", () => {
+    expect(kmSupuesto(15_000, 45_000)).toBe(30_000);
+    expect(kmSupuesto(15_000, 30_000)).toBe(15_000);
   });
   it("no hay supuesto si el alta no supera el intervalo", () => {
     expect(kmSupuesto(90_000, 62_400)).toBeNull();
@@ -112,14 +113,38 @@ describe("calcularEstado: referencia y vencimiento (RF-08, CU-14)", () => {
     const r = unico(
       entrada({
         intervenciones: [
+          { itemId: 1, origen: "registrada", km: 20_000, fecha: d("2026-09-15") },
           { itemId: 1, origen: "registrada", km: 35_000, fecha: d("2026-09-01") },
-          { itemId: 1, origen: "registrada", km: 20_000, fecha: d("2026-03-10") },
         ],
         kmActual: 36_000,
         hoy: d("2026-10-01"),
       }),
     );
     expect(r.kmVence).toBe(50_000);
+  });
+
+  it("con dos ejecuciones ciertas al mismo km, usa la de fecha más reciente, en cualquier orden", () => {
+    const viejo = { itemId: 1, origen: "registrada" as const, km: 60_000, fecha: d("2025-01-01") };
+    const nuevo = { itemId: 1, origen: "supuesta_confirmada" as const, km: 60_000, fecha: d("2026-09-01") };
+    const base = { kmAlta: 62_400, kmActual: 62_400, hoy: d("2026-10-12") };
+    for (const intervenciones of [[viejo, nuevo], [nuevo, viejo]]) {
+      expect(unico(entrada({ ...base, intervenciones })).fechaVence).toEqual(d("2027-09-01"));
+    }
+  });
+
+  it("una ejecución cierta gana sobre un supuesto pendiente del mismo ítem", () => {
+    const r = unico(
+      entrada({
+        kmAlta: 62_400,
+        intervenciones: [
+          { itemId: 1, origen: "supuesta_pendiente", km: 60_000, fecha: null },
+          { itemId: 1, origen: "registrada", km: 61_000, fecha: d("2026-09-01") },
+        ],
+        kmActual: 62_400,
+        hoy: d("2026-10-12"),
+      }),
+    );
+    expect(r).toMatchObject({ incertidumbre: null, kmVence: 76_000, fechaVence: d("2027-09-01") });
   });
 
   it("un supuesto confirmado es una referencia cierta, con fecha", () => {

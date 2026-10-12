@@ -54,9 +54,12 @@ export function sumarMeses(fecha: Date, meses: number): Date {
   return new Date(Date.UTC(anio, mes, Math.min(fecha.getUTCDate(), ultimoDia)));
 }
 
-/** RF-09: múltiplo del intervalo inmediatamente anterior al km de alta, si el alta lo supera. */
+/**
+ * RF-09: múltiplo del intervalo inmediatamente anterior al km de alta, si el alta lo supera.
+ * "Anterior" es estricto: con un alta justo en un múltiplo se supone el previo, no "recién hecho".
+ */
 export function kmSupuesto(intervaloKm: number, kmAlta: number): number | null {
-  return kmAlta > intervaloKm ? Math.floor(kmAlta / intervaloKm) * intervaloKm : null;
+  return kmAlta > intervaloKm ? Math.ceil(kmAlta / intervaloKm - 1) * intervaloKm : null;
 }
 
 const DIA_MS = 86_400_000;
@@ -73,7 +76,8 @@ function referenciaDe(item: ItemDelPlan, entrada: EntradaMotor): Referencia {
   const delItem = entrada.intervenciones.filter((e) => e.itemId === item.itemId);
   const ciertas = delItem.filter((e) => CIERTAS.includes(e.origen));
   if (ciertas.length > 0) {
-    const ultima = ciertas.reduce((a, b) => (b.km > a.km ? b : a));
+    // Mayor km; ante un empate, la fecha más reciente (no el orden en que llegan de la base).
+    const ultima = ciertas.reduce((a, b) => (b.km > a.km || (b.km === a.km && (b.fecha?.getTime() ?? 0) > (a.fecha?.getTime() ?? 0)) ? b : a));
     return { km: ultima.km, fecha: ultima.fecha, incertidumbre: null };
   }
   const supuesto = delItem[0];
