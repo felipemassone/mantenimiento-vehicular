@@ -43,6 +43,14 @@ test("propietario: cuenta, vehículo, kilometraje y baja", async ({ page }) => {
     await page.getByLabel("Año").selectOption("2014");
     await page.getByLabel("Kilometraje actual").fill("45000");
     await page.getByRole("button", { name: "Agregar vehículo" }).click();
+    // CU-05 → CU-06: con 45.000 km se supusieron aceite, pastillas, amortiguadores y neumáticos.
+    await expect(page.getByRole("heading", { name: "Confirmar datos" })).toBeVisible();
+    await expect(page.getByText(/^Como cargaste el Ford Ka con 45\.000 km/)).toBeVisible();
+    await page.getByRole("button", { name: /^Neumáticos/ }).click();
+    await page.getByLabel("¿Cuándo se hizo?").fill("2026-01-15");
+    await page.getByRole("button", { name: "Sí, se hizo" }).click();
+    await expect(page.getByRole("button", { name: /^Neumáticos/ })).toHaveCount(0);
+    await page.getByRole("link", { name: "Más tarde" }).click();
     await expect(page.getByRole("heading", { name: "Ford Ka 2014" })).toBeVisible();
     await expect(page.getByText("45.000 km", { exact: true })).toBeVisible();
     // CU-09: con 45.000 km de alta, el aceite (cada 15.000) queda supuesto a los 30.000 y vencido.
@@ -50,6 +58,8 @@ test("propietario: cuenta, vehículo, kilometraje y baja", async ({ page }) => {
     const aceite = page.getByRole("listitem").filter({ hasText: "Aceite y filtro de aceite" });
     await expect(aceite.getByText("Vencido")).toBeVisible();
     await expect(aceite.getByText("A confirmar")).toBeVisible();
+    const neumaticos = page.getByRole("listitem").filter({ hasText: "Neumáticos" });
+    await expect(neumaticos.getByText("A confirmar")).toHaveCount(0);
   });
 
   const dialogo = page.getByRole("dialog");
