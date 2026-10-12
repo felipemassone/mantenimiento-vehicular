@@ -74,7 +74,8 @@ Acción ("Cambiar" para `reemplazo`, "Revisar" para `inspeccion`) y el dato del 
 
 - Vencido: "venció a los 75.000 km" o "venció el 10/03/2026".
 - Próximo o al día: "faltan 900 km o vence el 02/05/2027" (la fecha solo si el ítem tiene meses y la referencia tiene fecha).
-- Incierto: "supuesto a los 45.000 km".
+- Incierto que daría al día (el chip incierto reemplaza a "al día"): "supuesto a los 45.000 km". Un supuesto vencido o próximo usa el texto de su estado, como cualquier otro ítem.
+- Vencido por los dos límites: se cita el de km.
 
 Números con separador de miles es-AR; fechas dd/mm/aaaa en hora de Argentina (`src/dominio/fechas.ts`).
 
