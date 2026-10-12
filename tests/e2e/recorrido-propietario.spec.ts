@@ -68,6 +68,10 @@ test("propietario: cuenta, vehículo, kilometraje y baja", async ({ page }) => {
     await dialogo.getByRole("button", { name: "Guardar" }).click();
     await expect(dialogo.getByText("No puede ser menor a 47.500 km, la última lectura.")).toBeVisible();
     await page.keyboard.press("Escape");
+    // Mockup 04: la tarjeta del vehículo resume su estado.
+    await page.getByRole("link", { name: "Volver" }).click();
+    await expect(page.getByRole("heading", { name: "Mis vehículos" })).toBeVisible();
+    await expect(page.getByText(/^\d+ vencidos?$/)).toBeVisible();
   });
 
   await test.step("Un propietario no ve la administración", async () => {
