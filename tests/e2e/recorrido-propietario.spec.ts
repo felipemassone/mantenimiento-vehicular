@@ -45,6 +45,11 @@ test("propietario: cuenta, vehículo, kilometraje y baja", async ({ page }) => {
     await page.getByRole("button", { name: "Agregar vehículo" }).click();
     await expect(page.getByRole("heading", { name: "Ford Ka 2014" })).toBeVisible();
     await expect(page.getByText("45.000 km", { exact: true })).toBeVisible();
+    // CU-09: con 45.000 km de alta, el aceite (cada 15.000) queda supuesto a los 30.000 y vencido.
+    await expect(page.getByRole("heading", { name: "Mantenimiento" })).toBeVisible();
+    const aceite = page.getByRole("listitem").filter({ hasText: "Aceite y filtro de aceite" });
+    await expect(aceite.getByText("Vencido")).toBeVisible();
+    await expect(aceite.getByText("A confirmar")).toBeVisible();
   });
 
   const dialogo = page.getByRole("dialog");
@@ -63,6 +68,10 @@ test("propietario: cuenta, vehículo, kilometraje y baja", async ({ page }) => {
     await dialogo.getByRole("button", { name: "Guardar" }).click();
     await expect(dialogo.getByText("No puede ser menor a 47.500 km, la última lectura.")).toBeVisible();
     await page.keyboard.press("Escape");
+    // Mockup 04: la tarjeta del vehículo resume su estado.
+    await page.getByRole("link", { name: "Volver" }).click();
+    await expect(page.getByRole("heading", { name: "Mis vehículos" })).toBeVisible();
+    await expect(page.getByText(/^\d+ vencidos?$/)).toBeVisible();
   });
 
   await test.step("Un propietario no ve la administración", async () => {

@@ -16,11 +16,9 @@ export type VehiculoResumen = {
   fechaLectura: Date | null;
   catalogado: boolean;
 };
-export type ItemPlan = { nombre: string; tipo: "reemplazo" | "inspeccion"; km: number; meses: number | null };
 export type VehiculoDetalle = VehiculoResumen & {
   datos: DatosVehiculo;
   marcaId: number | null;
-  plan: { version: number; items: ItemPlan[] } | null;
 };
 export type Resultado<T> = { ok: true; valor: T } | { ok: false; errores: ErroresCampo };
 
@@ -81,12 +79,6 @@ export async function obtenerVehiculo(claims: ClaimsUsuario, id: string): Promis
   return conUsuario(claims, async (tx) => {
     const [v] = await buscarVehiculos(tx, id);
     if (!v) return null;
-    const plan = v.modeloId
-      ? await tx.planMantenimiento.findFirst({
-          where: { modeloId: v.modeloId, estado: "publicado" },
-          include: { intervalos: { include: { item: true }, orderBy: { intervaloKm: "asc" } } },
-        })
-      : null;
     const datos: DatosVehiculo = v.modeloId
       ? { tipo: "catalogo", modeloId: v.modeloId, anio: v.anio }
       : { tipo: "libre", marca: v.marcaLibre ?? "", modelo: v.modeloLibre ?? "", anio: v.anio };
@@ -94,15 +86,6 @@ export async function obtenerVehiculo(claims: ClaimsUsuario, id: string): Promis
       ...resumen(v),
       datos,
       marcaId: v.modelo?.marcaId ?? null,
-      plan: plan && {
-        version: plan.version,
-        items: plan.intervalos.map((i) => ({
-          nombre: i.item.nombre,
-          tipo: i.item.tipo,
-          km: i.intervaloKm,
-          meses: i.intervaloMeses,
-        })),
-      },
     };
   });
 }

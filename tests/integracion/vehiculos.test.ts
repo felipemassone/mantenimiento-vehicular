@@ -59,23 +59,11 @@ describe("alta (CU-05)", () => {
     const r = await crearVehiculo(claimsDe(a), { tipo: "libre", marca: "Peugeot", modelo: "208", anio: 2019 }, 41000);
     expect(r.ok).toBe(true);
     const detalle = await obtenerVehiculo(claimsDe(a), r.ok ? r.valor.id : "");
-    expect(detalle).toMatchObject({ nombre: "Peugeot 208", catalogado: false, plan: null });
+    expect(detalle).toMatchObject({ nombre: "Peugeot 208", catalogado: false });
   });
 });
 
 describe("ficha", () => {
-  it("trae el plan publicado del modelo con sus 8 ítems", async () => {
-    const [ka] = (await listarVehiculos(claimsDe(a))).filter((v) => v.catalogado);
-    const detalle = await obtenerVehiculo(claimsDe(a), ka!.id);
-    expect(detalle?.plan?.items).toHaveLength(8);
-    expect(detalle?.plan?.items).toContainEqual({
-      nombre: "Aceite y filtro de aceite",
-      tipo: "reemplazo",
-      km: 15000,
-      meses: 12,
-    });
-  });
-
   it("un id que no es un uuid devuelve null en lugar de fallar", async () => {
     expect(await obtenerVehiculo(claimsDe(a), "no-es-un-uuid")).toBeNull();
   });

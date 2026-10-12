@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { erroresDe, type ErroresCampo } from "./cuenta";
-import { formatearKm, type ResultadoValidacion } from "./kilometraje";
+import type { ResultadoValidacion } from "./kilometraje";
 
 export type DatosVehiculo =
   | { tipo: "catalogo"; modeloId: number; anio: number }
@@ -72,9 +72,4 @@ export function nombreVehiculo(v: {
   modeloLibre?: string | null;
 }): string {
   return `${v.marca ?? v.marcaLibre ?? ""} ${v.modelo ?? v.modeloLibre ?? ""}`.trim();
-}
-
-/** "cada 15.000 km o 12 meses": el que ocurra primero. */
-export function formatearIntervalo(km: number, meses: number | null): string {
-  return meses ? `cada ${formatearKm(km)} km o ${meses} meses` : `cada ${formatearKm(km)} km`;
 }
