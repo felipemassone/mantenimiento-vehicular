@@ -81,19 +81,32 @@ describe("estadoDelVehiculo (CU-09, CU-14)", () => {
   });
 
   it("un ítem agregado al plan publicado recibe su supuesto en la próxima consulta", async () => {
-    const id = await nuevoKa(a, 62_400);
-    await estadoDelVehiculo(claimsDe(a), id);
-    const plan = await db.planMantenimiento.findFirstOrThrow({ where: { modeloId: kaId, estado: "publicado" } });
-    const item = await db.itemMantenimiento.create({ data: { modeloId: kaId, nombre: `Filtro de prueba ${Date.now()}`, tipo: "reemplazo" } });
-    await db.intervaloPlan.create({ data: { planId: plan.id, itemId: item.id, intervaloKm: 30_000 } });
+    // Modelo descartable: no se toca el plan publicado del Ka de la base compartida.
+    const marca = await db.marca.create({ data: { nombre: `Prueba estado ${Date.now()}` } });
+    const modelo = await db.modelo.create({ data: { marcaId: marca.id, nombre: "M", anioDesde: 2010 } });
+    const plan = await db.planMantenimiento.create({
+      data: { modeloId: modelo.id, version: 1, estado: "publicado", fechaPublicacion: new Date() },
+    });
+    const crearItem = async (nombre: string) => {
+      const item = await db.itemMantenimiento.create({ data: { modeloId: modelo.id, nombre, tipo: "reemplazo" } });
+      await db.intervaloPlan.create({ data: { planId: plan.id, itemId: item.id, intervaloKm: 30_000 } });
+    };
     try {
-      const e = await estadoDelVehiculo(claimsDe(a), id);
-      expect(e?.items).toHaveLength(9);
-      expect(await supuestosDe(id)).toBe(7);
+      await crearItem("Primero");
+      const r = await crearVehiculo(claimsDe(a), { tipo: "catalogo", modeloId: modelo.id, anio: 2012 }, 62_400);
+      if (!r.ok) throw new Error("alta");
+      expect(await supuestosDe(r.valor.id)).toBe(1);
+      await crearItem("Agregado después");
+      const e = await estadoDelVehiculo(claimsDe(a), r.valor.id);
+      expect(e?.items).toHaveLength(2);
+      expect(await supuestosDe(r.valor.id)).toBe(2);
     } finally {
-      await db.intervencion.deleteMany({ where: { itemId: item.id } });
-      await db.intervaloPlan.delete({ where: { planId_itemId: { planId: plan.id, itemId: item.id } } });
-      await db.itemMantenimiento.delete({ where: { id: item.id } });
+      await db.vehiculo.deleteMany({ where: { modeloId: modelo.id } });
+      await db.intervaloPlan.deleteMany({ where: { planId: plan.id } });
+      await db.itemMantenimiento.deleteMany({ where: { modeloId: modelo.id } });
+      await db.planMantenimiento.delete({ where: { id: plan.id } });
+      await db.modelo.delete({ where: { id: modelo.id } });
+      await db.marca.delete({ where: { id: marca.id } });
     }
   });
 
@@ -198,6 +211,12 @@ describe("confirmación de supuestos (CU-06)", () => {
     expect(await confirmarSupuesto(claimsDe(a), id, aceite.itemId, "2026-03-10")).toEqual({ ok: true, valor: null });
   });
 
+  it('tocar dos veces "No lo sé" no da error', async () => {
+    const { id, aceite } = await kaConSupuestos(a);
+    expect(await marcarAVerificar(claimsDe(a), id, aceite.itemId)).toEqual({ ok: true, valor: null });
+    expect(await marcarAVerificar(claimsDe(a), id, aceite.itemId)).toEqual({ ok: true, valor: null });
+  });
+
   it("otro usuario no puede confirmar, corregir ni marcar supuestos ajenos", async () => {
     const { id, aceite } = await kaConSupuestos(a);
     for (const r of [
@@ -240,5 +259,23 @@ describe("alta y kilometraje con el motor (CU-05 paso 6, CU-08 paso 7)", () => {
       ok: false,
       errores: { kilometraje: "No puede ser menor a 62.400 km, la última lectura." },
     });
+  });
+});
+
+describe("concurrencia al crear supuestos (revisión 2B)", () => {
+  it("actualizar el kilometraje mientras otra consulta crea los supuestos no falla", async () => {
+    for (let i = 0; i < 4; i++) {
+      // Vehículo cargado antes de la Iteración 2: con lectura y sin supuestos guardados.
+      const v = await db.vehiculo.create({
+        data: { usuarioId: a, modeloId: kaId, anio: 2014, lecturas: { create: { kilometraje: 62_400, fecha: new Date() } } },
+      });
+      const r = await Promise.allSettled([
+        estadoDelVehiculo(claimsDe(a), v.id),
+        registrarLectura(claimsDe(a), v.id, 63_000),
+        estadoDelVehiculo(claimsDe(a), v.id),
+      ]);
+      expect(r.filter((x) => x.status === "rejected").map((x) => String((x as PromiseRejectedResult).reason))).toEqual([]);
+      expect(await supuestosDe(v.id)).toBe(6);
+    }
   });
 });

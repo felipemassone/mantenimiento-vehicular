@@ -50,6 +50,9 @@ export async function calcularEnTx(tx: TxUsuario, vehiculoId: string, hoy: Date)
 
   const faltantes = supuestosFaltantes({ items, intervenciones, kmAlta });
   if (faltantes.length > 0) {
+    // Primero el vehículo, como registrarLectura: si no, el índice único y la clave foránea se
+    // esperan en orden inverso y PostgreSQL corta una de las dos transacciones (deadlock).
+    await tx.$queryRaw`SELECT 1 FROM public.vehiculo WHERE id = ${vehiculoId}::uuid FOR UPDATE`;
     await tx.intervencion.createMany({
       data: faltantes.map((s) => ({ vehiculoId, itemId: s.itemId, origen: "supuesta_pendiente" as const, kilometraje: s.km })),
       skipDuplicates: true,
@@ -179,8 +182,9 @@ export async function corregirSupuesto(
 export async function marcarAVerificar(claims: ClaimsUsuario, vehiculoId: string, itemId: number): Promise<Resultado<null>> {
   if (!UUID.test(vehiculoId)) return SIN_SUPUESTO;
   return conUsuario(claims, async (tx) => {
+    // Con los dos orígenes pendientes, tocar dos veces "No lo sé" no da error.
     const r = await tx.intervencion.updateMany({
-      where: { vehiculoId, itemId, origen: "supuesta_pendiente" },
+      where: { vehiculoId, itemId, origen: { in: [...PENDIENTES] } },
       data: { origen: "supuesta_a_verificar" },
     });
     return r.count === 1 ? { ok: true, valor: null } : SIN_SUPUESTO;
