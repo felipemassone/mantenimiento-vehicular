@@ -165,7 +165,7 @@ Flujos:
 - **CU-03 Recuperación:** el enlace de un solo uso lleva a `/auth/confirmar` y de ahí a la pantalla de contraseña nueva.
 - **CU-04 Eliminar cuenta:** se reverifica la contraseña antes de eliminar, y la eliminación del registro de autenticación arrastra todo lo demás en cascada. La limpieza de Storage se agrega en la Iteración 3.
 
-Enlaces del correo (*ajuste del plan 1B*): sin SMTP propio, Supabase no permite editar las plantillas. Con las plantillas por defecto el enlace vuelve con un código PKCE (`?code=`), que solo se puede canjear en el mismo navegador donde se pidió; con SMTP propio se usan plantillas en español con `token_hash`, que funcionan en cualquier dispositivo. `/auth/confirmar` acepta los dos formatos, así que pasar de uno a otro no requiere cambios de código.
+Enlaces del correo (*ajuste del plan 1B*): sin SMTP propio, Supabase no permite editar las plantillas. Con las plantillas por defecto el enlace vuelve con un código PKCE (`?code=`), que solo se puede canjear en el mismo navegador donde se pidió; con SMTP propio se usan plantillas en español con `token_hash`, que funcionan en cualquier dispositivo. `/auth/confirmar` acepta los dos formatos, así que pasar de uno a otro no requiere cambios de código. *Ajuste del plan 1E:* las plantillas usan `{{ .RedirectTo }}` (que ya trae `/auth/confirmar?next=…`) en vez de `{{ .SiteURL }}`, para que el enlace vuelva al entorno donde se pidió: local, vista previa o producción.
 
 Correo:
 - Durante el desarrollo, el servidor de Supabase que viene por defecto (solo envía a las direcciones del equipo del proyecto).
@@ -218,7 +218,7 @@ Las pruebas de integración crean sus propios usuarios y datos, y los eliminan a
 ## 9. Integración continua y forma de trabajo
 
 - GitHub Actions en cada push y en cada pull request: `tsc --noEmit` (RNF-11), ESLint y pruebas unitarias. Las pruebas de integración corren con secretos del repositorio.
-- RNF-13 (desplegar solo si compila y pasan las pruebas) se configura junto con Vercel.
+- RNF-13 (*plan 1E*): `main` protegida (PR con `verificar`, `integracion` y `e2e` en verde, rama al día, también para administradores); Vercel despliega cada cambio de `main` y migra en el build. Vistas previas por rama contra el proyecto de desarrollo. Producción: https://mantenimiento-vehicular-ten.vercel.app (el dominio sin sufijo estaba tomado).
 - Una rama por funcionalidad y un pull request a `main`, con la integración continua en verde.
 - Commits con prefijos convencionales (`feat:`, `fix:`, `test:`, `docs:`).
 - Las claves van solo en `.env.local` (ignorado por git). En el repositorio queda `.env.example` sin valores. Antes de cada commit se revisa que no haya claves.
