@@ -1,8 +1,10 @@
 import type { ErroresCampo } from "@/dominio/cuenta";
 import { fechaDeHoy } from "@/dominio/fechas";
 import { validarNuevaLectura } from "@/dominio/kilometraje";
+import { cambiosDeEstado, type Cambio } from "@/dominio/motor";
 import { nombreVehiculo, validarAnioDelModelo, type DatosVehiculo } from "@/dominio/vehiculo";
 import { conUsuario, type ClaimsUsuario, type TxUsuario } from "./cliente-usuario";
+import { calcularEnTx } from "./estado";
 
 export type ModeloCatalogo = { id: number; nombre: string; anioDesde: number; anioHasta: number | null };
 export type MarcaCatalogo = { id: number; nombre: string; modelos: ModeloCatalogo[] };
@@ -125,14 +127,17 @@ export async function crearVehiculo(
   claims: ClaimsUsuario,
   datos: DatosVehiculo,
   kilometraje: number,
-): Promise<Resultado<string>> {
+): Promise<Resultado<{ id: string; conSupuestos: boolean }>> {
   return conUsuario(claims, async (tx) => {
     const errores = await validarCatalogo(tx, datos);
     if (errores) return { ok: false, errores };
     const v = await tx.vehiculo.create({
       data: { usuarioId: claims.sub, ...columnas(datos), lecturas: { create: { kilometraje, fecha: fechaDeHoy() } } },
     });
-    return { ok: true, valor: v.id };
+    // CU-05 paso 6: el cálculo guarda los supuestos; si hay, el alta ofrece confirmarlos (CU-06).
+    const estado = await calcularEnTx(tx, v.id, fechaDeHoy());
+    const conSupuestos = estado?.items.some((i) => i.incertidumbre !== null) ?? false;
+    return { ok: true, valor: { id: v.id, conSupuestos } };
   });
 }
 
@@ -160,13 +165,14 @@ export async function eliminarVehiculo(claims: ClaimsUsuario, id: string): Promi
 
 /**
  * CU-08 (RF-07): bloquea la fila del vehículo para que dos cargas simultáneas no salteen la regla,
- * valida contra la última lectura y guarda la nueva con la fecha del día.
+ * valida contra la última lectura, guarda la nueva con la fecha del día y devuelve los ítems
+ * que cambiaron de estado.
  */
 export async function registrarLectura(
   claims: ClaimsUsuario,
   id: string,
   kilometraje: number,
-): Promise<Resultado<null>> {
+): Promise<Resultado<{ cambios: Cambio[] }>> {
   if (!UUID.test(id)) return NO_ENCONTRADO;
   return conUsuario(claims, async (tx) => {
     const bloqueado = await tx.$queryRaw<{ id: string }[]>`SELECT id FROM public.vehiculo WHERE id = ${id}::uuid FOR UPDATE`;
@@ -177,7 +183,11 @@ export async function registrarLectura(
     });
     const r = validarNuevaLectura(ultima?.kilometraje ?? null, kilometraje);
     if (!r.ok) return { ok: false, errores: { kilometraje: r.mensaje } };
-    await tx.lecturaKilometraje.create({ data: { vehiculoId: id, kilometraje, fecha: fechaDeHoy() } });
-    return { ok: true, valor: null };
+    const hoy = fechaDeHoy();
+    const antes = await calcularEnTx(tx, id, hoy);
+    await tx.lecturaKilometraje.create({ data: { vehiculoId: id, kilometraje, fecha: hoy } });
+    const despues = await calcularEnTx(tx, id, hoy);
+    // CU-08 paso 7: los ítems que cambiaron de estado con la lectura nueva.
+    return { ok: true, valor: { cambios: cambiosDeEstado(antes?.items ?? [], despues?.items ?? []) } };
   });
 }

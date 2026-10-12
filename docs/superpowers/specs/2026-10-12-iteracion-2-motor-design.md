@@ -110,7 +110,7 @@ cambiosDeEstado(antes: ItemConEstado[], despues: ItemConEstado[]): { itemId: num
 ### 4.2 Datos: `src/datos/estado.ts`
 
 - `estadoDelVehiculo(claims, vehiculoId)`: una transacción con `conUsuario`. Lee el vehículo, su plan publicado con intervalos, sus intervenciones de ítems del plan y su primera y última lectura; inserta los supuestos faltantes (`INSERT … ON CONFLICT DO NOTHING`) y devuelve el resultado del motor.
-- `estadosDeMisVehiculos(claims)`: lo mismo para la lista de vehículos, con el `resumen` de cada uno (mockup 04).
+- `resumenesDeMisVehiculos(claims)`: lo mismo para la lista de vehículos, con el `resumen` de cada uno (mockup 04).
 - `confirmarSupuesto(claims, vehiculoId, itemId, fecha)`, `corregirSupuesto(claims, vehiculoId, itemId, km, fecha)` y `marcarAVerificar(claims, vehiculoId, itemId)`: CU-06, cada una en su transacción. Corregir reemplaza km y fecha del mismo registro y lo deja `supuesta_confirmada`.
 - `registrarLectura` (ya existe) calcula el estado antes y después dentro de su transacción y devuelve `cambiosDeEstado` para el aviso de CU-08.
 - `crearVehiculo` (ya existe) asegura los supuestos y devuelve si se creó alguno, para decidir si el alta lleva a la confirmación.
@@ -180,7 +180,7 @@ GitHub desactiva los workflows programados de un repositorio público tras 60 d�
 2. En producción, la ficha del Ka de Felipe muestra el estado de cada ítem ordenado por urgencia, y la confirmación de supuestos funciona desde el celular.
 3. El promedio de 20 consultas de estado en producción es menor a 500 ms medido en el servidor.
 4. El respaldo semanal corrió al menos una vez (a mano) y su archivo se verificó.
-5. El merge a `main` despliega solo en Vercel (pendiente de comprobar desde la reconexión con GitHub del 12/10).
+5. El merge a `main` despliega solo en Vercel (comprobado el 12/10/2026: el job `desplegar` del CI despliega producción después de los tres checks; la conexión Git de Vercel quedó apagada).
 6. Lo que cambie respecto del informe queda en `docs/cambios-para-el-informe.md`.
 
 ## 10. Fuera del alcance de esta iteración

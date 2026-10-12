@@ -17,7 +17,7 @@ export async function agregarVehiculo(_previo: EstadoVehiculo, datos: FormData):
   const r = await crearVehiculo(claims, p.datos, p.kilometraje!);
   if (!r.ok) return { errores: r.errores };
   revalidatePath("/vehiculos");
-  redirect(`/vehiculos/${r.valor}`);
+  redirect(`/vehiculos/${r.valor.id}`);
 }
 
 /** CU-07. */

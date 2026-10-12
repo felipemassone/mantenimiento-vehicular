@@ -53,6 +53,11 @@ La prueba de punta a punta crea una cuenta con una dirección de prueba de Resen
   proyecto de Supabase de desarrollo.
 - Secretos y variables del repositorio: `VERCEL_TOKEN` (secreto), `VERCEL_ORG_ID` y
   `VERCEL_PROJECT_ID` (variables).
+- Limitación de las vistas previas: comparten el proyecto de Supabase de desarrollo, cuya lista
+  de Redirect URLs solo tiene `http://localhost:3000/**`. Ingresar funciona; crear una cuenta o
+  recuperar la contraseña desde una vista previa no (el enlace del correo cae en localhost). No se
+  usan comodines de `*.vercel.app`: cualquiera puede crear un proyecto con ese nombre y recibir
+  los enlaces. Nota para la tesis final: una base efímera por PR (Supabase branching).
 - Funciones en São Paulo (`gru1`), junto a la base.
 - Correo propio con Resend desde un subdominio verificado (SPF, DKIM y DMARC).
 

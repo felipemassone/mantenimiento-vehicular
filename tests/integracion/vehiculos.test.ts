@@ -58,7 +58,7 @@ describe("alta (CU-05)", () => {
   it("registra un modelo libre (3a) sin plan", async () => {
     const r = await crearVehiculo(claimsDe(a), { tipo: "libre", marca: "Peugeot", modelo: "208", anio: 2019 }, 41000);
     expect(r.ok).toBe(true);
-    const detalle = await obtenerVehiculo(claimsDe(a), r.ok ? r.valor : "");
+    const detalle = await obtenerVehiculo(claimsDe(a), r.ok ? r.valor.id : "");
     expect(detalle).toMatchObject({ nombre: "Peugeot 208", catalogado: false, plan: null });
   });
 });
