@@ -13,9 +13,14 @@ export async function conUsuario<T>(
   claims: ClaimsUsuario,
   fn: (tx: TxUsuario) => Promise<T>,
 ): Promise<T> {
-  return prisma.$transaction(async (tx) => {
-    await tx.$queryRaw`SELECT set_config('request.jwt.claims', ${JSON.stringify(claims)}, true)`;
-    await tx.$executeRawUnsafe("SET LOCAL ROLE authenticated");
-    return fn(tx);
-  });
+  // Más margen que los valores por defecto de Prisma (2 s y 5 s): por el pooler, abrir la
+  // transacción puede tardar más de 2 s en una red lenta ("Unable to start a transaction").
+  return prisma.$transaction(
+    async (tx) => {
+      await tx.$queryRaw`SELECT set_config('request.jwt.claims', ${JSON.stringify(claims)}, true)`;
+      await tx.$executeRawUnsafe("SET LOCAL ROLE authenticated");
+      return fn(tx);
+    },
+    { maxWait: 10_000, timeout: 15_000 },
+  );
 }
