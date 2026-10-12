@@ -125,14 +125,14 @@ export async function crearVehiculo(
   claims: ClaimsUsuario,
   datos: DatosVehiculo,
   kilometraje: number,
-): Promise<Resultado<string>> {
+): Promise<Resultado<{ id: string; conSupuestos: boolean }>> {
   return conUsuario(claims, async (tx) => {
     const errores = await validarCatalogo(tx, datos);
     if (errores) return { ok: false, errores };
     const v = await tx.vehiculo.create({
       data: { usuarioId: claims.sub, ...columnas(datos), lecturas: { create: { kilometraje, fecha: fechaDeHoy() } } },
     });
-    return { ok: true, valor: v.id };
+    return { ok: true, valor: { id: v.id, conSupuestos: false } };
   });
 }
 
