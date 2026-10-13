@@ -99,4 +99,17 @@
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
+  /* Safari de iOS: el campo de fecha trae ancho mínimo y fondo gris propios, y se sale de la
+     columna. Sin su apariencia nativa toma el ancho y el fondo de los demás campos. */
+  @supports (-webkit-touch-callout: none) {
+    input[type="date"] {
+      -webkit-appearance: none;
+      appearance: none;
+      min-width: 0;
+      display: block;
+    }
+    input[type="date"]::-webkit-date-and-time-value {
+      text-align: left;
+    }
+  }
 }
