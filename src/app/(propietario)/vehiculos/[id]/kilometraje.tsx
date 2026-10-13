@@ -12,12 +12,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { actualizarKilometraje, type EstadoVehiculo } from "../acciones";
+import { usePublicarCambios } from "./cambios";
 
 /** CU-08: muestra la última lectura y registra la nueva. */
 export function ActualizarKilometraje({ id, ultima }: { id: string; ultima: string }) {
   const [abierto, setAbierto] = useState(false);
+  const publicar = usePublicarCambios();
   const [estado, enviar, enviando] = useActionState(async (previo: EstadoVehiculo, datos: FormData) => {
     const r = await actualizarKilometraje(id, previo, datos);
+    // CU-08 paso 7: una lectura rechazada o sin cambios borra el aviso anterior.
+    publicar(r.ok && r.km !== undefined ? { km: r.km, cambios: r.cambios ?? [] } : null);
     if (r.ok) setAbierto(false); // se cierra solo si se guardó
     return r;
   }, {});
