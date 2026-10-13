@@ -1,0 +1,51 @@
+name: Respaldo
+
+# RNF-08: respaldo completo semanal de producción, cifrado, con las cuatro últimas copias (spec 7).
+on:
+  schedule:
+    - cron: "0 6 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  respaldo:
+    runs-on: ubuntu-latest
+    # Entorno limitado a ramas protegidas: un PR no puede leer estos secretos.
+    environment: produccion
+    steps:
+      - name: Instalar el cliente de PostgreSQL 17
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client-17
+
+      - name: Volcar, cifrar y verificar
+        env:
+          PROD_DIRECT_URL: ${{ secrets.PROD_DIRECT_URL }}
+          RESPALDO_FRASE: ${{ secrets.RESPALDO_FRASE }}
+        run: |
+          set -euo pipefail
+          test -n "$PROD_DIRECT_URL" && test -n "$RESPALDO_FRASE"
+          bin=/usr/lib/postgresql/17/bin
+          nombre="respaldo-$(date -u +%Y-%m-%d)"
+          "$bin/pg_dump" "$PROD_DIRECT_URL" --format=custom --no-owner --no-privileges \
+            --schema=public --schema=auth --file "$nombre.dump"
+          gpg --batch --yes --pinentry-mode loopback --passphrase-fd 3 --symmetric --cipher-algo AES256 \
+            --output "$nombre.dump.gpg" "$nombre.dump" 3<<< "$RESPALDO_FRASE"
+          rm "$nombre.dump"
+          # Verificación: se descifra y pg_restore lee el índice completo.
+          gpg --batch --pinentry-mode loopback --passphrase-fd 3 --decrypt --output verificar.dump "$nombre.dump.gpg" 3<<< "$RESPALDO_FRASE"
+          "$bin/pg_restore" --list verificar.dump > /dev/null
+          rm verificar.dump
+          echo "NOMBRE=$nombre" >> "$GITHUB_ENV"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.NOMBRE }}
+          path: ${{ env.NOMBRE }}.dump.gpg
+          retention-days: 28
+          if-no-files-found: error

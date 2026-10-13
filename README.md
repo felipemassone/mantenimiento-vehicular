@@ -66,3 +66,28 @@ Para correr la CLI de Prisma o el seed contra producción, con un `.env.producci
 ```bash
 ARCHIVO_ENTORNO=.env.produccion.local npx prisma db seed
 ```
+
+## Respaldo y restauración (RNF-08)
+
+- El workflow `Respaldo` (`.github/workflows/respaldo.yml`) corre los domingos a las 06:00 UTC y
+  a mano (Actions → Respaldo → Run workflow). Vuelca los esquemas `public` y `auth` de producción
+  con `pg_dump` 17 en formato custom, lo cifra con `gpg` (AES256) y verifica que se pueda
+  descifrar y leer con `pg_restore --list` antes de subirlo.
+- Cada corrida deja un artefacto `respaldo-AAAA-MM-DD` que se conserva 28 días: siempre hay
+  cuatro copias semanales. El repositorio es público, por eso los archivos van cifrados.
+- Corre en el entorno `produccion`, limitado a ramas protegidas, con los secretos
+  `PROD_DIRECT_URL` (pooler en modo sesión) y `RESPALDO_FRASE` (la frase de cifrado; está solo en
+  GitHub y en el gestor de contraseñas del responsable: sin ella el respaldo no se puede abrir).
+- GitHub apaga los workflows programados de un repositorio público después de 60 días sin
+  actividad; si pasa, se reactiva desde la pestaña Actions.
+
+Restauración, siempre en un proyecto de Supabase **nuevo**, nunca sobre producción:
+
+```bash
+gpg --decrypt respaldo-AAAA-MM-DD.dump.gpg > respaldo.dump
+pg_restore --list respaldo.dump
+pg_restore --clean --if-exists --no-owner --dbname "$DESTINO" respaldo.dump
+```
+
+`$DESTINO` es la cadena de conexión directa del proyecto nuevo. Después se cargan sus claves en
+Vercel y se vuelve a desplegar.
