@@ -32,6 +32,9 @@ describe("validarIntervencion (CU-10)", () => {
     expect(validarIntervencion({ ...base, km: "" }, hoy)).toMatchObject({ errores: { km: "Ingresá el kilometraje." } });
     expect(validarIntervencion({ ...base, km: "0" }, hoy)).toMatchObject({ errores: { km: "Ingresá un kilometraje mayor a 0." } });
     expect(validarIntervencion({ ...base, km: "12,5" }, hoy)).toMatchObject({ errores: { km: "Ingresá un kilometraje válido." } });
+    expect(validarIntervencion({ ...base, km: "2.000.001" }, hoy)).toMatchObject({ errores: { km: "Ingresá un kilometraje válido." } });
+    expect(validarIntervencion({ ...base, km: "3000000000" }, hoy)).toMatchObject({ errores: { km: "Ingresá un kilometraje válido." } });
+    expect(validarIntervencion({ ...base, km: "2.000.000" }, hoy)).toMatchObject({ ok: true });
   });
   it("tipo, ítem y descripción", () => {
     expect(validarIntervencion({ ...base, tipo: "" }, hoy)).toMatchObject({ errores: { tipo: "Elegí el tipo de trabajo." } });

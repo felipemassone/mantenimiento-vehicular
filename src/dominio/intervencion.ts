@@ -7,6 +7,7 @@ type Validado<T> = { ok: true; datos: T } | { ok: false; errores: ErroresCampo }
 
 const texto = (v: unknown) => (typeof v === "string" ? v.trim() : "");
 const COSTO_MAXIMO = 10_000_000_000;
+const KM_MAXIMO = 2_000_000; // el mismo tope que el alta (vehiculo.ts)
 const ERROR_COSTO = "Ingresá un costo válido, por ejemplo 85.000 o 85.000,50.";
 
 /** "85.000,50" → "85000.50"; acepta puntos de miles bien puestos y hasta 2 decimales con coma. */
@@ -22,7 +23,7 @@ function leerCosto(valor: unknown): { ok: true; costo: string | null } | { ok: f
 function leerKm(valor: unknown): { ok: true; km: number } | { ok: false; error: string } {
   const t = texto(valor).replace(/\./g, "");
   if (!t) return { ok: false, error: "Ingresá el kilometraje." };
-  if (!/^\d+$/.test(t) || !Number.isSafeInteger(Number(t))) return { ok: false, error: "Ingresá un kilometraje válido." };
+  if (!/^\d+$/.test(t) || Number(t) > KM_MAXIMO) return { ok: false, error: "Ingresá un kilometraje válido." };
   if (Number(t) === 0) return { ok: false, error: "Ingresá un kilometraje mayor a 0." };
   return { ok: true, km: Number(t) };
 }
