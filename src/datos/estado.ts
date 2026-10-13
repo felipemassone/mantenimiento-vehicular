@@ -74,7 +74,11 @@ export async function estadoDelVehiculo(
   ahora: Date = new Date(),
 ): Promise<EstadoVehiculo | null> {
   if (!UUID.test(vehiculoId)) return null;
-  return conUsuario(claims, (tx) => calcularEnTx(tx, vehiculoId, fechaDeHoy(ahora)));
+  const inicio = performance.now();
+  const estado = await conUsuario(claims, (tx) => calcularEnTx(tx, vehiculoId, fechaDeHoy(ahora)));
+  // RNF-01 (spec 4.4): la duración queda en los logs de Vercel; sin datos del usuario.
+  console.info(`[RNF-01] estadoDelVehiculo ${Math.round(performance.now() - inicio)} ms`);
+  return estado;
 }
 
 /** Chips de "Mis vehículos" (mockup 04): null para los modelos fuera del catálogo. */
