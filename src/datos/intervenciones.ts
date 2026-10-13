@@ -118,3 +118,86 @@ export async function eliminarIntervencion(
     };
   });
 }
+
+export type TrabajoDelHistorial = {
+  id: string;
+  origen: "registrada" | "supuesta_confirmada";
+  fecha: Date;
+  km: number;
+  descripcion: string;
+  itemId: number | null;
+  taller: string | null;
+  costo: string | null;
+  tieneComprobante: boolean;
+  editable: boolean;
+};
+
+const SELECCION = {
+  id: true,
+  origen: true,
+  fecha: true,
+  kilometraje: true,
+  itemId: true,
+  descripcionLibre: true,
+  taller: true,
+  costo: true,
+  item: { select: { nombre: true } },
+  comprobante: { select: { rutaArchivo: true } },
+} as const;
+
+type Fila = {
+  id: string;
+  origen: string;
+  fecha: Date | null;
+  kilometraje: number;
+  itemId: number | null;
+  descripcionLibre: string | null;
+  taller: string | null;
+  costo: { toString(): string } | null;
+  item: { nombre: string } | null;
+  comprobante: { rutaArchivo: string } | null;
+};
+
+function aTrabajo(f: Fila): TrabajoDelHistorial {
+  return {
+    id: f.id,
+    origen: f.origen as TrabajoDelHistorial["origen"],
+    fecha: f.fecha!, // registradas y confirmadas siempre tienen fecha
+    km: f.kilometraje,
+    descripcion: f.item?.nombre ?? f.descripcionLibre ?? "",
+    itemId: f.itemId,
+    taller: f.taller,
+    costo: f.costo?.toString() ?? null,
+    tieneComprobante: f.comprobante !== null,
+    editable: f.origen === "registrada",
+  };
+}
+
+const DEL_HISTORIAL = { in: ["registrada", "supuesta_confirmada"] as ("registrada" | "supuesta_confirmada")[] };
+
+/** CU-13 (RF-17): sin supuestos pendientes ni "a verificar"; null si el vehículo no es del usuario. */
+export async function historialDelVehiculo(claims: ClaimsUsuario, vehiculoId: string): Promise<TrabajoDelHistorial[] | null> {
+  if (!UUID.test(vehiculoId)) return null;
+  return conUsuario(claims, async (tx) => {
+    if (!(await tx.vehiculo.findUnique({ where: { id: vehiculoId }, select: { id: true } }))) return null;
+    const filas = await tx.intervencion.findMany({
+      where: { vehiculoId, origen: DEL_HISTORIAL },
+      orderBy: [{ fecha: "desc" }, { kilometraje: "desc" }, { fechaRegistro: "desc" }],
+      select: SELECCION,
+    });
+    return filas.map(aTrabajo);
+  });
+}
+
+/** Detalle de un trabajo del historial (CU-13 paso 3, CU-12 paso 2). */
+export async function intervencionDelVehiculo(
+  claims: ClaimsUsuario,
+  vehiculoId: string,
+  intervencionId: string,
+): Promise<(TrabajoDelHistorial & { rutaComprobante: string | null }) | null> {
+  if (!UUID.test(vehiculoId) || !UUID.test(intervencionId)) return null;
+  return conUsuario(claims, async (tx) => {
+    const f = await tx.intervencion.findFirst({ where: { id: intervencionId, vehiculoId, origen: DEL_HISTORIAL }, select: SELECCION });
+    return f ? { ...aTrabajo(f), rutaComprobante: f.comprobante?.rutaArchivo ?? null } : null;
+  });
+}

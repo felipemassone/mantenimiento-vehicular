@@ -1,6 +1,12 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { estadoDelVehiculo, supuestosDelVehiculo } from "@/datos/estado";
-import { editarIntervencion, eliminarIntervencion, registrarIntervencion } from "@/datos/intervenciones";
+import { confirmarSupuesto, estadoDelVehiculo, supuestosDelVehiculo } from "@/datos/estado";
+import {
+  editarIntervencion,
+  eliminarIntervencion,
+  historialDelVehiculo,
+  intervencionDelVehiculo,
+  registrarIntervencion,
+} from "@/datos/intervenciones";
 import { prismaPrivilegiado as db } from "@/datos/privilegiado";
 import { crearVehiculo } from "@/datos/vehiculos";
 import { fechaDeHoy } from "@/dominio/fechas";
@@ -210,5 +216,46 @@ describe("eliminarIntervencion (CU-12 1a)", () => {
     expect(await eliminarIntervencion(claimsDe(a), vehiculoId, "no-es-un-uuid")).toEqual(SIN_TRABAJO);
     expect(await eliminarIntervencion(claimsDe(b), vehiculoId, trabajoId)).toEqual(NO_ENCONTRADO_ESPERADO);
     expect(await db.intervencion.count({ where: { id: trabajoId } })).toBe(1);
+  });
+});
+
+describe("historialDelVehiculo (CU-13)", () => {
+  it("trabajos registrados y supuestos confirmados, del más nuevo al más viejo; sin pendientes", async () => {
+    const id = await nuevoKa(a);
+    await registrarIntervencion(claimsDe(a), id, { tipo: "libre", descripcion: "Escobillas", fecha: "2026-08-02", km: "60900", costo: "12.500" });
+    await registrarIntervencion(claimsDe(a), id, { tipo: "catalogo", itemId: String(aceite), fecha: "2026-10-10", km: "62400" });
+    await registrarIntervencion(claimsDe(a), id, { tipo: "libre", descripcion: "Mismo día, más km", fecha: "2026-08-02", km: "61000" });
+    const frenos = (await supuestosDelVehiculo(claimsDe(a), id))!.supuestos.find((s) => s.nombre === "Líquido de frenos")!;
+    await confirmarSupuesto(claimsDe(a), id, frenos.itemId, "2026-01-05");
+
+    const h = (await historialDelVehiculo(claimsDe(a), id))!;
+    expect(h.map((t) => [t.descripcion, t.fecha.toISOString().slice(0, 10), t.km, t.editable])).toEqual([
+      ["Aceite y filtro de aceite", "2026-10-10", 62400, true],
+      ["Mismo día, más km", "2026-08-02", 61000, true],
+      ["Escobillas", "2026-08-02", 60900, true],
+      ["Líquido de frenos", "2026-01-05", 45000, false],
+    ]);
+    expect(h[2]).toMatchObject({ origen: "registrada", costo: "12500", tieneComprobante: false, itemId: null });
+    expect(h[3]).toMatchObject({ origen: "supuesta_confirmada" });
+  });
+  it("vacío para un vehículo sin trabajos; null para uno ajeno o inexistente", async () => {
+    const id = await nuevoKa(a);
+    expect(await historialDelVehiculo(claimsDe(a), id)).toEqual([]);
+    expect(await historialDelVehiculo(claimsDe(b), id)).toBeNull();
+    expect(await historialDelVehiculo(claimsDe(a), "no-es-un-uuid")).toBeNull();
+  });
+});
+
+describe("intervencionDelVehiculo", () => {
+  it("trae un trabajo con su comprobante; null si es ajeno o no existe", async () => {
+    const { vehiculoId, trabajoId } = await conTrabajo(a);
+    await db.comprobante.create({
+      data: { intervencionId: trabajoId, rutaArchivo: `${a}/f.png`, tipoMime: "image/png", tamanoBytes: 10 },
+    });
+    expect(await intervencionDelVehiculo(claimsDe(a), vehiculoId, trabajoId)).toMatchObject({
+      descripcion: "Aceite y filtro de aceite", taller: "Lubri", costo: "85000", tieneComprobante: true, rutaComprobante: `${a}/f.png`,
+    });
+    expect(await intervencionDelVehiculo(claimsDe(b), vehiculoId, trabajoId)).toBeNull();
+    expect(await intervencionDelVehiculo(claimsDe(a), vehiculoId, "no-es-un-uuid")).toBeNull();
   });
 });
