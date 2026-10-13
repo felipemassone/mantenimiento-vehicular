@@ -44,3 +44,12 @@ describe("validarCorreccion (CU-06 2a)", () => {
     });
   });
 });
+
+describe("validarCorreccion: puntos de miles", () => {
+  it("rechaza puntos de miles mal puestos", () => {
+    expect(validarCorreccion({ km: "50.0", fecha: "2026-01-10", kmActual: 62400, hoy })).toMatchObject({
+      ok: false,
+      errores: { km: "Ingresá un kilometraje válido." },
+    });
+  });
+});

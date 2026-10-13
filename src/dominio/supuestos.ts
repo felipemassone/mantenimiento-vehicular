@@ -1,11 +1,12 @@
 import type { ErroresCampo } from "@/dominio/cuenta";
-import { formatearKm } from "@/dominio/kilometraje";
+import { formatearKm, leerEnteroConMiles } from "@/dominio/kilometraje";
 
 export type Fecha = { ok: true; fecha: Date } | { ok: false; error: string };
 
 /** Fecha de un input type="date" (aaaa-mm-dd), como día calendario en medianoche UTC. */
 export function leerFecha(valor: unknown, hoy: Date): Fecha {
-  const texto = typeof valor === "string" ? valor.trim() : "";
+  if (valor !== undefined && valor !== null && typeof valor !== "string") return { ok: false, error: "Ingresá una fecha válida." };
+  const texto = valor?.trim() ?? "";
   if (!texto) return { ok: false, error: "Ingresá la fecha." };
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(texto);
   const fecha = m ? new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3]))) : null;
@@ -30,8 +31,7 @@ export function validarCorreccion(entrada: {
   kmActual: number;
   hoy: Date;
 }): { ok: true; km: number; fecha: Date } | { ok: false; errores: ErroresCampo } {
-  const texto = typeof entrada.km === "string" ? entrada.km.replace(/\./g, "").trim() : "";
-  const km = /^\d+$/.test(texto) ? Number(texto) : NaN;
+  const km = typeof entrada.km === "string" ? (leerEnteroConMiles(entrada.km) ?? NaN) : NaN;
   const errores: ErroresCampo = {};
   if (!Number.isSafeInteger(km)) errores.km = "Ingresá un kilometraje válido.";
   else if (km > entrada.kmActual) errores.km = `No puede superar ${formatearKm(entrada.kmActual)} km, la lectura actual.`;

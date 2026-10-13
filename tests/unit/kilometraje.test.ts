@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatearKm, validarNuevaLectura } from "@/dominio/kilometraje";
+import { formatearKm, leerEnteroConMiles, validarNuevaLectura } from "@/dominio/kilometraje";
 
 describe("formatearKm", () => {
   it("usa punto de miles, como en Argentina", () => {
@@ -41,5 +41,16 @@ describe("validarNuevaLectura (RF-07)", () => {
       ok: false,
       mensaje: "Ingresá un kilometraje válido.",
     });
+  });
+});
+
+describe("leerEnteroConMiles", () => {
+  it("acepta el número pelado o con puntos de miles bien puestos", () => {
+    expect(leerEnteroConMiles("62400")).toBe(62400);
+    expect(leerEnteroConMiles(" 62.400 ")).toBe(62400);
+    expect(leerEnteroConMiles("1.062.400")).toBe(1062400);
+  });
+  it("rechaza puntos mal puestos y lo que no es un entero", () => {
+    for (const t of ["62.4", "6.2400", "1.0000", ".400", "62.", "62,4", "-1", "", "1e3"]) expect(leerEnteroConMiles(t)).toBeNull();
   });
 });
