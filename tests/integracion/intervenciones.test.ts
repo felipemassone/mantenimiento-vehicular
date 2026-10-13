@@ -259,3 +259,60 @@ describe("intervencionDelVehiculo", () => {
     expect(await intervencionDelVehiculo(claimsDe(a), vehiculoId, "no-es-un-uuid")).toBeNull();
   });
 });
+
+describe("rechazos sin escrituras (menores del plan 3A)", () => {
+  const MARCA = `Prueba plan viejo ${Date.now()}`;
+
+  afterAll(async () => {
+    // Los usuarios (y sus vehículos) se borran en el afterAll de arriba; este corre antes.
+    await db.vehiculo.deleteMany({ where: { modelo: { marca: { nombre: MARCA } } } });
+    const marca = await db.marca.findUnique({ where: { nombre: MARCA } });
+    if (!marca) return;
+    for (const m of await db.modelo.findMany({ where: { marcaId: marca.id } })) {
+      await db.planMantenimiento.deleteMany({ where: { modeloId: m.id } });
+      await db.itemMantenimiento.deleteMany({ where: { modeloId: m.id } });
+    }
+    await db.modelo.deleteMany({ where: { marcaId: marca.id } });
+    await db.marca.delete({ where: { id: marca.id } });
+  });
+
+  /** Modelo propio: plan v1 (reemplazado) con dos ítems y v2 (publicado) con uno solo. */
+  async function modeloConPlanViejo(): Promise<{ modeloId: number; itemViejo: number }> {
+    const marca = await db.marca.create({ data: { nombre: MARCA } });
+    const modelo = await db.modelo.create({ data: { marcaId: marca.id, nombre: "Prueba", anioDesde: 2020 } });
+    const [sigue, viejo] = await Promise.all(
+      ["Aceite", "Bujías"].map((nombre) => db.itemMantenimiento.create({ data: { modeloId: modelo.id, nombre, tipo: "reemplazo" } })),
+    );
+    await db.planMantenimiento.create({
+      data: {
+        modeloId: modelo.id,
+        version: 1,
+        estado: "reemplazado",
+        intervalos: { create: [sigue, viejo].map((i) => ({ itemId: i.id, intervaloKm: 10000 })) },
+      },
+    });
+    await db.planMantenimiento.create({
+      data: { modeloId: modelo.id, version: 2, estado: "publicado", intervalos: { create: [{ itemId: sigue.id, intervaloKm: 10000 }] } },
+    });
+    return { modeloId: modelo.id, itemViejo: viejo.id };
+  }
+
+  it("un registro rechazado no deja los supuestos que creó el cálculo", async () => {
+    const r0 = await crearVehiculo(claimsDe(a), { tipo: "catalogo", modeloId: kaId, anio: 2014 }, 62400);
+    const id = r0.ok ? r0.valor.id : "";
+    // El alta ya guarda los supuestos; se borran para ver si el registro rechazado los vuelve a dejar.
+    await db.intervencion.deleteMany({ where: { vehiculoId: id } });
+    const r = await registrarIntervencion(claimsDe(a), id, { tipo: "catalogo", itemId: "999999", fecha: hoy(), km: "62400" });
+    expect(r).toMatchObject({ ok: false, errores: { itemId: "Ese trabajo no está en el plan de este vehículo." } });
+    expect(await db.intervencion.count({ where: { vehiculoId: id } })).toBe(0);
+  });
+
+  it("un ítem de una versión vieja del plan se rechaza", async () => {
+    const { modeloId, itemViejo } = await modeloConPlanViejo();
+    const r0 = await crearVehiculo(claimsDe(a), { tipo: "catalogo", modeloId, anio: 2020 }, 1000);
+    const id = r0.ok ? r0.valor.id : "";
+    const r = await registrarIntervencion(claimsDe(a), id, { tipo: "catalogo", itemId: String(itemViejo), fecha: hoy(), km: "1000" });
+    expect(r).toMatchObject({ ok: false, errores: { itemId: "Ese trabajo no está en el plan de este vehículo." } });
+    expect(await db.intervencion.count({ where: { vehiculoId: id, origen: "registrada" } })).toBe(0);
+  });
+});
