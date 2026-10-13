@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { erroresDe, type ErroresCampo } from "./cuenta";
-import type { ResultadoValidacion } from "./kilometraje";
+import { leerEnteroConMiles, type ResultadoValidacion } from "./kilometraje";
 
 export type DatosVehiculo =
   | { tipo: "catalogo"; modeloId: number; anio: number }
@@ -9,7 +9,7 @@ export type DatosVehiculo =
 /** Entero escrito en un formulario: admite punto de miles; vacío no es 0. */
 function entero(mensaje: string, min: number, max: number) {
   return z.preprocess(
-    (v) => (typeof v === "string" ? (v.trim() === "" ? undefined : Number(v.trim().replace(/\./g, ""))) : v),
+    (v) => (typeof v === "string" ? (v.trim() === "" ? undefined : (leerEnteroConMiles(v) ?? NaN)) : v),
     z.number({ error: mensaje }).int({ error: mensaje }).min(min, { error: mensaje }).max(max, { error: mensaje }),
   );
 }

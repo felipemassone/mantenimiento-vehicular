@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { validarEdicion, validarIntervencion } from "@/dominio/intervencion";
+import { ordenarHistorial, validarEdicion, validarIntervencion } from "@/dominio/intervencion";
 
 const hoy = new Date("2026-10-13T00:00:00Z");
 const base = { tipo: "catalogo", itemId: "7", fecha: "2026-10-10", km: "62.400", taller: "", costo: "" };
@@ -81,5 +81,51 @@ describe("validarEdicion (CU-12)", () => {
       ok: false,
       errores: { fecha: "Ingresá la fecha.", km: "Ingresá el kilometraje." },
     });
+  });
+});
+
+describe("km y valores que no son texto", () => {
+  const km = (v: unknown) => validarIntervencion({ ...base, km: v }, hoy);
+  it("rechaza los puntos de miles mal puestos", () => {
+    expect(km("62.4")).toMatchObject({ ok: false, errores: { km: "Ingresá un kilometraje válido." } });
+  });
+  it("acepta un número", () => {
+    expect(km(62400)).toMatchObject({ ok: true, datos: { km: 62400 } });
+  });
+  it("un valor que no es texto ni número es inválido, no vacío", () => {
+    expect(km({})).toMatchObject({ ok: false, errores: { km: "Ingresá un kilometraje válido." } });
+    expect(validarIntervencion({ ...base, taller: ["x"] }, hoy)).toMatchObject({ ok: false, errores: { taller: "Ingresá un taller válido." } });
+    expect(validarIntervencion({ ...base, costo: true }, hoy)).toMatchObject({ ok: false, errores: { costo: expect.stringContaining("85.000") } });
+    expect(validarIntervencion({ ...base, fecha: 20261010 }, hoy)).toMatchObject({ ok: false, errores: { fecha: "Ingresá una fecha válida." } });
+    expect(validarIntervencion({ tipo: "libre", descripcion: Symbol("x"), fecha: "2026-10-10", km: "1" }, hoy)).toMatchObject({
+      ok: false,
+      errores: { descripcion: "Ingresá una descripción válida." },
+    });
+  });
+});
+
+describe("ordenarHistorial (CU-13)", () => {
+  const t = (id: string, fecha: string, km: number, registrado = "2026-10-13T10:00:00Z") => ({
+    id,
+    fecha: new Date(fecha),
+    km,
+    registrado: new Date(registrado),
+  });
+  it("fecha descendente, después km descendente, después el registrado último", () => {
+    const filas = [
+      t("viejo", "2025-01-10", 40000),
+      t("mismo-dia-menos-km", "2026-10-10", 62000),
+      t("nuevo", "2026-10-11", 62500),
+      t("mismo-dia-mas-km", "2026-10-10", 62400),
+      t("empate-primero", "2026-10-10", 62000, "2026-10-13T09:00:00Z"),
+    ];
+    expect(ordenarHistorial(filas).map((f) => f.id)).toEqual([
+      "nuevo",
+      "mismo-dia-mas-km",
+      "mismo-dia-menos-km",
+      "empate-primero",
+      "viejo",
+    ]);
+    expect(filas[0].id).toBe("viejo"); // no modifica la entrada
   });
 });

@@ -72,3 +72,10 @@ describe("nombreVehiculo", () => {
     expect(nombreVehiculo({ marcaLibre: "Peugeot", modeloLibre: "208" })).toBe("Peugeot 208");
   });
 });
+
+describe("parsearVehiculo: puntos de miles", () => {
+  it("rechaza un kilometraje con puntos de miles mal puestos", () => {
+    const r = parsearVehiculo({ tipo: "catalogo", modeloId: "3", anio: "2014", kilometraje: "62.4" }, true);
+    expect(r).toMatchObject({ ok: false, errores: { kilometraje: "Ingresá un kilometraje válido." } });
+  });
+});

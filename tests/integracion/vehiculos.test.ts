@@ -107,7 +107,7 @@ describe("edición y baja (CU-07)", () => {
 
   it("eliminar borra el vehículo y sus lecturas (cascada)", async () => {
     const libre = (await listarVehiculos(claimsDe(a))).find((v) => !v.catalogado)!;
-    expect(await eliminarVehiculo(claimsDe(a), libre.id)).toBe(true);
+    expect(await eliminarVehiculo(claimsDe(a), libre.id)).toEqual([]);
     expect(await db.lecturaKilometraje.count({ where: { vehiculoId: libre.id } })).toBe(0);
   });
 });
@@ -120,7 +120,7 @@ describe("aislamiento entre usuarios (RNF-04)", () => {
     const edicion = await actualizarVehiculo(claimsDe(b), ka!.id, { tipo: "libre", marca: "X", modelo: "Y", anio: 2000 });
     expect(edicion.ok).toBe(false);
     expect((await registrarLectura(claimsDe(b), ka!.id, 999999)).ok).toBe(false);
-    expect(await eliminarVehiculo(claimsDe(b), ka!.id)).toBe(false);
+    expect(await eliminarVehiculo(claimsDe(b), ka!.id)).toBeNull();
     expect((await obtenerVehiculo(claimsDe(a), ka!.id))?.kilometraje).not.toBe(999999);
   });
 });

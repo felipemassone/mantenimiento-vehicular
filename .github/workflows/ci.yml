@@ -47,6 +47,8 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      # La base dev sigue a la rama que se prueba (las migraciones son aditivas).
+      - run: npx prisma migrate deploy
       - run: npm run test:integracion
 
   e2e:

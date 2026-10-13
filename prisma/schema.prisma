@@ -174,7 +174,7 @@ model Intervencion {
 model Comprobante {
   id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   intervencionId String       @unique @map("intervencion_id") @db.Uuid
-  rutaArchivo    String       @map("ruta_archivo") @db.VarChar(255)
+  rutaArchivo    String       @unique(map: "comprobante_ruta_unica") @map("ruta_archivo") @db.VarChar(255)
   tipoMime       String       @map("tipo_mime") @db.VarChar(20)
   tamanoBytes    Int          @map("tamano_bytes")
   fechaCarga     DateTime     @default(now()) @map("fecha_carga") @db.Timestamptz(6)

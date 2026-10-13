@@ -34,8 +34,23 @@ GitHub Actions · Vercel · Resend.
 | Comando | Qué corre |
 |---|---|
 | `npm test` | Unitarias (dominio) |
-| `npm run test:integracion` | Integración contra Supabase de desarrollo: RLS, restricciones, trigger y publicación del plan |
+| `npm run test:integracion` | Integración contra Supabase de desarrollo: RLS, restricciones, trigger, publicación del plan y comprobantes en Storage |
 | `npm run test:e2e` | Punta a punta con Playwright, en un celular emulado |
+
+En el CI, el job `integracion` aplica primero las migraciones de la rama a la base de desarrollo
+(`prisma migrate deploy`); en local hay que correrlo a mano después de cada migración nueva.
+
+## Comprobantes (RF-15)
+
+- Bucket privado `comprobantes` de Supabase Storage, creado por la migración `0004_registro`
+  junto con sus políticas: 5 MB, JPG y PNG, y cada usuario sube, lee y borra solo en la carpeta
+  con su id. Producción lo recibe con el build del próximo despliegue.
+- El navegador sube la imagen con la sesión del usuario al enviar el formulario
+  (`src/lib/comprobantes.ts`) y manda solo la ruta; el servidor la verifica en `storage.objects`
+  dentro de la transacción del trabajo (`src/datos/intervenciones.ts`). Los archivos se borran
+  por la API de Storage (`src/datos/comprobantes.ts`): la base no deja borrarlos con SQL.
+- Las imágenes se ven con enlaces firmados de 60 segundos. Eliminar la cuenta vacía antes la
+  carpeta del usuario.
 
 La prueba de punta a punta crea una cuenta con una dirección de prueba de Resend
 (`delivered+…@resend.dev`) y la elimina al final.

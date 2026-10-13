@@ -1,12 +1,13 @@
 import { z } from "zod";
 import { erroresDe, type ErroresCampo } from "./cuenta";
+import { leerEnteroConMiles } from "./kilometraje";
 
 export type DatosModelo = { marca: string; nombre: string; anioDesde: number; anioHasta: number | null };
 export type DatosItem = { nombre: string; tipo: "reemplazo" | "inspeccion"; km: number; meses: number | null };
 
 /** Entero de formulario: admite punto de miles; vacío es `undefined`. */
 const aNumero = (v: unknown) =>
-  typeof v === "string" ? (v.trim() === "" ? undefined : Number(v.trim().replace(/\./g, ""))) : v;
+  typeof v === "string" ? (v.trim() === "" ? undefined : (leerEnteroConMiles(v) ?? NaN)) : v;
 
 /** Entero en un rango, con un único mensaje para cualquier error. */
 const enteroEntre = (mensaje: string, min: number, max: number) =>
