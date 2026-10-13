@@ -18,6 +18,24 @@ Comprobado sin diferencias:
 - RNF-11 y RNF-13 (6.1.2, "Infraestructura y despliegue"): despliegue automático desde `main`
   solo con las pruebas en verde, y vista previa por rama.
 
-Para avisar en la Iteración 2: RNF-08 (respaldo semanal, cuatro copias) no lo cubre el plan
-gratuito de Supabase. Propuesta: un job semanal de GitHub Actions con `pg_dump` de producción,
-cifrado y guardado 28 días.
+## Iteración 2 (motor de reglas)
+
+| Apartado del informe | Dice | Quedó | Ajuste de redacción |
+|---|---|---|---|
+| RNF-08 | Respaldo completo semanal con cuatro copias | El plan gratuito de Supabase no lo incluye. Un workflow de GitHub Actions hace `pg_dump` semanal de `public` y `auth`, cifrado con GnuPG (AES256), verificado con `pg_restore --list` y guardado 28 días (cuatro copias) | "El respaldo completo semanal lo ejecuta un job programado de GitHub Actions, cifrado, con retención de cuatro semanas" |
+| CU-06, flujo 2b ("No lo sé") | (cotejar con la ficha del CU) | Chip "Verificar en taller" en la ficha y "N a verificar" en la lista, separado de "N a confirmar" | Sin cambio de fondo; agregar el texto del chip si se muestra la pantalla |
+| CU-08 paso 7 | (cotejar con la ficha del CU) | Además, un aviso dice qué ítems cambiaron ("Con 74.000 km cambió el estado de 4 ítems: …") y los marca con la línea oro | Mencionar el aviso en el paso 7 |
+
+Evidencia:
+
+- RNF-01: 20 consultas de estado (ficha del Ford Ka de Felipe) en producción, el 13/10/2026,
+  medidas en el servidor (`[RNF-01] estadoDelVehiculo N ms` en los logs de Vercel, región
+  `gru1` junto a la base): **promedio 124 ms**, mediana 67 ms, mínimo 25 ms, máximo 496 ms. Las
+  20 quedan por debajo de 500 ms; los tres valores de más de 400 ms corresponden a arranques en
+  frío o a la primera consulta, que crea los supuestos. Cumple (umbral: 500 ms de promedio).
+- RNF-08: primera corrida manual el 13/10/2026, en verde; artefacto `respaldo-2026-10-13`
+  (29 KB) cifrado (paquete OpenPGP de cifrado simétrico v4, AES256) y verificado en el job. El
+  procedimiento de restauración está en el README y **todavía no se ensayó** contra un proyecto
+  real: queda para la Iteración 3 o la tesis final.
+- RNF-12: el motor (`src/dominio/motor.ts`) tiene 100 % de líneas y 96,7 % de ramas cubiertas.
+- RNF-13: cada merge de la Iteración 2 (PR #8 a #13) se desplegó solo después de los tres checks.
