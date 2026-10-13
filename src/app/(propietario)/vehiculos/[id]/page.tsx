@@ -65,6 +65,14 @@ export default async function FichaVehiculoPagina({ params }: PageProps<"/vehicu
                 <div className="min-w-0">
                   <p className="font-medium">{i.nombre}</p>
                   <p className="text-sm text-muted-foreground tabular-nums">{i.detalle}</p>
+                  {i.incertidumbre && (
+                    <Link
+                      href={`/vehiculos/${v.id}/confirmar?item=${i.itemId}`}
+                      className="mt-2 inline-block text-sm font-medium text-primary underline underline-offset-4"
+                    >
+                      Confirmar dato
+                    </Link>
+                  )}
                 </div>
                 <div className="flex shrink-0 flex-col items-end gap-1">
                   {chipsDeItem(i).map((c) => (
