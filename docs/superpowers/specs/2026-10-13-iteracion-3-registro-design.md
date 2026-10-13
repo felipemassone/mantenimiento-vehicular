@@ -96,6 +96,12 @@ Los pedidos quedan en `docs/diseno/prompts-stitch.md`:
 
 En la ficha aparecen el botón "Registrar trabajo" (ya previsto en el mockup 06) y el enlace "Historial".
 
+Los diseños generados están en `docs/diseno/pantallas/mobile/15` a `17` y `web/18`. Al programarlos:
+
+- Los colores salen de `DESIGN.md`, no del `tailwind.config` de los `code.html`: Stitch define `primary` como `#002869` y fuerza `#0B3D91` con estilos en línea.
+- 17, estado 2: detrás del diálogo va el estado 1 tal cual (Stitch puso fecha y km en dos columnas), con la barra superior también atenuada; "Cancelar" es secundario con borde.
+- 18: "Quitar administrador de catálogo" ocupa una sola línea (el botón toma el ancho del texto).
+
 ## 8. Pruebas
 
 | Nivel | Qué cubre |
