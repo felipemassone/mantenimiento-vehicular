@@ -2,7 +2,7 @@
 
 import { createClient as clienteSinSesion } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
-import { borrarCarpeta } from "@/datos/comprobantes";
+import { borrarComprobantesDeLaCuenta } from "@/datos/comprobantes";
 import { supabaseAdmin } from "@/datos/privilegiado";
 import { exigirClaims } from "@/datos/sesion";
 import { createClient } from "@/lib/supabase/server";
@@ -25,8 +25,8 @@ export async function eliminarCuenta(_previo: { error?: string }, datos: FormDat
 
   const supabase = await createClient();
   const NO_SE_PUDO = { error: "No pudimos eliminar la cuenta. Intentá de nuevo en unos minutos." };
-  // RF-04: borrar el usuario de Auth no borra sus archivos de Storage; la carpeta se vacía antes.
-  if (!(await borrarCarpeta(supabase, claims.sub))) return NO_SE_PUDO;
+  // RF-04: borrar el usuario de Auth no borra sus archivos de Storage; se borran antes.
+  if (!(await borrarComprobantesDeLaCuenta(claims, supabase))) return NO_SE_PUDO;
 
   const { error } = await supabaseAdmin().auth.admin.deleteUser(claims.sub);
   if (error) return NO_SE_PUDO;

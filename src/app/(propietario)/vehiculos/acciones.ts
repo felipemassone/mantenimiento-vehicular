@@ -2,12 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { eliminarVehiculoConComprobantes } from "@/datos/comprobantes";
 import { exigirClaims } from "@/datos/sesion";
-import { actualizarVehiculo, crearVehiculo, eliminarVehiculo, registrarLectura } from "@/datos/vehiculos";
+import { actualizarVehiculo, crearVehiculo, registrarLectura } from "@/datos/vehiculos";
 import { destinoDelAlta } from "@/dominio/confirmacion";
 import type { ErroresCampo } from "@/dominio/cuenta";
 import type { Cambio } from "@/dominio/motor";
 import { parsearVehiculo } from "@/dominio/vehiculo";
+import { createClient } from "@/lib/supabase/server";
 
 export type EstadoVehiculo = { errores?: ErroresCampo; ok?: true; cambios?: Cambio[]; km?: number };
 
@@ -36,7 +38,7 @@ export async function editarVehiculo(id: string, _previo: EstadoVehiculo, datos:
 /** CU-07 1a. */
 export async function borrarVehiculo(id: string): Promise<void> {
   const claims = await exigirClaims();
-  await eliminarVehiculo(claims, id);
+  await eliminarVehiculoConComprobantes(claims, await createClient(), id);
   revalidatePath("/vehiculos");
   redirect("/vehiculos");
 }

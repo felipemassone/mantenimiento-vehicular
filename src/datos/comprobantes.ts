@@ -3,7 +3,7 @@ import { BUCKET, rutaPropia } from "@/dominio/comprobante";
 import type { Cambio } from "@/dominio/motor";
 import { conUsuario, type ClaimsUsuario } from "./cliente-usuario";
 import { editarIntervencion, eliminarIntervencion, registrarIntervencion } from "./intervenciones";
-import type { Resultado } from "./vehiculos";
+import { eliminarVehiculo, type Resultado } from "./vehiculos";
 
 /*
  * Archivos del bucket, siempre con la sesión del usuario (`cliente`): la RLS de Storage limita
@@ -85,6 +85,24 @@ export async function eliminarTrabajo(
 export async function enlaceDelComprobante(cliente: SupabaseClient, ruta: string): Promise<string | null> {
   const { data, error } = await cliente.storage.from(BUCKET).createSignedUrl(ruta, 60);
   return error ? null : data.signedUrl;
+}
+
+/** CU-07 1a: la cascada se lleva las filas; los archivos se borran después. False si no es del usuario. */
+export async function eliminarVehiculoConComprobantes(claims: ClaimsUsuario, cliente: SupabaseClient, id: string): Promise<boolean> {
+  const rutas = await eliminarVehiculo(claims, id);
+  if (rutas === null) return false;
+  await borrarArchivos(cliente, rutas);
+  return true;
+}
+
+/**
+ * RF-04, antes de borrar la cuenta: primero las filas y después los archivos. Si algo falla a
+ * mitad de camino, la cuenta sigue sin comprobantes, pero nunca con filas que apunten a archivos
+ * que ya no existen.
+ */
+export async function borrarComprobantesDeLaCuenta(claims: ClaimsUsuario, cliente: SupabaseClient): Promise<boolean> {
+  await conUsuario(claims, (tx) => tx.comprobante.deleteMany({})); // la RLS lo limita a los del usuario
+  return borrarCarpeta(cliente, claims.sub);
 }
 
 /** RF-04: borrar el usuario de Auth no borra sus archivos; se vacía su carpeta antes. */

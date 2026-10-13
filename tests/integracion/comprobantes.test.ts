@@ -1,7 +1,15 @@
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { conUsuario } from "@/datos/cliente-usuario";
-import { borrarCarpeta, editarTrabajo, eliminarTrabajo, enlaceDelComprobante, registrarTrabajo } from "@/datos/comprobantes";
+import {
+  borrarCarpeta,
+  borrarComprobantesDeLaCuenta,
+  editarTrabajo,
+  eliminarTrabajo,
+  eliminarVehiculoConComprobantes,
+  enlaceDelComprobante,
+  registrarTrabajo,
+} from "@/datos/comprobantes";
 import { estadoDelVehiculo } from "@/datos/estado";
 import { historialDelVehiculo } from "@/datos/intervenciones";
 import { prismaPrivilegiado as db, supabaseAdmin } from "@/datos/privilegiado";
@@ -217,5 +225,27 @@ describe("comprobante de un trabajo (CU-11)", () => {
     const ruta = await subir(c);
     await borrarCarpeta(await sesionDe(b), c); // la RLS le muestra la carpeta vacía
     expect(await existe(ruta)).toBe(true);
+  });
+
+  it("eliminar el vehículo borra los archivos de sus trabajos (CU-07 1a)", async () => {
+    const id = await nuevoKa(a);
+    const ca = await sesionDe(a);
+    const ruta = await subir(a);
+    expect((await registrarTrabajo(claimsDe(a), ca, id, { ...aceite(), comprobante: ruta })).ok).toBe(true);
+    expect(await eliminarVehiculoConComprobantes(claimsDe(a), ca, id)).toBe(true);
+    expect(await db.vehiculo.count({ where: { id } })).toBe(0);
+    expect(await existe(ruta)).toBe(false);
+    expect(await eliminarVehiculoConComprobantes(claimsDe(b), await sesionDe(b), id)).toBe(false);
+  });
+
+  it("al eliminar la cuenta, las filas se borran antes que los archivos (RF-04)", async () => {
+    const id = await nuevoKa(c);
+    const cc = await sesionDe(c);
+    const ruta = await subir(c);
+    expect((await registrarTrabajo(claimsDe(c), cc, id, { ...aceite(), comprobante: ruta })).ok).toBe(true);
+    expect(await borrarComprobantesDeLaCuenta(claimsDe(c), cc)).toBe(true);
+    expect(await db.comprobante.count({ where: { rutaArchivo: ruta } })).toBe(0);
+    expect(await existe(ruta)).toBe(false);
+    expect(await db.intervencion.count({ where: { vehiculoId: id, origen: "registrada" } })).toBe(1);
   });
 });

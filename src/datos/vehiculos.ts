@@ -140,10 +140,18 @@ export async function actualizarVehiculo(
   });
 }
 
-/** CU-07 1a: la cascada borra lecturas, intervenciones y comprobantes. */
-export async function eliminarVehiculo(claims: ClaimsUsuario, id: string): Promise<boolean> {
-  if (!UUID.test(id)) return false;
-  return conUsuario(claims, async (tx) => (await tx.vehiculo.deleteMany({ where: { id } })).count === 1);
+/**
+ * CU-07 1a: la cascada borra lecturas, intervenciones y comprobantes. Devuelve las rutas de los
+ * archivos de esos comprobantes (los borra quien llama, por la API de Storage), o null si el
+ * vehículo no es del usuario.
+ */
+export async function eliminarVehiculo(claims: ClaimsUsuario, id: string): Promise<string[] | null> {
+  if (!UUID.test(id)) return null;
+  return conUsuario(claims, async (tx) => {
+    const archivos = await tx.comprobante.findMany({ where: { intervencion: { vehiculoId: id } }, select: { rutaArchivo: true } });
+    if ((await tx.vehiculo.deleteMany({ where: { id } })).count !== 1) return null;
+    return archivos.map((a) => a.rutaArchivo);
+  });
 }
 
 /**
