@@ -59,6 +59,7 @@ test("propietario: cuenta, vehículo, kilometraje y baja", async ({ page }) => {
     await expect(aceite.getByText("Vencido")).toBeVisible();
     await expect(aceite.getByText("A confirmar")).toBeVisible();
     const neumaticos = page.getByRole("listitem").filter({ hasText: "Neumáticos" });
+    await expect(neumaticos).toHaveCount(1);
     await expect(neumaticos.getByText("A confirmar")).toHaveCount(0);
   });
 
@@ -66,17 +67,25 @@ test("propietario: cuenta, vehículo, kilometraje y baja", async ({ page }) => {
 
   await test.step("CU-08: actualizar el kilometraje", async () => {
     await page.getByRole("button", { name: "Actualizar kilometraje" }).click();
-    await dialogo.getByLabel("Kilometraje actual").fill("47500");
+    await dialogo.getByLabel("Kilometraje actual").fill("82000");
     await dialogo.getByRole("button", { name: "Guardar" }).click();
     await expect(dialogo).toBeHidden();
-    await expect(page.getByText("47.500 km", { exact: true })).toBeVisible();
+    await expect(page.getByText("82.000 km", { exact: true })).toBeVisible();
+    // CU-08 paso 7 (mockup 14): el aviso nombra lo que cambió, y no vuelve al recargar.
+    await expect(
+      page.getByText(
+        "Con 82.000 km cambió el estado de 2 ítems: Correa auxiliar, ahora próximo; Líquido de enfriamiento, ahora próximo.",
+      ),
+    ).toBeVisible();
+    await page.reload();
+    await expect(page.getByText(/^Con 82\.000 km cambió/)).toHaveCount(0);
   });
 
   await test.step("CU-08 4a: rechazar una lectura menor", async () => {
     await page.getByRole("button", { name: "Actualizar kilometraje" }).click();
-    await dialogo.getByLabel("Kilometraje actual").fill("47000");
+    await dialogo.getByLabel("Kilometraje actual").fill("81000");
     await dialogo.getByRole("button", { name: "Guardar" }).click();
-    await expect(dialogo.getByText("No puede ser menor a 47.500 km, la última lectura.")).toBeVisible();
+    await expect(dialogo.getByText("No puede ser menor a 82.000 km, la última lectura.")).toBeVisible();
     await page.keyboard.press("Escape");
     // Mockup 04: la tarjeta del vehículo resume su estado.
     await page.getByRole("link", { name: "Volver" }).click();

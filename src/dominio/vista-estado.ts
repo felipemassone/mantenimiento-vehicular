@@ -1,4 +1,5 @@
-import type { Estado, Incertidumbre, ItemConEstado } from "@/dominio/motor";
+import { formatearKm } from "@/dominio/kilometraje";
+import type { Cambio, Estado, Incertidumbre, ItemConEstado } from "@/dominio/motor";
 
 export type TipoChip = Estado | Incertidumbre;
 export type Chip = { tipo: TipoChip; texto: string };
@@ -35,4 +36,13 @@ export function textoInciertos(items: Pick<ItemConEstado, "incertidumbre">[]): s
   const n = items.filter((i) => i.incertidumbre === "a_confirmar").length;
   if (n === 0) return null;
   return `${contar(n, "ítem", "ítems")} a confirmar. Lo supusimos porque el auto se cargó con más kilómetros que el intervalo.`;
+}
+
+const ESTADO_EN_TEXTO: Record<Estado, string> = { vencido: "vencido", proximo: "próximo", al_dia: "al día" };
+
+/** Mockup 14: "Con 75.300 km cambió el estado de 1 ítem: Aceite y filtro de aceite, ahora vencido." */
+export function textoCambios(km: number, cambios: Pick<Cambio, "nombre" | "estado">[]): string | null {
+  if (cambios.length === 0) return null;
+  const lista = cambios.map((c) => `${c.nombre}, ahora ${ESTADO_EN_TEXTO[c.estado]}`).join("; ");
+  return `Con ${formatearKm(km)} km cambió el estado de ${contar(cambios.length, "ítem", "ítems")}: ${lista}.`;
 }

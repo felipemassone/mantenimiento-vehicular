@@ -66,3 +66,48 @@ Para correr la CLI de Prisma o el seed contra producción, con un `.env.producci
 ```bash
 ARCHIVO_ENTORNO=.env.produccion.local npx prisma db seed
 ```
+
+## Respaldo y restauración (RNF-08)
+
+- El workflow `Respaldo` (`.github/workflows/respaldo.yml`) corre los domingos a las 06:00 UTC y
+  a mano (Actions → Respaldo → Run workflow). Vuelca los esquemas `public` y `auth` de producción
+  con `pg_dump` 17 en formato custom, lo cifra con `gpg` (AES256) y verifica que se pueda
+  descifrar y leer con `pg_restore --list` antes de subirlo.
+- Cada corrida deja un artefacto `respaldo-AAAA-MM-DD` (Actions → Respaldo → la corrida →
+  Artifacts; se descarga como `.zip`) que se conserva 28 días: cuatro copias semanales. El
+  repositorio es público, por eso los archivos van cifrados. El volcado incluye los permisos de
+  `public` (la app depende de los GRANT al rol `authenticated`), sin dueños.
+- Corre en el entorno `produccion`, limitado a la rama `main`, con los secretos
+  `PROD_DIRECT_URL` (pooler en modo sesión) y `RESPALDO_FRASE` (la frase de cifrado; está solo en
+  GitHub y en el gestor de contraseñas del responsable: sin ella el respaldo no se puede abrir).
+- GitHub apaga los workflows programados de un repositorio público después de 60 días sin
+  actividad; si pasa, se reactiva desde la pestaña Actions.
+
+Restauración, siempre en un proyecto de Supabase **nuevo**, nunca sobre producción. Hace falta
+`pg_restore` 17 o posterior y GnuPG 2.4 o posterior (Gpg4win 4 en Windows). **Procedimiento todavía
+no ensayado** contra un proyecto real; el orden responde a cómo se relacionan los esquemas:
+`public.usuario` apunta a `auth.users`, y el trigger `al_crear_usuario` (sobre `auth.users`) crea
+la fila de `public.usuario` de cada cuenta nueva.
+
+```bash
+# 1. Descifrar (con --output: en PowerShell, redirigir con > corrompe el binario).
+gpg --output respaldo.dump --decrypt respaldo-AAAA-MM-DD.dump.gpg
+pg_restore --list respaldo.dump
+
+# 2. Las cuentas: solo los datos de auth, porque el esquema ya lo crea Supabase. Va primero
+#    porque public.usuario las referencia, y todavía no existe el trigger que duplicaría filas.
+pg_restore --no-owner --data-only --schema=auth --table=users --table=identities --dbname "$DESTINO" respaldo.dump
+
+# 3. Todo public: tablas, datos, funciones, triggers, políticas RLS y permisos. pg_restore carga
+#    los datos antes de crear triggers y claves foráneas. Un error esperable: "schema public
+#    already exists".
+pg_restore --no-owner --schema=public --dbname "$DESTINO" respaldo.dump
+
+# 4. El trigger sobre auth.users no viaja con public: se vuelve a crear.
+psql "$DESTINO" -c "CREATE TRIGGER al_crear_usuario AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION public.crear_usuario();"
+```
+
+`$DESTINO` es la cadena de conexión directa del proyecto nuevo. Después se cargan sus claves en
+Vercel, se configuran Auth (SMTP, plantillas y Redirect URLs) como en producción y se vuelve a
+desplegar. Si la versión de Supabase Auth del proyecto nuevo cambió columnas de `auth.users`, el
+paso 2 puede fallar y hay que adaptar esos datos a mano.

@@ -6,9 +6,10 @@ import { exigirClaims } from "@/datos/sesion";
 import { actualizarVehiculo, crearVehiculo, eliminarVehiculo, registrarLectura } from "@/datos/vehiculos";
 import { destinoDelAlta } from "@/dominio/confirmacion";
 import type { ErroresCampo } from "@/dominio/cuenta";
+import type { Cambio } from "@/dominio/motor";
 import { parsearVehiculo } from "@/dominio/vehiculo";
 
-export type EstadoVehiculo = { errores?: ErroresCampo; ok?: true };
+export type EstadoVehiculo = { errores?: ErroresCampo; ok?: true; cambios?: Cambio[]; km?: number };
 
 /** CU-05. */
 export async function agregarVehiculo(_previo: EstadoVehiculo, datos: FormData): Promise<EstadoVehiculo> {
@@ -49,5 +50,5 @@ export async function actualizarKilometraje(id: string, _previo: EstadoVehiculo,
   if (!r.ok) return { errores: r.errores };
   revalidatePath(`/vehiculos/${id}`);
   revalidatePath("/vehiculos");
-  return { ok: true };
+  return { ok: true, cambios: r.valor.cambios, km };
 }
