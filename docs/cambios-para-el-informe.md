@@ -39,3 +39,11 @@ Evidencia:
   real: queda para la Iteración 3 o la tesis final.
 - RNF-12: el motor (`src/dominio/motor.ts`) tiene 100 % de líneas y 96,7 % de ramas cubiertas.
 - RNF-13: cada merge de la Iteración 2 (PR #8 a #13) se desplegó solo después de los tres checks.
+
+## Iteración 3 (registro e historial)
+
+| Apartado del informe | Dice | Quedó | Ajuste de redacción |
+|---|---|---|---|
+| RF-15 | Adjuntar una imagen del comprobante, hasta 5 MB | El navegador sube la imagen directo a Supabase Storage (bucket privado, una carpeta por usuario con RLS); el límite de 5 MB y los tipos JPG/PNG los aplica el bucket. Se ve con un enlace firmado de 60 segundos | "La imagen se guarda en un almacenamiento privado y solo la ve su propietario, mediante enlaces temporales" |
+| CU-11, postcondición | Si el registro falla, no queda el archivo | La imagen se sube al guardar el trabajo (no al elegirla); si el servidor rechaza el registro, la borra. Un formulario abandonado sin enviar no sube nada | Sin cambio de fondo |
+| RF-04 / CU-04 | La eliminación de la cuenta borra todos sus datos | Además de la cascada en la base, se vacía la carpeta de comprobantes del usuario antes de borrar la cuenta | Mencionar los comprobantes entre los datos que se eliminan |
