@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { chipsDeItem, chipsDeResumen, textoInciertos } from "@/dominio/vista-estado";
+import { chipsDeItem, chipsDeResumen, textoCambios, textoInciertos } from "@/dominio/vista-estado";
 
 describe("chipsDeItem (spec 3.3)", () => {
   it("un ítem cierto muestra solo su estado", () => {
@@ -58,5 +58,26 @@ describe("textoInciertos (mockup 06)", () => {
   });
   it("sin supuestos pendientes no hay texto (los de verificar en taller ya tienen respuesta)", () => {
     expect(textoInciertos([{ incertidumbre: "verificar_en_taller" }, { incertidumbre: null }])).toBeNull();
+  });
+});
+
+describe("textoCambios (CU-08 paso 7, mockup 14)", () => {
+  it("un cambio, en singular", () => {
+    expect(textoCambios(75300, [{ nombre: "Aceite y filtro de aceite", estado: "vencido" }])).toBe(
+      "Con 75.300 km cambió el estado de 1 ítem: Aceite y filtro de aceite, ahora vencido.",
+    );
+  });
+  it("varios, en plural y en el orden recibido", () => {
+    expect(
+      textoCambios(82000, [
+        { nombre: "Correa auxiliar", estado: "proximo" },
+        { nombre: "Líquido de enfriamiento", estado: "al_dia" },
+      ]),
+    ).toBe(
+      "Con 82.000 km cambió el estado de 2 ítems: Correa auxiliar, ahora próximo; Líquido de enfriamiento, ahora al día.",
+    );
+  });
+  it("sin cambios no hay aviso", () => {
+    expect(textoCambios(82000, [])).toBeNull();
   });
 });
