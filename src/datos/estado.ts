@@ -125,10 +125,15 @@ export async function supuestosDelVehiculo(
       where: { vehiculoId, origen: { in: [...PENDIENTES] } },
       select: { itemId: true, kilometraje: true, origen: true },
     });
+    // Spec 3.1 (Iteración 3): un ítem con un trabajo registrado ya no se ofrece para confirmar.
+    const conTrabajo = new Set(
+      (await tx.intervencion.findMany({ where: { vehiculoId, origen: "registrada", itemId: { not: null } }, select: { itemId: true } }))
+        .map((f) => f.itemId),
+    );
     const porItem = new Map(filas.map((f) => [f.itemId, f]));
     const supuestos = e.items.flatMap((i) => {
       const f = porItem.get(i.itemId);
-      return f ? [{ itemId: i.itemId, nombre: i.nombre, km: f.kilometraje, origen: f.origen as SupuestoPendiente["origen"] }] : [];
+      return f && !conTrabajo.has(i.itemId) ? [{ itemId: i.itemId, nombre: i.nombre, km: f.kilometraje, origen: f.origen as SupuestoPendiente["origen"] }] : [];
     });
     return { kmActual: e.kmActual, supuestos };
   });

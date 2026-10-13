@@ -1,10 +1,10 @@
 import type { ErroresCampo } from "@/dominio/cuenta";
 import { formatearKm } from "@/dominio/kilometraje";
 
-type Fecha = { ok: true; fecha: Date } | { ok: false; error: string };
+export type Fecha = { ok: true; fecha: Date } | { ok: false; error: string };
 
 /** Fecha de un input type="date" (aaaa-mm-dd), como día calendario en medianoche UTC. */
-function leerFecha(valor: unknown, hoy: Date): Fecha {
+export function leerFecha(valor: unknown, hoy: Date): Fecha {
   const texto = typeof valor === "string" ? valor.trim() : "";
   if (!texto) return { ok: false, error: "Ingresá la fecha." };
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(texto);
