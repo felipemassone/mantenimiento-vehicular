@@ -359,3 +359,107 @@ Sin botón al pie.
 Colores exactos: fondo #F6F4EF, texto #1B2430, botón principal y enlaces #0B3D91, oro #F2B705 solo en el ícono del logo. Sin degradados, ilustraciones, fotos ni emojis.
 Títulos y botones con mayúscula solo en la primera palabra ("Agregar vehículo", no "Agregar Vehículo"). No agregues textos, avisos, subtítulos ni notas al pie que no estén en este pedido. En las pantallas internas (las que tienen flecha "Volver"), la barra superior no lleva el botón de cuenta.
 ```
+
+## 15. Registrar trabajo — Aplicación
+
+```
+Dos estados de la misma pantalla, uno al lado del otro.
+
+Barra superior con flecha "Volver" y el título "Registrar trabajo".
+
+Estado 1, trabajo del plan:
+Selector de dos opciones arriba, a lo ancho: "Del plan" (elegido) y "Otro trabajo".
+Campo desplegable "Trabajo" con el valor "Aceite y filtro de aceite".
+Campo de fecha "Fecha" con el valor "10/10/2026".
+Campo "Kilometraje" con el valor "62.400" y el sufijo "km".
+Campo "Taller" con el valor "Lubricentro San Martín" y, a la derecha de la etiqueta, la palabra "Opcional" en texto secundario.
+Campo "Costo" con el prefijo "$" y el valor "85.000", también con "Opcional".
+Bloque "Comprobante": una miniatura de una foto de factura (rectángulo gris con un ícono de imagen, sin foto real), al lado el nombre "factura.jpg · 1,2 MB" y el enlace "Quitar".
+Botón principal a lo ancho al pie: "Guardar trabajo".
+
+Estado 2, otro trabajo con errores:
+El selector con "Otro trabajo" elegido.
+Campo "Descripción" con el valor "Cambio de escobillas".
+Campo de fecha "Fecha" con el valor "20/10/2026" y un error: borde rojo y el mensaje "La fecha no puede ser posterior a hoy."
+Campo "Kilometraje" vacío con un error: borde rojo y el mensaje "Ingresá el kilometraje."
+Campos "Taller" y "Costo" vacíos, con "Opcional".
+Botón secundario a lo ancho "Adjuntar comprobante", con un ícono de clip, y debajo en texto secundario "JPG o PNG, hasta 5 MB."
+Botón principal a lo ancho al pie: "Guardar trabajo".
+
+Colores exactos: fondo #F6F4EF, texto #1B2430, botón principal y enlaces #0B3D91, oro #F2B705 solo en el ícono del logo. Sin degradados, ilustraciones, fotos ni emojis.
+Títulos y botones con mayúscula solo en la primera palabra ("Agregar vehículo", no "Agregar Vehículo"). No agregues textos, avisos, subtítulos ni notas al pie que no estén en este pedido. En las pantallas internas (las que tienen flecha "Volver"), la barra superior no lleva el botón de cuenta.
+```
+
+## 16. Historial — Aplicación
+
+```
+Dos estados de la misma pantalla, uno al lado del otro.
+
+Barra superior con flecha "Volver" y el título "Historial".
+
+Estado 1, con trabajos:
+En texto secundario arriba: "Ford Ka 2014".
+Lista de filas blancas separadas por líneas, de la más nueva a la más vieja. Cada fila tiene a la izquierda la fecha en dos líneas (día y mes arriba, año abajo) y a la derecha: el nombre del trabajo, debajo en texto secundario el kilometraje y el taller, y a la derecha de la fila el costo. Las filas con comprobante muestran un ícono de clip junto al nombre.
+- 10/10/2026 — "Aceite y filtro de aceite" (con clip) — "62.400 km · Lubricentro San Martín" — "$ 85.000".
+- 02/08/2026 — "Cambio de escobillas" — "60.900 km" — "$ 12.500".
+- 14/03/2026 — "Neumáticos" (con clip) — "58.300 km · Gomería Centro" — "$ 420.000".
+- 05/01/2026 — "Líquido de frenos" — "45.000 km" — sin costo; debajo, en texto secundario, "Dato del alta, confirmado por vos".
+Cada fila lleva una flecha a la derecha.
+Botón principal al pie, a lo ancho: "Registrar trabajo".
+
+Estado 2, sin trabajos:
+Texto: "Todavía no registraste trabajos para este vehículo."
+Texto secundario: "Cuando registres uno, el plan vuelve a contar desde ese día."
+Botón principal a lo ancho: "Registrar el primero".
+
+Colores exactos: fondo #F6F4EF, texto #1B2430, botón principal y enlaces #0B3D91, oro #F2B705 solo en el ícono del logo. Sin degradados, ilustraciones, fotos ni emojis.
+Títulos y botones con mayúscula solo en la primera palabra ("Agregar vehículo", no "Agregar Vehículo"). No agregues textos, avisos, subtítulos ni notas al pie que no estén en este pedido. En las pantallas internas (las que tienen flecha "Volver"), la barra superior no lleva el botón de cuenta.
+```
+
+## 17. Detalle del trabajo — Aplicación
+
+```
+Dos estados, uno al lado del otro.
+
+Estado 1, detalle:
+Barra superior con flecha "Volver" y el título "Aceite y filtro de aceite".
+Lista de datos en una tarjeta blanca, cada uno con la etiqueta en texto secundario arriba y el valor abajo:
+- "Fecha": "10/10/2026".
+- "Kilometraje": "62.400 km".
+- "Taller": "Lubricentro San Martín".
+- "Costo": "$ 85.000".
+Sección "Comprobante" con la imagen de una factura ocupando el ancho (un rectángulo gris claro con líneas de texto simuladas, sin foto real) y debajo el enlace "Ver en tamaño completo".
+Dos botones a lo ancho al pie, uno debajo del otro: secundario "Editar" y secundario con texto rojo "Eliminar trabajo".
+
+Estado 2, diálogo de confirmación sobre la pantalla atenuada:
+Título: "¿Eliminar este trabajo?"
+Texto: "Se borran el trabajo y su comprobante. El plan vuelve a contar desde el trabajo anterior."
+Botón secundario "Cancelar" y botón rojo "Eliminar", uno al lado del otro.
+
+Colores exactos: fondo #F6F4EF, texto #1B2430, botón principal y enlaces #0B3D91, oro #F2B705 solo en el ícono del logo. Sin degradados, ilustraciones, fotos ni emojis.
+Títulos y botones con mayúscula solo en la primera palabra ("Agregar vehículo", no "Agregar Vehículo"). No agregues textos, avisos, subtítulos ni notas al pie que no estén en este pedido. En las pantallas internas (las que tienen flecha "Volver"), la barra superior no lleva el botón de cuenta.
+```
+
+## 18. Administración: usuarios — Web
+
+Va en el proyecto Web de Stitch, junto a las pantallas 9 a 12.
+
+```
+Pantalla de escritorio de 1440 × 900 px, no de celular.
+Panel de administración, sección de usuarios.
+
+Barra lateral izquierda de 240 px con fondo gris cálido: arriba el logo "Libreta de service" con la palabra "Administración" debajo; secciones "Modelos" y "Usuarios" (activa, con una línea oro de 2 px a la izquierda). Al pie de la barra: el correo tecnico@example.com y el enlace "Ir a Mis vehículos".
+
+Contenido, en una columna de 720 px:
+Título "Usuarios".
+Texto secundario: "Buscá una cuenta por su correo exacto para darle o sacarle el rol de administrador de catálogo."
+Campo "Correo electrónico" con el valor "taller.norte@example.com" y, en la misma línea a la derecha, el botón principal "Buscar".
+Debajo, una tarjeta blanca con el resultado:
+- El correo "taller.norte@example.com" en negrita y, en texto secundario, "Cuenta creada el 02/10/2026".
+- "Roles": dos chips grises, "Propietario" y "Administrador de catálogo".
+- Botón secundario con texto rojo "Quitar administrador de catálogo".
+- Texto secundario: "El cambio se aplica en el próximo ingreso del usuario a cualquier pantalla."
+
+Colores exactos: fondo #F6F4EF, texto #1B2430, botón principal y enlaces #0B3D91, oro #F2B705 solo en el ícono del logo. Sin degradados, ilustraciones, fotos ni emojis.
+Títulos y botones con mayúscula solo en la primera palabra ("Agregar vehículo", no "Agregar Vehículo"). No agregues textos, avisos, subtítulos ni notas al pie que no estén en este pedido. En las pantallas internas (las que tienen flecha "Volver"), la barra superior no lleva el botón de cuenta.
+```
