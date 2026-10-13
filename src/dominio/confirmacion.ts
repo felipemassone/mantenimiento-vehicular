@@ -16,3 +16,12 @@ export function terminoLaConfirmacion(supuestos: Supuesto[]): boolean {
 export function destinoDelAlta(id: string, conSupuestos: boolean): string {
   return conSupuestos ? `/vehiculos/${id}/confirmar?desde=alta` : `/vehiculos/${id}`;
 }
+
+/**
+ * Spec 5: después de una respuesta, vuelve a la ficha si terminó; si no, sigue en la pantalla sin `?item=`,
+ * para que la fila pedida (ya respondida) no se vuelva a abrir.
+ */
+export function destinoTrasResponder(id: string, deAlta: boolean, termino: boolean): string {
+  if (termino) return `/vehiculos/${id}`;
+  return deAlta ? `/vehiculos/${id}/confirmar?desde=alta` : `/vehiculos/${id}/confirmar`;
+}

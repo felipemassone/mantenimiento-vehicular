@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { destinoDelAlta, filaAbierta, terminoLaConfirmacion } from "@/dominio/confirmacion";
+import { destinoDelAlta, destinoTrasResponder, filaAbierta, terminoLaConfirmacion } from "@/dominio/confirmacion";
 
 const p = (itemId: number) => ({ itemId, origen: "supuesta_pendiente" as const });
 const v = (itemId: number) => ({ itemId, origen: "supuesta_a_verificar" as const });
@@ -34,5 +34,16 @@ describe("destinoDelAlta (CU-05)", () => {
   it("con supuestos va a confirmarlos; sin supuestos, a la ficha", () => {
     expect(destinoDelAlta("abc", true)).toBe("/vehiculos/abc/confirmar?desde=alta");
     expect(destinoDelAlta("abc", false)).toBe("/vehiculos/abc");
+  });
+});
+
+describe("destinoTrasResponder (spec 5)", () => {
+  it("si terminó, vuelve a la ficha", () => {
+    expect(destinoTrasResponder("abc", true, true)).toBe("/vehiculos/abc");
+    expect(destinoTrasResponder("abc", false, true)).toBe("/vehiculos/abc");
+  });
+  it("si no terminó, sigue en la pantalla sin la fila pedida, que ya se respondió", () => {
+    expect(destinoTrasResponder("abc", true, false)).toBe("/vehiculos/abc/confirmar?desde=alta");
+    expect(destinoTrasResponder("abc", false, false)).toBe("/vehiculos/abc/confirmar");
   });
 });

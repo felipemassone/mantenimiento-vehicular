@@ -42,6 +42,7 @@ export default async function ConfirmarPagina({ params, searchParams }: PageProp
           vehiculoId={id}
           filas={filas}
           abierta={abierta}
+          deAlta={deAlta}
         />
       </div>
       {deAlta && (
