@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { estadoDelVehiculo, supuestosDelVehiculo } from "@/datos/estado";
-import { registrarIntervencion } from "@/datos/intervenciones";
+import { editarIntervencion, eliminarIntervencion, registrarIntervencion } from "@/datos/intervenciones";
 import { prismaPrivilegiado as db } from "@/datos/privilegiado";
 import { crearVehiculo } from "@/datos/vehiculos";
 import { fechaDeHoy } from "@/dominio/fechas";
@@ -129,5 +129,86 @@ describe("supuestosDelVehiculo con trabajos registrados (spec 3.1)", () => {
     const despues = (await supuestosDelVehiculo(claimsDe(a), id))!.supuestos.map((s) => s.itemId);
     expect(despues).not.toContain(aceite);
     expect(despues).toHaveLength(antes.length - 1);
+  });
+});
+
+const SIN_TRABAJO = { ok: false, errores: { formulario: "Ese trabajo ya no existe. Volvé al historial." } };
+
+async function conTrabajo(usuario: string) {
+  const id = await nuevoKa(usuario);
+  const r = await registrarIntervencion(claimsDe(usuario), id, {
+    tipo: "catalogo", itemId: String(aceite), fecha: hoy(), km: "62400", taller: "Lubri", costo: "85.000",
+  });
+  if (!r.ok) throw new Error("No se pudo registrar el trabajo de prueba");
+  return { vehiculoId: id, trabajoId: r.valor.id };
+}
+
+describe("editarIntervencion (CU-12)", () => {
+  it("cambia fecha, km, taller y costo, y recalcula", async () => {
+    const { vehiculoId, trabajoId } = await conTrabajo(a);
+    const r = await editarIntervencion(claimsDe(a), vehiculoId, trabajoId, { fecha: hoy(), km: "61000", taller: "", costo: "" });
+    expect(r.ok).toBe(true);
+    expect(await db.intervencion.findUniqueOrThrow({ where: { id: trabajoId } })).toMatchObject({
+      kilometraje: 61000, taller: null, costo: null, itemId: aceite,
+    });
+    expect((await filaDe(a, vehiculoId, "Aceite y filtro de aceite")).kmVence).toBe(76000);
+  });
+  it("con más km que la última lectura, también registra la lectura", async () => {
+    const { vehiculoId, trabajoId } = await conTrabajo(a);
+    await editarIntervencion(claimsDe(a), vehiculoId, trabajoId, { fecha: hoy(), km: "64000" });
+    expect((await estadoDelVehiculo(claimsDe(a), vehiculoId))!.kmActual).toBe(64000);
+  });
+  it("valida como el registro", async () => {
+    const { vehiculoId, trabajoId } = await conTrabajo(a);
+    expect(await editarIntervencion(claimsDe(a), vehiculoId, trabajoId, { fecha: "2099-01-01", km: "1" })).toEqual({
+      ok: false,
+      errores: { fecha: "La fecha no puede ser posterior a hoy." },
+    });
+  });
+  it("no edita un supuesto ni el trabajo de otro propietario", async () => {
+    const { vehiculoId, trabajoId } = await conTrabajo(a);
+    const supuesto = await db.intervencion.findFirstOrThrow({ where: { vehiculoId, origen: { not: "registrada" } } });
+    expect(await editarIntervencion(claimsDe(a), vehiculoId, supuesto.id, { fecha: hoy(), km: "1" })).toEqual(SIN_TRABAJO);
+    expect(await editarIntervencion(claimsDe(b), vehiculoId, trabajoId, { fecha: hoy(), km: "1" })).toEqual(NO_ENCONTRADO_ESPERADO);
+    expect((await db.intervencion.findUniqueOrThrow({ where: { id: trabajoId } })).kilometraje).toBe(62400);
+  });
+});
+
+const NO_ENCONTRADO_ESPERADO = { ok: false, errores: { formulario: "No encontramos el vehículo." } };
+
+describe("eliminarIntervencion (CU-12 1a)", () => {
+  it("borra el trabajo y el ítem vuelve a su supuesto", async () => {
+    const { vehiculoId, trabajoId } = await conTrabajo(a);
+    expect((await filaDe(a, vehiculoId, "Aceite y filtro de aceite")).incertidumbre).toBeNull();
+    const r = await eliminarIntervencion(claimsDe(a), vehiculoId, trabajoId);
+    expect(r).toMatchObject({ ok: true, valor: { rutaComprobante: null } });
+    expect(await db.intervencion.count({ where: { id: trabajoId } })).toBe(0);
+    expect((await filaDe(a, vehiculoId, "Aceite y filtro de aceite")).incertidumbre).toBe("a_confirmar");
+    expect((await supuestosDelVehiculo(claimsDe(a), vehiculoId))!.supuestos.map((s) => s.itemId)).toContain(aceite);
+  });
+  it("con dos trabajos del ítem, vuelve al anterior", async () => {
+    const { vehiculoId, trabajoId } = await conTrabajo(a);
+    await registrarIntervencion(claimsDe(a), vehiculoId, { tipo: "catalogo", itemId: String(aceite), fecha: hoy(), km: "70000" });
+    const nuevo = await db.intervencion.findFirstOrThrow({ where: { vehiculoId, origen: "registrada", kilometraje: 70000 } });
+    await eliminarIntervencion(claimsDe(a), vehiculoId, nuevo.id);
+    expect((await filaDe(a, vehiculoId, "Aceite y filtro de aceite")).kmVence).toBe(77400);
+    expect(await db.intervencion.count({ where: { id: trabajoId } })).toBe(1);
+  });
+  it("devuelve la ruta del comprobante para borrar el archivo", async () => {
+    const { vehiculoId, trabajoId } = await conTrabajo(a);
+    await db.comprobante.create({
+      data: { intervencionId: trabajoId, rutaArchivo: `${a}/prueba.jpg`, tipoMime: "image/jpeg", tamanoBytes: 1000 },
+    });
+    const r = await eliminarIntervencion(claimsDe(a), vehiculoId, trabajoId);
+    expect(r).toMatchObject({ ok: true, valor: { rutaComprobante: `${a}/prueba.jpg` } });
+    expect(await db.comprobante.count({ where: { intervencionId: trabajoId } })).toBe(0);
+  });
+  it("no elimina un supuesto, un id inexistente ni el trabajo de otro", async () => {
+    const { vehiculoId, trabajoId } = await conTrabajo(a);
+    const supuesto = await db.intervencion.findFirstOrThrow({ where: { vehiculoId, origen: { not: "registrada" } } });
+    expect(await eliminarIntervencion(claimsDe(a), vehiculoId, supuesto.id)).toEqual(SIN_TRABAJO);
+    expect(await eliminarIntervencion(claimsDe(a), vehiculoId, "no-es-un-uuid")).toEqual(SIN_TRABAJO);
+    expect(await eliminarIntervencion(claimsDe(b), vehiculoId, trabajoId)).toEqual(NO_ENCONTRADO_ESPERADO);
+    expect(await db.intervencion.count({ where: { id: trabajoId } })).toBe(1);
   });
 });

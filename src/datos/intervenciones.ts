@@ -1,5 +1,5 @@
 import { fechaDeHoy } from "@/dominio/fechas";
-import { validarIntervencion } from "@/dominio/intervencion";
+import { validarEdicion, validarIntervencion } from "@/dominio/intervencion";
 import { cambiosDeEstado, type Cambio } from "@/dominio/motor";
 import { conUsuario, type ClaimsUsuario, type TxUsuario } from "./cliente-usuario";
 import { calcularEnTx } from "./estado";
@@ -57,5 +57,64 @@ export async function registrarIntervencion(
     await registrarLecturaSiSupera(tx, vehiculoId, d.km, hoy);
     const despues = await calcularEnTx(tx, vehiculoId, hoy);
     return { ok: true, valor: { id: creada.id, cambios: cambiosDeEstado(antes?.items ?? [], despues?.items ?? []) } };
+  });
+}
+
+const SIN_TRABAJO: Resultado<never> = { ok: false, errores: { formulario: "Ese trabajo ya no existe. Volvé al historial." } };
+
+/** CU-12: solo los trabajos registrados; el ítem y la descripción no cambian. */
+export async function editarIntervencion(
+  claims: ClaimsUsuario,
+  vehiculoId: string,
+  intervencionId: string,
+  entrada: Record<string, unknown>,
+  ahora: Date = new Date(),
+): Promise<Resultado<{ cambios: Cambio[] }>> {
+  const hoy = fechaDeHoy(ahora);
+  const v = validarEdicion(entrada, hoy);
+  if (!v.ok) return v;
+  if (!UUID.test(vehiculoId)) return NO_ENCONTRADO;
+  if (!UUID.test(intervencionId)) return SIN_TRABAJO;
+  return conUsuario(claims, async (tx) => {
+    if (!(await bloquear(tx, vehiculoId))) return NO_ENCONTRADO;
+    const antes = await calcularEnTx(tx, vehiculoId, hoy);
+    const r = await tx.intervencion.updateMany({
+      where: { id: intervencionId, vehiculoId, origen: "registrada" },
+      data: { fecha: v.datos.fecha, kilometraje: v.datos.km, taller: v.datos.taller, costo: v.datos.costo },
+    });
+    if (r.count !== 1) return SIN_TRABAJO;
+    await registrarLecturaSiSupera(tx, vehiculoId, v.datos.km, hoy);
+    const despues = await calcularEnTx(tx, vehiculoId, hoy);
+    return { ok: true, valor: { cambios: cambiosDeEstado(antes?.items ?? [], despues?.items ?? []) } };
+  });
+}
+
+/** CU-12 1a: borra el trabajo (y su comprobante, en cascada); el cálculo vuelve a la ejecución anterior. */
+export async function eliminarIntervencion(
+  claims: ClaimsUsuario,
+  vehiculoId: string,
+  intervencionId: string,
+  ahora: Date = new Date(),
+): Promise<Resultado<{ cambios: Cambio[]; rutaComprobante: string | null }>> {
+  const hoy = fechaDeHoy(ahora);
+  if (!UUID.test(vehiculoId)) return NO_ENCONTRADO;
+  if (!UUID.test(intervencionId)) return SIN_TRABAJO;
+  return conUsuario(claims, async (tx) => {
+    if (!(await bloquear(tx, vehiculoId))) return NO_ENCONTRADO;
+    const trabajo = await tx.intervencion.findFirst({
+      where: { id: intervencionId, vehiculoId, origen: "registrada" },
+      select: { comprobante: { select: { rutaArchivo: true } } },
+    });
+    if (!trabajo) return SIN_TRABAJO;
+    const antes = await calcularEnTx(tx, vehiculoId, hoy);
+    await tx.intervencion.delete({ where: { id: intervencionId } });
+    const despues = await calcularEnTx(tx, vehiculoId, hoy);
+    return {
+      ok: true,
+      valor: {
+        cambios: cambiosDeEstado(antes?.items ?? [], despues?.items ?? []),
+        rutaComprobante: trabajo.comprobante?.rutaArchivo ?? null,
+      },
+    };
   });
 }
