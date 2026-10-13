@@ -32,7 +32,7 @@ jobs:
           test -n "$PROD_DIRECT_URL" && test -n "$RESPALDO_FRASE"
           bin=/usr/lib/postgresql/17/bin
           nombre="respaldo-$(date -u +%Y-%m-%d)"
-          "$bin/pg_dump" "$PROD_DIRECT_URL" --format=custom --no-owner --no-privileges \
+          "$bin/pg_dump" "$PROD_DIRECT_URL" --format=custom --no-owner \
             --schema=public --schema=auth --file "$nombre.dump"
           gpg --batch --yes --pinentry-mode loopback --passphrase-fd 3 --symmetric --cipher-algo AES256 \
             --output "$nombre.dump.gpg" "$nombre.dump" 3<<< "$RESPALDO_FRASE"

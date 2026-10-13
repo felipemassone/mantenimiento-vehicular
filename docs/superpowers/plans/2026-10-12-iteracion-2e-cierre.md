@@ -16,7 +16,7 @@
 - El aviso y la línea oro se ven solo en la respuesta a esa actualización; al volver a entrar a la ficha no están (spec 5).
 - La línea oro es de 2 px a la izquierda de la fila, con el token `oro`. El oro nunca es texto ni fondo (DESIGN.md).
 - RNF-01: promedio de 20 consultas de estado en producción, medido en el servidor, menor a 500 ms (spec 9.3).
-- Respaldo: domingos 06:00 UTC y a mano; entorno `produccion` limitado a ramas protegidas; `pg_dump` 17 en formato custom de `public` y `auth`; cifrado con `gpg` simétrico; verificado con `pg_restore --list`; artefacto con retención de 28 días (spec 7).
+- Respaldo: domingos 06:00 UTC y a mano; entorno `produccion` limitado a la rama `main`; `pg_dump` 17 en formato custom de `public` y `auth`; cifrado con `gpg` simétrico; verificado con `pg_restore --list`; artefacto con retención de 28 días (spec 7).
 - Las claves nunca se imprimen ni se suben al repositorio. `RESPALDO_FRASE` la elige y guarda Felipe.
 
 ## Review Focus
@@ -267,7 +267,7 @@ jobs:
   (Si el Step 1 dio que no hay acceso a `auth`, sacar `--schema=auth`.)
 
 - [ ] **Step 3: Entorno y secretos — FRENAR y pedirle a Felipe:**
-  - Crear el entorno `produccion` limitado a ramas protegidas: `gh api -X PUT repos/felipemassone/mantenimiento-vehicular/environments/produccion -F "deployment_branch_policy[protected_branches]=true" -F "deployment_branch_policy[custom_branch_policies]=false"` (con su visto bueno).
+  - Limitar el entorno `produccion` (ya existe: lo crea el job `desplegar`) a la rama `main` por nombre, antes de cargar ningún secreto: `gh api -X PUT repos/felipemassone/mantenimiento-vehicular/environments/produccion --input` con `{"deployment_branch_policy":{"protected_branches":false,"custom_branch_policies":true}}` y `gh api -X POST …/environments/produccion/deployment-branch-policies -f name=main -f type=branch` (con su visto bueno).
   - `PROD_DIRECT_URL`: `gh secret set PROD_DIRECT_URL --env produccion` leyendo la `DIRECT_URL` de `.env.produccion.local` por stdin, sin imprimirla (con su visto bueno).
   - `RESPALDO_FRASE`: la elige Felipe, la guarda en su gestor de contraseñas y la carga él en GitHub → Settings → Environments → produccion. Sin ella los respaldos no se pueden abrir.
 
