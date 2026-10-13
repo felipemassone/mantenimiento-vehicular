@@ -11,7 +11,8 @@ permissions:
 
 jobs:
   respaldo:
-    runs-on: ubuntu-latest
+    # Fijado: el repositorio de PostgreSQL se elige por la versión de Ubuntu, y ubuntu-latest pasa a 26 (beta).
+    runs-on: ubuntu-24.04
     # Entorno limitado a ramas protegidas: un PR no puede leer estos secretos.
     environment: produccion
     steps:
