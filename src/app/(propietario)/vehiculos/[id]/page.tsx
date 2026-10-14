@@ -10,7 +10,8 @@ import { exigirClaims } from "@/datos/sesion";
 import { obtenerVehiculo } from "@/datos/vehiculos";
 import { formatearFecha } from "@/dominio/fechas";
 import { formatearKm } from "@/dominio/kilometraje";
-import { chipsDeItem, textoInciertos } from "@/dominio/vista-estado";
+import { chipsDeItem, textoCambiosTrabajo, textoInciertos } from "@/dominio/vista-estado";
+import { leerCambios } from "@/dominio/vista-trabajo";
 import { cn } from "@/lib/utils";
 import { AvisoCambios, FilaItem, ProveedorCambios } from "./cambios";
 import { EliminarVehiculo } from "./eliminar";
@@ -18,18 +19,24 @@ import { ActualizarKilometraje } from "./kilometraje";
 
 export const metadata: Metadata = { title: "Ficha del vehículo · Libreta de service" };
 
-export default async function FichaVehiculoPagina({ params }: PageProps<"/vehiculos/[id]">) {
+export default async function FichaVehiculoPagina({ params, searchParams }: PageProps<"/vehiculos/[id]">) {
   const { id } = await params;
+  const { cambios } = await searchParams;
   const claims = await exigirClaims();
   const [v, estado] = await Promise.all([obtenerVehiculo(claims, id), estadoDelVehiculo(claims, id)]);
   if (!v) notFound();
 
   const km = v.kilometraje === null ? "sin lecturas" : `${formatearKm(v.kilometraje)} km`;
   const ultima = v.fechaLectura ? `${km}, el ${formatearFecha(v.fechaLectura)}` : km;
+  // CU-10 paso 7: los ítems que cambió el trabajo recién registrado, con su estado ya recalculado.
+  const ids = leerCambios(cambios);
+  const cambiados = (estado?.items ?? []).filter((i) => ids.includes(i.itemId));
+  const texto = textoCambiosTrabajo(cambiados);
+  const inicial = texto ? { texto, itemIds: cambiados.map((i) => i.itemId) } : null;
 
   return (
     <section>
-      <ProveedorCambios>
+      <ProveedorCambios inicial={inicial}>
         <Link href="/vehiculos" className="mb-4 inline-flex items-center gap-1 text-sm">
           <ArrowLeft className="size-4" aria-hidden="true" /> Volver
         </Link>
@@ -97,6 +104,13 @@ export default async function FichaVehiculoPagina({ params }: PageProps<"/vehicu
         )}
 
         <div className="mt-8 space-y-2">
+          {/* Mockup 06: la acción principal de la ficha. */}
+          <Button asChild className="h-12 w-full">
+            <Link href={`/vehiculos/${v.id}/registrar`}>Registrar trabajo</Link>
+          </Button>
+          <Button asChild variant="outline" className="h-12 w-full">
+            <Link href={`/vehiculos/${v.id}/historial`}>Historial</Link>
+          </Button>
           <Button asChild variant="outline" className="h-12 w-full">
             <Link href={`/vehiculos/${v.id}/editar`}>Editar datos</Link>
           </Button>
