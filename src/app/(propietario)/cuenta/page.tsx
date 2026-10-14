@@ -4,27 +4,22 @@ import Link from "next/link";
 import { cerrarSesion } from "@/app/(auth)/acciones";
 import { rolesDelUsuario } from "@/datos/cuenta";
 import { exigirClaims } from "@/datos/sesion";
+import { esAdministrador, nombreDeRol } from "@/dominio/roles";
 import { EliminarCuenta } from "./eliminar";
 
 export const metadata: Metadata = { title: "Mi cuenta · Libreta de service" };
 
-const NOMBRE_ROL: Record<string, string> = {
-  propietario: "Propietario",
-  administrador_catalogo: "Administrador de catálogo",
-  administrador_tecnico: "Administrador técnico",
-};
-
 export default async function CuentaPagina() {
   const claims = await exigirClaims();
   const roles = await rolesDelUsuario(claims);
-  const esAdmin = roles.includes("administrador_catalogo");
+  const esAdmin = esAdministrador(roles);
 
   return (
     <section>
       <h1 className="text-[22px] font-semibold">Mi cuenta</h1>
       <div className="mt-6">
         <p className="font-semibold">{claims.email}</p>
-        <p className="text-sm text-muted-foreground">{roles.map((r) => NOMBRE_ROL[r] ?? r).join(" · ")}</p>
+        <p className="text-sm text-muted-foreground">{roles.map(nombreDeRol).join(" · ")}</p>
       </div>
       <ul className="mt-6 divide-y divide-border overflow-hidden rounded-[14px] border border-border bg-card">
         {esAdmin && (
