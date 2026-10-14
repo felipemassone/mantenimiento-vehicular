@@ -8,7 +8,7 @@ export function BarraTrabajo({ volver, titulo }: { volver: string; titulo: strin
       <Link href={volver} className="inline-flex items-center gap-1 text-sm">
         <ArrowLeft className="size-4" aria-hidden="true" /> Volver
       </Link>
-      <h1 className="truncate text-center text-[17px] font-semibold">{titulo}</h1>
+      <h1 className="line-clamp-2 text-center text-[17px] font-semibold leading-snug">{titulo}</h1>
       {/* Contrapeso de "Volver" para que el título quede centrado. */}
       <span className="invisible inline-flex items-center gap-1 text-sm" aria-hidden="true">
         <ArrowLeft className="size-4" /> Volver

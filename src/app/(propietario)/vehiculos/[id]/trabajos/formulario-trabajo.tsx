@@ -181,17 +181,23 @@ export function FormularioTrabajo({ accion, usuarioId, hoy, items, inicial, text
               <span className="flex size-12 shrink-0 items-center justify-center rounded-[6px] bg-muted">
                 <ImageIcon className="size-5 text-muted-foreground" aria-hidden="true" />
               </span>
-              <p className="min-w-0 flex-1 text-sm">Comprobante guardado</p>
-              <button
-                type="button"
-                onClick={() => selectorArchivo.current?.click()}
-                className="text-sm font-medium text-primary underline underline-offset-4"
-              >
-                Reemplazar
-              </button>
-              <button type="button" onClick={() => setQuitar(true)} className="text-sm font-medium text-primary underline underline-offset-4">
-                Quitar
-              </button>
+              <p className="min-w-0 flex-1 text-sm">Imagen guardada</p>
+              <span className="flex shrink-0 gap-4">
+                <button
+                  type="button"
+                  onClick={() => selectorArchivo.current?.click()}
+                  className="text-sm font-medium text-primary underline underline-offset-4"
+                >
+                  Reemplazar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setQuitar(true)}
+                  className="text-sm font-medium text-primary underline underline-offset-4"
+                >
+                  Quitar
+                </button>
+              </span>
             </div>
           </>
         ) : (
