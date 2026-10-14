@@ -11,6 +11,9 @@ type Props = {
   error?: string;
   valorInicial?: string;
   sufijo?: string;
+  prefijo?: string;
+  opcional?: boolean;
+  max?: string;
   autoComplete?: string;
   inputMode?: "text" | "numeric" | "email";
 };
@@ -25,21 +28,28 @@ export function Campo({
   error,
   valorInicial,
   sufijo,
+  prefijo,
+  opcional,
+  max,
   autoComplete,
   inputMode,
 }: Props) {
   const idAyuda = `${id}-ayuda`;
   return (
     <div className="space-y-1.5">
-      <Label htmlFor={id} className="text-sm font-medium">
-        {etiqueta}
-      </Label>
+      <div className="flex items-baseline justify-between">
+        <Label htmlFor={id} className="text-sm font-medium">
+          {etiqueta}
+        </Label>
+        {opcional && <span className="text-[13px] text-muted-foreground">Opcional</span>}
+      </div>
       <div className="relative">
         <Input
           id={id}
           name={nombre}
           type={tipo}
           defaultValue={valorInicial}
+          max={max}
           autoComplete={autoComplete}
           inputMode={inputMode}
           aria-invalid={error ? true : undefined}
@@ -47,9 +57,15 @@ export function Campo({
           className={cn(
             "h-12 bg-card text-base",
             sufijo && "pr-12",
+            prefijo && "pl-8",
             error && "border-destructive focus-visible:ring-destructive",
           )}
         />
+        {prefijo && (
+          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-base text-muted-foreground">
+            {prefijo}
+          </span>
+        )}
         {sufijo && (
           <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">
             {sufijo}
