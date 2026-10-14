@@ -17,6 +17,9 @@ export const esquemaIngresar = z.object({
 
 export const esquemaPedirEnlace = z.object({ email });
 
+/** CU-18: correo exacto (normalizado); sin búsqueda parcial (RNF-06). */
+export const esquemaBuscarCuenta = z.object({ email });
+
 export const esquemaNuevaContrasena = z
   .object({ contrasena, repetida: z.string() })
   .refine((d) => d.contrasena === d.repetida, { error: "Las contraseñas no coinciden.", path: ["repetida"] });

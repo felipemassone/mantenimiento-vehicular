@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   erroresDe,
+  esquemaBuscarCuenta,
   esquemaCrearCuenta,
   esquemaNuevaContrasena,
   iniciales,
@@ -56,5 +57,16 @@ describe("rutaSegura", () => {
     expect(rutaSegura("//otro.sitio", "/vehiculos")).toBe("/vehiculos");
     expect(rutaSegura("/\\otro.sitio", "/vehiculos")).toBe("/vehiculos");
     expect(rutaSegura(null, "/vehiculos")).toBe("/vehiculos");
+  });
+});
+
+describe("esquemaBuscarCuenta (CU-18)", () => {
+  it("normaliza el correo buscado", () => {
+    expect(esquemaBuscarCuenta.parse({ email: "  Otro@Example.COM " }).email).toBe("otro@example.com");
+  });
+
+  it("rechaza un texto que no es un correo completo (sin búsqueda parcial)", () => {
+    const r = esquemaBuscarCuenta.safeParse({ email: "otro@" });
+    expect(erroresDe(r.error!)).toEqual({ email: "Ingresá un correo electrónico válido." });
   });
 });
