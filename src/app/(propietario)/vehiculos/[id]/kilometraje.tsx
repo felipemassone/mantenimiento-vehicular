@@ -11,6 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { textoCambios } from "@/dominio/vista-estado";
 import { actualizarKilometraje, type EstadoVehiculo } from "../acciones";
 import { usePublicarCambios } from "./cambios";
 
@@ -21,7 +22,8 @@ export function ActualizarKilometraje({ id, ultima }: { id: string; ultima: stri
   const [estado, enviar, enviando] = useActionState(async (previo: EstadoVehiculo, datos: FormData) => {
     const r = await actualizarKilometraje(id, previo, datos);
     // CU-08 paso 7: una lectura rechazada o sin cambios borra el aviso anterior.
-    publicar(r.ok && r.km !== undefined ? { km: r.km, cambios: r.cambios ?? [] } : null);
+    const texto = r.ok && r.km !== undefined ? textoCambios(r.km, r.cambios ?? []) : null;
+    publicar(texto ? { texto, itemIds: (r.cambios ?? []).map((c) => c.itemId) } : null);
     if (r.ok) setAbierto(false); // se cierra solo si se guardó
     return r;
   }, {});

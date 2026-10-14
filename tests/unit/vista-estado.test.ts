@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { chipsDeItem, chipsDeResumen, textoCambios, textoInciertos } from "@/dominio/vista-estado";
+import { chipsDeItem, chipsDeResumen, textoCambios, textoCambiosTrabajo, textoInciertos } from "@/dominio/vista-estado";
 
 describe("chipsDeItem (spec 3.3)", () => {
   it("un ítem cierto muestra solo su estado", () => {
@@ -79,5 +79,16 @@ describe("textoCambios (CU-08 paso 7, mockup 14)", () => {
   });
   it("sin cambios no hay aviso", () => {
     expect(textoCambios(82000, [])).toBeNull();
+  });
+});
+
+describe("textoCambiosTrabajo (CU-10 paso 7)", () => {
+  it("nombra lo que cambió con el trabajo", () => {
+    expect(textoCambiosTrabajo([{ nombre: "Aceite y filtro de aceite", estado: "al_dia" }])).toBe(
+      "Con el trabajo registrado cambió el estado de 1 ítem: Aceite y filtro de aceite, ahora al día.",
+    );
+  });
+  it("sin cambios, nada", () => {
+    expect(textoCambiosTrabajo([])).toBeNull();
   });
 });

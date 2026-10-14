@@ -40,9 +40,19 @@ export function textoInciertos(items: Pick<ItemConEstado, "incertidumbre">[]): s
 
 const ESTADO_EN_TEXTO: Record<Estado, string> = { vencido: "vencido", proximo: "próximo", al_dia: "al día" };
 
+const frase = (cambios: Pick<Cambio, "nombre" | "estado">[]) =>
+  `cambió el estado de ${contar(cambios.length, "ítem", "ítems")}: ${cambios
+    .map((c) => `${c.nombre}, ahora ${ESTADO_EN_TEXTO[c.estado]}`)
+    .join("; ")}.`;
+
 /** Mockup 14: "Con 75.300 km cambió el estado de 1 ítem: Aceite y filtro de aceite, ahora vencido." */
 export function textoCambios(km: number, cambios: Pick<Cambio, "nombre" | "estado">[]): string | null {
   if (cambios.length === 0) return null;
-  const lista = cambios.map((c) => `${c.nombre}, ahora ${ESTADO_EN_TEXTO[c.estado]}`).join("; ");
-  return `Con ${formatearKm(km)} km cambió el estado de ${contar(cambios.length, "ítem", "ítems")}: ${lista}.`;
+  return `Con ${formatearKm(km)} km ${frase(cambios)}`;
+}
+
+/** CU-10 paso 7: lo mismo que textoCambios, para un trabajo registrado. */
+export function textoCambiosTrabajo(cambios: Pick<Cambio, "nombre" | "estado">[]): string | null {
+  if (cambios.length === 0) return null;
+  return `Con el trabajo registrado ${frase(cambios)}`;
 }
