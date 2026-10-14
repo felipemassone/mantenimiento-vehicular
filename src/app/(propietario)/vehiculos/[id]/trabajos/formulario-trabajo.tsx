@@ -1,7 +1,7 @@
 "use client";
 
 import { ImageIcon, Paperclip } from "lucide-react";
-import { useActionState, useEffect, useRef, useState } from "react";
+import { startTransition, useActionState, useEffect, useRef, useState, type FormEvent } from "react";
 import { Aviso } from "@/components/aviso";
 import { Campo } from "@/components/campo";
 import { Selector } from "@/components/selector";
@@ -40,10 +40,13 @@ export function FormularioTrabajo({ accion, usuarioId, hoy, items, inicial, text
   const [vista, setVista] = useState<string | null>(null);
   const [errorArchivo, setErrorArchivo] = useState<string | null>(null);
   const [quitar, setQuitar] = useState(false);
+  // Oculta el error del servidor sobre el comprobante hasta el próximo envío, si se eligió otro archivo.
+  const [archivoNuevo, setArchivoNuevo] = useState(false);
   const selectorArchivo = useRef<HTMLInputElement>(null);
 
   const [estado, enviar, enviando] = useActionState(async (previo: EstadoTrabajo, datos: FormData) => {
     setErrorArchivo(null);
+    setArchivoNuevo(false);
     // CU-11: la imagen va directo del navegador a Storage; al servidor solo llega la ruta.
     if (archivo) {
       const s = await subirComprobante(createClient(), usuarioId, archivo);
@@ -55,8 +58,22 @@ export function FormularioTrabajo({ accion, usuarioId, hoy, items, inicial, text
 
   useEffect(() => () => void (vista && URL.revokeObjectURL(vista)), [vista]);
 
+  /** Sin `action={...}`: React 19 reiniciaría el formulario y el selector controlado quedaría en blanco. */
+  function enviarFormulario(ev: FormEvent<HTMLFormElement>) {
+    ev.preventDefault();
+    const datos = new FormData(ev.currentTarget);
+    startTransition(() => enviar(datos));
+  }
+
+  /** Vacía el input: así se puede volver a elegir el mismo archivo. */
+  const vaciarSelector = () => {
+    if (selectorArchivo.current) selectorArchivo.current.value = "";
+  };
+
   function elegir(f: File | undefined) {
+    vaciarSelector();
     if (!f) return;
+    setArchivoNuevo(true);
     const v = validarArchivo({ tipo: f.type, tamano: f.size });
     if (!v.ok) {
       setErrorArchivo(v.error); // CU-11 2a: aviso inmediato, no se sube nada
@@ -68,17 +85,18 @@ export function FormularioTrabajo({ accion, usuarioId, hoy, items, inicial, text
   }
 
   function sacarArchivo() {
+    vaciarSelector();
     setArchivo(null);
     setVista(null);
   }
 
   const e = estado.errores ?? {};
   const val = (campo: "fecha" | "km" | "taller" | "costo") => estado.valores?.[campo] ?? inicial?.[campo];
-  const errorComprobante = errorArchivo ?? e.comprobante;
+  const errorComprobante = errorArchivo ?? (archivoNuevo ? undefined : e.comprobante);
   const guardado = !registrar && inicial.comprobanteGuardado && !quitar;
 
   return (
-    <form action={enviar} className="space-y-4" noValidate>
+    <form onSubmit={enviarFormulario} className="space-y-4" noValidate>
       {e.formulario && <Aviso tipo="error">{e.formulario}</Aviso>}
       {e.tipo && <Aviso tipo="error">{e.tipo}</Aviso>}
 

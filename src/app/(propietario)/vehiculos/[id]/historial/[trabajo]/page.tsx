@@ -55,7 +55,7 @@ export default async function DetalleTrabajoPagina({ params }: PageProps<"/vehic
                 className="mt-2 max-h-80 w-full rounded-[14px] border border-border bg-muted object-contain"
               />
               <a
-                href={imagen}
+                href={`/vehiculos/${id}/historial/${trabajo}/comprobante`}
                 target="_blank"
                 rel="noreferrer"
                 className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-primary"
