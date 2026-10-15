@@ -28,9 +28,23 @@ export async function existeUsuario(id: string): Promise<boolean> {
   return Boolean(data.user);
 }
 
-/** Si la prueba falló a mitad de camino, borra la cuenta que haya quedado. */
+/** Rutas de los comprobantes guardados en la carpeta del usuario (spec 4). */
+async function rutasDelUsuario(usuarioId: string): Promise<string[]> {
+  const { data, error } = await admin().storage.from("comprobantes").list(usuarioId);
+  if (error) throw new Error(`No se pudo listar la carpeta: ${error.message}`);
+  return data.map((f) => `${usuarioId}/${f.name}`);
+}
+
+export async function archivosDelUsuario(usuarioId: string): Promise<number> {
+  return (await rutasDelUsuario(usuarioId)).length;
+}
+
+/** Si la prueba falló a mitad de camino, borra la cuenta que haya quedado y sus comprobantes. */
 export async function borrarSiQuedo(email: string): Promise<void> {
   const { data } = await admin().auth.admin.listUsers({ perPage: 1000 });
   const usuario = data.users.find((u) => u.email === email);
-  if (usuario) await admin().auth.admin.deleteUser(usuario.id);
+  if (!usuario) return;
+  const rutas = await rutasDelUsuario(usuario.id);
+  if (rutas.length > 0) await admin().storage.from("comprobantes").remove(rutas);
+  await admin().auth.admin.deleteUser(usuario.id);
 }
