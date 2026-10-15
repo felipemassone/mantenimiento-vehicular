@@ -69,17 +69,23 @@ export default async function FichaVehiculoPagina({ params, searchParams }: Page
                   key={i.itemId}
                   itemId={i.itemId}
                   className={cn(
-                    "flex items-start justify-between gap-3 rounded-[14px] border bg-card p-4",
+                    "relative flex items-start justify-between gap-3 rounded-[14px] border bg-card p-4 transition-colors hover:bg-muted",
                     i.incertidumbre ? "border-dashed border-estado-confirmar-borde" : "border-border",
                   )}
                 >
                   <div className="min-w-0">
-                    <p className="font-medium">{i.nombre}</p>
+                    {/* Toda la fila abre Registrar trabajo con este ítem elegido (CU-10). */}
+                    <Link
+                      href={`/vehiculos/${v.id}/registrar?item=${i.itemId}`}
+                      className="font-medium after:absolute after:inset-0 after:rounded-[14px]"
+                    >
+                      {i.nombre}
+                    </Link>
                     <p className="text-sm text-muted-foreground tabular-nums">{i.detalle}</p>
                     {i.incertidumbre && (
                       <Link
                         href={`/vehiculos/${v.id}/confirmar?item=${i.itemId}`}
-                        className="mt-2 inline-block text-sm font-medium text-primary underline underline-offset-4"
+                        className="relative z-10 mt-2 inline-block text-sm font-medium text-primary underline underline-offset-4"
                       >
                         Confirmar dato
                       </Link>

@@ -22,6 +22,8 @@ type Props = {
   hoy: string;
   /** Registrar: ítems del plan publicado (vacío si el vehículo no tiene plan). */
   items?: { id: number; nombre: string }[];
+  /** Registrar: el ítem ya elegido al llegar desde su fila en la ficha. */
+  itemInicial?: number;
   /** Editar: los datos guardados; sin tipo, ítem ni descripción (CU-12). */
   inicial?: Inicial;
   textoBoton: string;
@@ -31,11 +33,11 @@ const valoresDe = (datos: FormData) =>
   Object.fromEntries([...datos].filter((e): e is [string, string] => typeof e[1] === "string"));
 
 /** Pantalla 15: registrar (CU-10) y editar (CU-12) un trabajo, con su comprobante (CU-11). */
-export function FormularioTrabajo({ accion, usuarioId, hoy, items, inicial, textoBoton }: Props) {
+export function FormularioTrabajo({ accion, usuarioId, hoy, items, itemInicial, inicial, textoBoton }: Props) {
   const registrar = inicial === undefined;
   const conPlan = registrar && (items?.length ?? 0) > 0;
   const [tipo, setTipo] = useState<"catalogo" | "libre">(conPlan ? "catalogo" : "libre");
-  const [item, setItem] = useState("");
+  const [item, setItem] = useState(itemInicial === undefined ? "" : String(itemInicial));
   const [archivo, setArchivo] = useState<File | null>(null);
   const [vista, setVista] = useState<string | null>(null);
   const [errorArchivo, setErrorArchivo] = useState<string | null>(null);

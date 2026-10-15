@@ -12,8 +12,9 @@ import { FormularioTrabajo } from "../trabajos/formulario-trabajo";
 export const metadata: Metadata = { title: "Registrar trabajo · Libreta de service" };
 
 /** Pantalla 15 (CU-10). */
-export default async function RegistrarTrabajoPagina({ params }: PageProps<"/vehiculos/[id]/registrar">) {
+export default async function RegistrarTrabajoPagina({ params, searchParams }: PageProps<"/vehiculos/[id]/registrar">) {
   const { id } = await params;
+  const { item } = await searchParams;
   const claims = await exigirClaims();
   const [v, estado] = await Promise.all([obtenerVehiculo(claims, id), estadoDelVehiculo(claims, id)]);
   if (!v) notFound();
@@ -21,6 +22,8 @@ export default async function RegistrarTrabajoPagina({ params }: PageProps<"/veh
   const items = (estado?.catalogado ? estado.items : [])
     .map((i) => ({ id: i.itemId, nombre: i.nombre }))
     .sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
+  // Desde una fila de la ficha llega `?item=`: solo se usa si es un ítem del plan.
+  const elegido = items.find((i) => String(i.id) === item)?.id;
 
   return (
     <section>
@@ -30,6 +33,7 @@ export default async function RegistrarTrabajoPagina({ params }: PageProps<"/veh
         usuarioId={claims.sub}
         hoy={fechaParaCampo(fechaDeHoy())}
         items={items}
+        itemInicial={elegido}
         textoBoton="Guardar trabajo"
       />
     </section>

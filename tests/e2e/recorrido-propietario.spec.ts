@@ -110,10 +110,13 @@ test("propietario: cuenta, vehículo, kilometraje, trabajos y baja", async ({ pa
 
   await test.step("CU-10 y CU-11: registrar el cambio de aceite con su comprobante", async () => {
     await page.goto(ficha);
-    await page.getByRole("link", { name: "Registrar trabajo" }).click();
+    // Tocar el ítem en la ficha abre el formulario con ese ítem ya elegido.
+    await aceite.getByRole("link", { name: "Aceite y filtro de aceite" }).click();
     await expect(page.getByRole("heading", { name: "Registrar trabajo" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Del plan" })).toHaveAttribute("aria-pressed", "true");
-    await page.getByLabel("Trabajo", { exact: true }).selectOption({ label: "Aceite y filtro de aceite" });
+    await expect(page.getByLabel("Trabajo", { exact: true }).locator("option:checked")).toHaveText(
+      "Aceite y filtro de aceite",
+    );
     await page.getByLabel("Fecha").fill(hoy);
     await page.getByLabel("Kilometraje").fill("82000");
     await page.getByLabel("Taller").fill("Lubricentro e2e");
