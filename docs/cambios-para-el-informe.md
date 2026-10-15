@@ -36,7 +36,7 @@ Evidencia:
 - RNF-08: primera corrida manual el 13/10/2026, en verde; artefacto `respaldo-2026-10-13`
   (29 KB) cifrado (paquete OpenPGP de cifrado simétrico v4, AES256) y verificado en el job. El
   procedimiento de restauración está en el README y **todavía no se ensayó** contra un proyecto
-  real: queda para la Iteración 3 o la tesis final.
+  real: queda para la tesis final (spec de la Iteración 3, apartado 11).
 - RNF-12: el motor (`src/dominio/motor.ts`) tiene 100 % de líneas y 96,7 % de ramas cubiertas.
 - RNF-13: cada merge de la Iteración 2 (PR #8 a #13) se desplegó solo después de los tres checks.
 
@@ -50,3 +50,23 @@ Evidencia:
 | CU-18, paso 4 | El cambio de rol se aplica al renovar el token (≤ 60 min, RNF-05) | Rige en el pedido siguiente del usuario afectado: la app lee los roles de la base en cada pedido. La búsqueda es por correo exacto y la hacen funciones SQL que exigen el rol de administrador técnico; no hay listado de cuentas (RNF-06) | "El cambio se aplica en el siguiente pedido del usuario afectado" |
 | CU-18, pantalla 18 | Mockup con "Cuenta creada el…" y "El cambio se aplica en el próximo ingreso" | La tarjeta muestra correo y roles, sin fecha de alta (la búsqueda devuelve solo lo necesario, RNF-06). El texto dice "El cambio se aplica en la próxima pantalla que abra el usuario" | Sin cambio de fondo; coincide con el ajuste de CU-18 paso 4 |
 | CU-10, paso 7 | Después de registrar, se muestra el estado recalculado | La ficha muestra el aviso "Con el trabajo registrado cambió el estado de N ítems…" y la línea oro en esos ítems; al recargar, el aviso no vuelve (igual que CU-08) | Sin cambio |
+| CU-10, flujo 4a | Si el km supera la última lectura, se actualiza el kilometraje | Se registra como lectura nueva en la misma transacción, con la fecha del día del registro y no la del trabajo: una fecha vieja la volvería la primera lectura y cambiaría el km de alta que usa el motor | Precisar "con la fecha del día en que se registra" |
+| CU-12 | Editar o eliminar una intervención | Solo las de origen `registrada`. Los supuestos confirmados en el alta aparecen en el historial como "Dato del alta, confirmado por vos", de solo lectura; si estaban mal, se registra el trabajo real | Mencionar que los datos del alta no se editan |
+
+Evidencia:
+
+- RNF-07: el trabajo, la lectura nueva y el comprobante se guardan en una sola transacción;
+  las pruebas de integración comprueban que un registro rechazado no escribe nada, borra el
+  archivo subido y no deja los supuestos que creó el cálculo.
+- RF-15 y RNF-04: las pruebas de integración comprueban que nadie lee, sube ni borra archivos
+  fuera de su carpeta, y que el bucket rechaza otros tipos y más de 5 MB aunque no se use la app.
+- RF-21 y RNF-06: solo el administrador técnico busca (por correo exacto, sin listados ni
+  comodines) y cambia roles, y solo el de catálogo; lo rechaza la base, no solo la pantalla.
+- Punta a punta (CI, celular Pixel 7): el propietario registra el cambio de aceite del Ford Ka
+  con un comprobante, el ítem pasa de "Vencido" a "Al día", el trabajo aparece en el historial
+  con el comprobante (la imagen se carga desde el enlace firmado), se elimina y el ítem vuelve a
+  su supuesto sin dejar el archivo; al eliminar la cuenta no queda ningún comprobante.
+- RNF-13: cada merge de la Iteración 3 (PR #16 a #22) se desplegó solo después de los tres checks.
+- Producción (criterio de terminado, spec 10): *pendiente de la verificación de Felipe desde el
+  celular* — trabajo registrado que reinicia el conteo y queda en el historial, comprobante
+  subido y visto, y rol de catálogo otorgado y revocado a una cuenta de prueba.
