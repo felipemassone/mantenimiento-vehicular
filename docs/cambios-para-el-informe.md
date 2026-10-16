@@ -66,7 +66,16 @@ Evidencia:
   con un comprobante, el ítem pasa de "Vencido" a "Al día", el trabajo aparece en el historial
   con el comprobante (la imagen se carga desde el enlace firmado), se elimina y el ítem vuelve a
   su supuesto sin dejar el archivo; al eliminar la cuenta no queda ningún comprobante.
-- RNF-13: cada merge de la Iteración 3 (PR #16 a #22) se desplegó solo después de los tres checks.
-- Producción (criterio de terminado, spec 10): *pendiente de la verificación de Felipe desde el
-  celular* — trabajo registrado que reinicia el conteo y queda en el historial, comprobante
-  subido y visto, y rol de catálogo otorgado y revocado a una cuenta de prueba.
+- RNF-13: cada merge de la Iteración 3 (PR #16 a #23) se desplegó solo después de los tres
+  checks. La corrida de `main` del PR #22 falló en la punta a punta (la baja de la cuenta tardó
+  más de 15 s con la base de desarrollo ocupada por otro job) y **no desplegó**: el despliegue
+  quedó frenado, como corresponde, hasta la corrida en verde del PR #23.
+- Producción (criterio de terminado, spec 10), verificado por Felipe desde el celular el
+  16/10/2026: un trabajo registrado reinició el conteo del ítem y quedó en el historial
+  (resultado verificable de la Tabla 8); el comprobante se subió y se vio en el detalle; como
+  administrador técnico dio y quitó el rol de administrador de catálogo a una cuenta de prueba.
+- Ajuste surgido de esa verificación (PR #23): tocar un ítem de la ficha abre "Registrar
+  trabajo" con ese ítem ya elegido. En CU-10 es otro punto de entrada al mismo flujo; sin
+  cambio de fondo en la ficha del caso de uso.
+
+**La Iteración 3 queda cerrada** con los cinco puntos del criterio de terminado cumplidos.
