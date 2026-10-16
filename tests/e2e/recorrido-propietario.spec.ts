@@ -192,7 +192,9 @@ test("propietario: cuenta, vehículo, kilometraje, trabajos y baja", async ({ pa
     await page.getByRole("button", { name: "Eliminar mi cuenta" }).click();
     await dialogo.getByLabel("Ingresá tu contraseña para confirmar").fill(contrasena);
     await dialogo.getByRole("button", { name: "Eliminar cuenta" }).click();
-    await expect(page).toHaveURL(/\/ingresar\?cuenta=eliminada/);
+    // Borra los comprobantes y después la cuenta en cascada: con la base dev compartida por otro job
+    // del CI tardó más de 15 s (main, 15/10/2026).
+    await expect(page).toHaveURL(/\/ingresar\?cuenta=eliminada/, { timeout: 45_000 });
     expect(await existeUsuario(usuarioId)).toBe(false);
     // RF-04: la cuenta se va con sus comprobantes.
     expect(await archivosDelUsuario(usuarioId)).toBe(0);
