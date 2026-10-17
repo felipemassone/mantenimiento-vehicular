@@ -22,8 +22,15 @@ export default defineConfig({
     timezoneId: "America/Argentina/Buenos_Aires",
     trace: "retain-on-failure",
   },
-  // Diseño primero para celular (RNF-10).
-  projects: [{ name: "celular", use: { ...devices["Pixel 7"] } }],
+  // Diseño primero para celular (RNF-10); el mismo recorrido en los otros motores de RNF-09
+  // (Firefox, WebKit, el de Safari, y Edge instalado). En serie: cada uno crea y borra su cuenta
+  // en la base dev compartida.
+  projects: [
+    { name: "celular", use: { ...devices["Pixel 7"] } },
+    { name: "firefox", use: { ...devices["Desktop Firefox"] } },
+    { name: "webkit", use: { ...devices["Desktop Safari"] } },
+    { name: "edge", use: { ...devices["Desktop Edge"], channel: "msedge" } },
+  ],
   webServer: {
     command: enCI ? "npm run build && npm run start" : "npm run dev",
     url: "http://localhost:3000/ingresar",

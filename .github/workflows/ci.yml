@@ -78,7 +78,8 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      # RNF-09: el recorrido corre en los cuatro (Edge estable, instalado con su paquete).
+      - run: npx playwright install --with-deps chromium firefox webkit msedge
       - run: npm run test:e2e
       # El informe y la traza solo usan la cuenta descartable de la prueba.
       - uses: actions/upload-artifact@v4

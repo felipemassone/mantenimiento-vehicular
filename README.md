@@ -35,10 +35,36 @@ GitHub Actions · Vercel · Resend.
 |---|---|
 | `npm test` | Unitarias (dominio) |
 | `npm run test:integracion` | Integración contra Supabase de desarrollo: RLS, restricciones, trigger, publicación del plan y comprobantes en Storage |
-| `npm run test:e2e` | Punta a punta con Playwright, en un celular emulado |
+| `npm run test:e2e` | Punta a punta con Playwright: el recorrido del propietario en un celular emulado (Chromium) y en Firefox, WebKit y Edge (RNF-09); en cada pantalla comprueba que con 360 px de ancho no haya desplazamiento horizontal (RNF-10) |
 
 En el CI, el job `integracion` aplica primero las migraciones de la rama a la base de desarrollo
 (`prisma migrate deploy`); en local hay que correrlo a mano después de cada migración nueva.
+Para un solo navegador: `npx playwright test --project=firefox` (los nombres están en
+`playwright.config.ts`; `edge` usa el Edge instalado en la máquina).
+
+### Prueba de carga (RNF-02, PS-07)
+
+50 usuarios virtuales de [k6](https://k6.io) consultan cada uno la ficha de su vehículo, una
+vez por segundo durante 5 minutos. Criterio: promedio menor a 500 ms y 0 % de errores. **Nunca
+contra producción**: las cuentas se crean en la base de desarrollo, la misma que usan las vistas
+previas.
+
+En GitHub: Actions → **Carga** → Run workflow. El job despliega su propia vista previa, prepara
+las cuentas, corre k6, deja el resumen en la página de la corrida y borra las cuentas. Comparte
+el grupo `base-dev` con integración y punta a punta, así que espera a que terminen. Necesita el
+secreto `VERCEL_AUTOMATION_BYPASS_SECRET` (Vercel → Settings → Deployment Protection →
+Protection Bypass for Automation), porque las vistas previas piden ingresar.
+
+En local, con k6 instalado y la URL de una vista previa:
+
+```bash
+npx tsx tests/carga/preparar.ts
+k6 run -e BASE_URL=https://<vista-previa>.vercel.app -e VERCEL_AUTOMATION_BYPASS_SECRET=<secreto> tests/carga/ficha.js
+npx tsx tests/carga/limpiar.ts
+```
+
+`preparar.ts` deja las cookies de sesión en `tests/carga/sesiones.json` (no se versiona);
+`limpiar.ts` borra todas las cuentas `carga-k6-…`, también las de una corrida que se cortó.
 
 ## Comprobantes (RF-15)
 

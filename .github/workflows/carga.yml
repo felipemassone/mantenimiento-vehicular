@@ -1,0 +1,71 @@
+name: Carga
+
+# PS-07 (RNF-02): prueba de carga con k6, a mano (Actions → Carga → Run workflow).
+# Despliega su propia vista previa (nunca producción: sin --prod) contra la base de desarrollo,
+# crea 50 cuentas con un vehículo, corre 5 minutos de consultas a la ficha y borra las cuentas.
+on:
+  workflow_dispatch:
+    inputs:
+      usuarios:
+        description: Usuarios virtuales
+        default: "50"
+      duracion:
+        description: Duración (formato de k6)
+        default: 5m
+
+jobs:
+  carga:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # La misma base que integración y punta a punta: de a un job por vez (ver ci.yml).
+    concurrency:
+      group: base-dev
+      cancel-in-progress: false
+    # Los secretos van solo a los pasos que los usan, no a las acciones de terceros.
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+        env:
+          # prisma generate lee prisma.config.ts, que exige DIRECT_URL aunque no se conecte
+          DIRECT_URL: postgresql://localhost:5432/ci
+      - name: Vista previa
+        id: previa
+        env:
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          url=$(npx --yes vercel@63 deploy --yes --token "$VERCEL_TOKEN")
+          case "$url" in
+            https://mantenimiento-vehicular-ten.vercel.app*) echo "Es producción: no se carga." >&2; exit 1 ;;
+          esac
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+      - name: Cuentas de prueba
+        env:
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          CUENTAS: ${{ inputs.usuarios }}
+        run: npx tsx tests/carga/preparar.ts
+      # v1.2.2
+      - uses: grafana/setup-k6-action@43b9fc21641a76002687994433dd586f56e791b1
+      - name: k6
+        env:
+          BASE_URL: ${{ steps.previa.outputs.url }}
+          VUS: ${{ inputs.usuarios }}
+          DURACION: ${{ inputs.duracion }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: k6 run tests/carga/ficha.js
+      - if: always()
+        run: cat tests/carga/resumen.md >> "$GITHUB_STEP_SUMMARY" || true
+      - name: Borrar las cuentas
+        if: always()
+        env:
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: npx tsx tests/carga/limpiar.ts

@@ -49,3 +49,7 @@ next-env.d.ts
 /test-results/
 /playwright-report/
 /blob-report/
+
+# Prueba de carga (PS-07): las sesiones tienen tokens
+/tests/carga/sesiones.json
+/tests/carga/resumen.md
