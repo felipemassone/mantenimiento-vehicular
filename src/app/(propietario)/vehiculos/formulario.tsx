@@ -14,11 +14,12 @@ type Props = {
   accion: (previo: EstadoVehiculo, datos: FormData) => Promise<EstadoVehiculo>;
   inicial?: { datos: DatosVehiculo; marcaId: number | null };
   conKilometraje: boolean;
+  ayudaKilometraje?: string;
   textoBoton: string;
 };
 
 /** CU-05 (alta) y CU-07 (edición): catálogo o modelo libre (3a). */
-export function FormularioVehiculo({ catalogo, accion, inicial, conKilometraje, textoBoton }: Props) {
+export function FormularioVehiculo({ catalogo, accion, inicial, conKilometraje, ayudaKilometraje, textoBoton }: Props) {
   const [estado, enviar, enviando] = useActionState(accion, {});
   const [modo, setModo] = useState<"catalogo" | "libre">(inicial?.datos.tipo ?? "catalogo");
   const [marcaId, setMarcaId] = useState(inicial?.marcaId ? String(inicial.marcaId) : "");
@@ -125,6 +126,7 @@ export function FormularioVehiculo({ catalogo, accion, inicial, conKilometraje, 
           nombre="kilometraje"
           inputMode="numeric"
           sufijo="km"
+          ayuda={ayudaKilometraje}
           error={e.kilometraje}
         />
       )}

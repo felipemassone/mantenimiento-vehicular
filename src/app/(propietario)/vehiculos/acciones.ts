@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { eliminarVehiculoConComprobantes } from "@/datos/comprobantes";
 import { exigirClaims } from "@/datos/sesion";
-import { actualizarVehiculo, crearVehiculo, registrarLectura } from "@/datos/vehiculos";
+import { actualizarVehiculo, crearVehiculo, listarVehiculos, registrarLectura } from "@/datos/vehiculos";
 import { destinoDelAlta } from "@/dominio/confirmacion";
 import type { ErroresCampo } from "@/dominio/cuenta";
 import type { Cambio } from "@/dominio/motor";
@@ -21,7 +21,9 @@ export async function agregarVehiculo(_previo: EstadoVehiculo, datos: FormData):
   const r = await crearVehiculo(claims, p.datos, p.kilometraje!);
   if (!r.ok) return { errores: r.errores };
   revalidatePath("/vehiculos");
-  redirect(destinoDelAlta(r.valor.id, r.valor.conSupuestos));
+  // Primer auto guiado: el alta que acaba de crear el único vehículo de la cuenta.
+  const primero = (await listarVehiculos(claims)).length === 1;
+  redirect(destinoDelAlta(r.valor.id, r.valor.conSupuestos, primero));
 }
 
 /** CU-07. */

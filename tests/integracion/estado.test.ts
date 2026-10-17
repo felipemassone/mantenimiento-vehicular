@@ -65,7 +65,7 @@ describe("estadoDelVehiculo (CU-09, CU-14)", () => {
   it("un modelo fuera del catálogo no tiene ítems", async () => {
     const r = await crearVehiculo(claimsDe(a), { tipo: "libre", marca: "Peugeot", modelo: "208", anio: 2019 }, 41_000);
     if (!r.ok) throw new Error("alta");
-    expect(await estadoDelVehiculo(claimsDe(a), r.valor.id)).toEqual({ catalogado: false, kmActual: 41_000, items: [] });
+    expect(await estadoDelVehiculo(claimsDe(a), r.valor.id)).toEqual({ catalogado: false, kmActual: 41_000, items: [], plan: [] });
   });
 
   it("el vehículo de otro usuario no existe para él y no recibe supuestos", async () => {
@@ -157,6 +157,8 @@ describe("confirmación de supuestos (CU-06)", () => {
     expect(s?.kmActual).toBe(62_400);
     expect(s?.supuestos).toHaveLength(6);
     expect(aceite).toMatchObject({ km: 60_000, origen: "supuesta_pendiente" });
+    // Para la pregunta y la vista previa de Confirmar datos (spec 2026-10-16, apartado 2).
+    expect(aceite.item).toMatchObject({ itemId: aceite.itemId, tipo: "reemplazo", km: 15_000 });
   });
 
   it("confirmar guarda la fecha y saca la marca (paso 3)", async () => {

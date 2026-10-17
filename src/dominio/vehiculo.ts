@@ -73,3 +73,18 @@ export function nombreVehiculo(v: {
 }): string {
   return `${v.marca ?? v.marcaLibre ?? ""} ${v.modelo ?? v.modeloLibre ?? ""}`.trim();
 }
+
+type ModeloConPlan = { nombre: string; anioDesde: number; anioHasta: number | null };
+
+/** Bienvenida del primer auto: "el Ford Ka, de 2014 a 2016"; null si el catálogo está vacío. */
+export function textoModelosConPlan(catalogo: { nombre: string; modelos: ModeloConPlan[] }[]): string | null {
+  const textos = catalogo.flatMap((marca) =>
+    marca.modelos.map((m) => {
+      const base = `el ${marca.nombre} ${m.nombre}`;
+      if (m.anioHasta === m.anioDesde) return `${base} ${m.anioDesde}`;
+      return `${base}, ${m.anioHasta ? `de ${m.anioDesde} a ${m.anioHasta}` : `desde ${m.anioDesde}`}`;
+    }),
+  );
+  if (textos.length === 0) return null;
+  return textos.length === 1 ? textos[0] : `${textos.slice(0, -1).join("; ")} y ${textos.at(-1)}`;
+}

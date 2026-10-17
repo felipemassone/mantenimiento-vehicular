@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Aviso } from "@/components/aviso";
 import { ChipEstado } from "@/components/chip-estado";
+import { Pasos } from "@/components/pasos";
 import { Button } from "@/components/ui/button";
 import { estadoDelVehiculo } from "@/datos/estado";
 import { historialDelVehiculo } from "@/datos/intervenciones";
@@ -28,7 +29,7 @@ export const metadata: Metadata = { title: "Ficha del vehículo" };
 
 export default async function FichaVehiculoPagina({ params, searchParams }: PageProps<"/vehiculos/[id]">) {
   const { id } = await params;
-  const { cambios } = await searchParams;
+  const { cambios, bienvenida } = await searchParams;
   const claims = await exigirClaims();
   const [v, estado, historial] = await Promise.all([
     obtenerVehiculo(claims, id),
@@ -52,9 +53,25 @@ export default async function FichaVehiculoPagina({ params, searchParams }: Page
         <Link href="/vehiculos" className="mb-4 inline-flex items-center gap-1 text-sm">
           <ArrowLeft className="size-4" aria-hidden="true" /> Volver
         </Link>
+        {bienvenida === "1" && <Pasos actual={3} />}
         <h1 className="text-[22px] font-semibold">
           {v.nombre} {v.anio}
         </h1>
+        {bienvenida === "1" && (
+          // Primer auto guiado, paso 3: cómo se lee la ficha. "Entendido" saca el parámetro.
+          <div className="mt-4">
+            <Aviso tipo="info">
+              <p>
+                {estado?.catalogado
+                  ? "Listo. Tocá un ítem para ver qué hacer con él, y actualizá el kilometraje cada tanto (por ejemplo, cuando cargás nafta): con ese dato calculamos lo que le toca."
+                  : "Listo. Como todavía no tenemos el plan de este modelo, acá vas a registrar los trabajos que le hagas y tenerlos a mano en el historial."}
+              </p>
+              <Link href={`/vehiculos/${v.id}`} className="mt-2 inline-block font-medium underline underline-offset-4">
+                Entendido
+              </Link>
+            </Aviso>
+          </div>
+        )}
 
         <div className="mt-6">
           <p className="text-sm text-muted-foreground">Kilometraje actual</p>

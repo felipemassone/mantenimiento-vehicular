@@ -16,6 +16,8 @@ type Props = {
   max?: string;
   autoComplete?: string;
   inputMode?: "text" | "numeric" | "email";
+  /** Para reaccionar mientras se escribe (vista previa); el campo sigue sin controlar. */
+  onCambio?: (valor: string) => void;
 };
 
 /** Etiqueta arriba, campo de 48 px, ayuda o error debajo (DESIGN.md, Components). */
@@ -33,6 +35,7 @@ export function Campo({
   max,
   autoComplete,
   inputMode,
+  onCambio,
 }: Props) {
   const idAyuda = `${id}-ayuda`;
   return (
@@ -52,6 +55,7 @@ export function Campo({
           max={max}
           autoComplete={autoComplete}
           inputMode={inputMode}
+          onChange={onCambio && ((e) => onCambio(e.target.value))}
           aria-invalid={error ? true : undefined}
           aria-describedby={error || ayuda ? idAyuda : undefined}
           className={cn(

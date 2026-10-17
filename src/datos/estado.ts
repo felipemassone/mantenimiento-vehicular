@@ -11,7 +11,7 @@ import { validarConfirmacion, validarCorreccion } from "@/dominio/supuestos";
 import { conUsuario, type ClaimsUsuario, type TxUsuario } from "./cliente-usuario";
 import type { Resultado } from "./vehiculos";
 
-export type EstadoVehiculo = { catalogado: boolean; kmActual: number; items: ItemConEstado[] };
+export type EstadoVehiculo = { catalogado: boolean; kmActual: number; items: ItemConEstado[]; plan: ItemDelPlan[] };
 export type ResumenEstado = ReturnType<typeof resumen>;
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -28,7 +28,7 @@ export async function calcularEnTx(tx: TxUsuario, vehiculoId: string, hoy: Date)
     tx.lecturaKilometraje.findFirst({ where: { vehiculoId }, orderBy: { kilometraje: "desc" } }),
   ]);
   const kmActual = ultima?.kilometraje ?? 0;
-  if (v.modeloId === null) return { catalogado: false, kmActual, items: [] };
+  if (v.modeloId === null) return { catalogado: false, kmActual, items: [], plan: [] };
 
   const plan = await tx.planMantenimiento.findFirst({
     where: { modeloId: v.modeloId, estado: "publicado" },
@@ -63,6 +63,7 @@ export async function calcularEnTx(tx: TxUsuario, vehiculoId: string, hoy: Date)
   return {
     catalogado: true,
     kmActual,
+    plan: items,
     items: calcularEstado({ items, intervenciones, kmAlta, fechaAlta: fechaDeHoy(v.fechaAlta), kmActual, hoy }),
   };
 }
@@ -103,6 +104,8 @@ export type SupuestoPendiente = {
   nombre: string;
   km: number;
   origen: "supuesta_pendiente" | "supuesta_a_verificar";
+  /** El ítem del plan, para la pregunta y la vista previa de Confirmar datos. */
+  item: ItemDelPlan;
 };
 
 const SIN_SUPUESTO: Resultado<never> = {
@@ -131,9 +134,13 @@ export async function supuestosDelVehiculo(
         .map((f) => f.itemId),
     );
     const porItem = new Map(filas.map((f) => [f.itemId, f]));
+    const delPlan = new Map(e.plan.map((p) => [p.itemId, p]));
     const supuestos = e.items.flatMap((i) => {
       const f = porItem.get(i.itemId);
-      return f && !conTrabajo.has(i.itemId) ? [{ itemId: i.itemId, nombre: i.nombre, km: f.kilometraje, origen: f.origen as SupuestoPendiente["origen"] }] : [];
+      const item = delPlan.get(i.itemId);
+      return f && item && !conTrabajo.has(i.itemId)
+        ? [{ itemId: i.itemId, nombre: i.nombre, km: f.kilometraje, origen: f.origen as SupuestoPendiente["origen"], item }]
+        : [];
     });
     return { kmActual: e.kmActual, supuestos };
   });
