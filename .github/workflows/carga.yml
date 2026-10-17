@@ -12,6 +12,11 @@ on:
       duracion:
         description: Duración (formato de k6)
         default: 5m
+      compresion:
+        description: Pedir la página comprimida, como un navegador (no = como las dos primeras corridas)
+        type: choice
+        options: ["si", "no"]
+        default: "si"
 
 jobs:
   carga:
@@ -60,6 +65,7 @@ jobs:
           BASE_URL: ${{ steps.previa.outputs.url }}
           VUS: ${{ inputs.usuarios }}
           DURACION: ${{ inputs.duracion }}
+          COMPRESION: ${{ inputs.compresion }}
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: k6 run tests/carga/ficha.js
       - if: always()

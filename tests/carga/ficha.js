@@ -30,6 +30,9 @@ http.setResponseCallback(http.expectedStatuses(200));
 export default function consultarFicha() {
   const sesion = sesiones[(__VU - 1) % sesiones.length];
   const headers = { Cookie: sesion.cookie };
+  // Como un navegador, que siempre pide la página comprimida (53 KB sin comprimir, 6,5 KB con brotli).
+  // k6 no lo pide solo; COMPRESION=no repite las dos primeras corridas, que la pedían sin comprimir.
+  if (__ENV.COMPRESION !== "no") headers["Accept-Encoding"] = "gzip, deflate, br";
   // Las vistas previas de Vercel piden ingresar; el secreto de automatización las abre.
   if (__ENV.VERCEL_AUTOMATION_BYPASS_SECRET) {
     headers["x-vercel-protection-bypass"] = __ENV.VERCEL_AUTOMATION_BYPASS_SECRET;
@@ -57,6 +60,7 @@ export function handleSummary(data) {
     `## PS-07 (RNF-02): ${options.vus} usuarios, ${options.duration}`,
     "",
     `- Vista previa: ${BASE_URL}`,
+    `- Página comprimida: ${__ENV.COMPRESION === "no" ? "no (sin Accept-Encoding)" : "sí (gzip, deflate, br, como un navegador)"}`,
     `- Consultas: ${consultas} (${data.metrics.http_reqs.values.rate.toFixed(1)} por segundo)`,
     `- Tiempo de respuesta: promedio ${ms(d.avg)}, mediana ${ms(d.med)}, p95 ${ms(d["p(95)"])}, mínimo ${ms(d.min)}, máximo ${ms(d.max)}`,
     `- Errores: ${(fallidas.rate * 100).toFixed(2)} % (${fallidas.passes} de ${consultas})`,

@@ -63,6 +63,8 @@ k6 run -e BASE_URL=https://<vista-previa>.vercel.app -e VERCEL_AUTOMATION_BYPASS
 npx tsx tests/carga/limpiar.ts
 ```
 
+k6 pide la página comprimida, como un navegador; `-e COMPRESION=no` (o la opción "compresion" del
+workflow) la pide sin comprimir, como las dos primeras corridas del 17/10/2026.
 `preparar.ts` deja las cookies de sesión en `tests/carga/sesiones.json` (no se versiona);
 `limpiar.ts` borra todas las cuentas `carga-k6-…`, también las de una corrida que se cortó.
 

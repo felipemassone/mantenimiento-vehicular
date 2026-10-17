@@ -76,18 +76,21 @@ export async function listarVehiculos(claims: ClaimsUsuario): Promise<VehiculoRe
 
 export async function obtenerVehiculo(claims: ClaimsUsuario, id: string): Promise<VehiculoDetalle | null> {
   if (!UUID.test(id)) return null;
-  return conUsuario(claims, async (tx) => {
-    const [v] = await buscarVehiculos(tx, id);
-    if (!v) return null;
-    const datos: DatosVehiculo = v.modeloId
-      ? { tipo: "catalogo", modeloId: v.modeloId, anio: v.anio }
-      : { tipo: "libre", marca: v.marcaLibre ?? "", modelo: v.modeloLibre ?? "", anio: v.anio };
-    return {
-      ...resumen(v),
-      datos,
-      marcaId: v.modelo?.marcaId ?? null,
-    };
-  });
+  return conUsuario(claims, (tx) => vehiculoEnTx(tx, id));
+}
+
+/** obtenerVehiculo dentro de una transacción del usuario que ya está abierta (ver fichaDelVehiculo). */
+export async function vehiculoEnTx(tx: TxUsuario, id: string): Promise<VehiculoDetalle | null> {
+  const [v] = await buscarVehiculos(tx, id);
+  if (!v) return null;
+  const datos: DatosVehiculo = v.modeloId
+    ? { tipo: "catalogo", modeloId: v.modeloId, anio: v.anio }
+    : { tipo: "libre", marca: v.marcaLibre ?? "", modelo: v.modeloLibre ?? "", anio: v.anio };
+  return {
+    ...resumen(v),
+    datos,
+    marcaId: v.modelo?.marcaId ?? null,
+  };
 }
 
 /** Verifica el modelo del catálogo (que tenga plan publicado) y el rango de años. */

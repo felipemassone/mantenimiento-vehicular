@@ -17,8 +17,8 @@ export async function conUsuario<T>(
   // transacción puede tardar más de 2 s en una red lenta ("Unable to start a transaction").
   return prisma.$transaction(
     async (tx) => {
-      await tx.$queryRaw`SELECT set_config('request.jwt.claims', ${JSON.stringify(claims)}, true)`;
-      await tx.$executeRawUnsafe("SET LOCAL ROLE authenticated");
+      // Una sola ida y vuelta: set_config('role', …, true) equivale a SET LOCAL ROLE (así lo hace PostgREST).
+      await tx.$queryRaw`SELECT set_config('request.jwt.claims', ${JSON.stringify(claims)}, true), set_config('role', 'authenticated', true)`;
       return fn(tx);
     },
     { maxWait: 10_000, timeout: 15_000 },

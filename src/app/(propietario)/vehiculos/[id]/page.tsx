@@ -7,10 +7,8 @@ import { BarraVolver } from "@/components/barra-volver";
 import { ChipEstado } from "@/components/chip-estado";
 import { Pasos } from "@/components/pasos";
 import { Button } from "@/components/ui/button";
-import { estadoDelVehiculo } from "@/datos/estado";
-import { historialDelVehiculo } from "@/datos/intervenciones";
+import { fichaDelVehiculo } from "@/datos/ficha";
 import { exigirClaims } from "@/datos/sesion";
-import { obtenerVehiculo } from "@/datos/vehiculos";
 import { formatearFecha } from "@/dominio/fechas";
 import { formatearKm } from "@/dominio/kilometraje";
 import {
@@ -32,13 +30,10 @@ export default async function FichaVehiculoPagina({ params, searchParams }: Page
   const { id } = await params;
   const { cambios, bienvenida } = await searchParams;
   const claims = await exigirClaims();
-  const [v, estado, historial] = await Promise.all([
-    obtenerVehiculo(claims, id),
-    estadoDelVehiculo(claims, id),
-    historialDelVehiculo(claims, id),
-  ]);
-  if (!v) notFound();
-  const ultimos = ultimosTrabajosPorItem(historial ?? []);
+  const ficha = await fichaDelVehiculo(claims, id);
+  if (!ficha) notFound();
+  const { vehiculo: v, estado, historial } = ficha;
+  const ultimos = ultimosTrabajosPorItem(historial);
 
   const km = v.kilometraje === null ? "sin lecturas" : `${formatearKm(v.kilometraje)} km`;
   const ultima = v.fechaLectura ? `${km}, el ${formatearFecha(v.fechaLectura)}` : km;

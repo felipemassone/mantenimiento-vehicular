@@ -240,9 +240,14 @@ export async function historialDelVehiculo(claims: ClaimsUsuario, vehiculoId: st
   if (!UUID.test(vehiculoId)) return null;
   return conUsuario(claims, async (tx) => {
     if (!(await tx.vehiculo.findUnique({ where: { id: vehiculoId }, select: { id: true } }))) return null;
-    const filas = await tx.intervencion.findMany({ where: { vehiculoId, origen: DEL_HISTORIAL }, select: SELECCION });
-    return ordenarHistorial(filas.map(aTrabajo));
+    return historialEnTx(tx, vehiculoId);
   });
+}
+
+/** El historial de un vehículo que ya se sabe del usuario, en su transacción (ver fichaDelVehiculo). */
+export async function historialEnTx(tx: TxUsuario, vehiculoId: string): Promise<TrabajoDelHistorial[]> {
+  const filas = await tx.intervencion.findMany({ where: { vehiculoId, origen: DEL_HISTORIAL }, select: SELECCION });
+  return ordenarHistorial(filas.map(aTrabajo));
 }
 
 /** Detalle de un trabajo del historial (CU-13 paso 3, CU-12 paso 2). */
