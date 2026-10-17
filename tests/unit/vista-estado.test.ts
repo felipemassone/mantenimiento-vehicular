@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { chipsDeItem, chipsDeResumen, textoCambios, textoCambiosTrabajo, textoInciertos } from "@/dominio/vista-estado";
+import {
+  chipsDeItem,
+  chipsDeResumen,
+  destinoDeItem,
+  textoCambios,
+  textoCambiosTrabajo,
+  textoInciertos,
+  ultimosTrabajosPorItem,
+} from "@/dominio/vista-estado";
 
 describe("chipsDeItem (spec 3.3)", () => {
   it("un ítem cierto muestra solo su estado", () => {
@@ -90,5 +98,52 @@ describe("textoCambiosTrabajo (CU-10 paso 7)", () => {
   });
   it("sin cambios, nada", () => {
     expect(textoCambiosTrabajo([])).toBeNull();
+  });
+});
+
+describe("destinoDeItem (la fila lleva a lo que pide su estado)", () => {
+  const v = "v1";
+  it("con duda lleva a confirmar, con registrar como enlace secundario", () => {
+    expect(destinoDeItem(v, { itemId: 3, estado: "vencido", incertidumbre: "a_confirmar" }, null)).toEqual({
+      href: "/vehiculos/v1/confirmar?item=3",
+      secundario: { href: "/vehiculos/v1/registrar?item=3", texto: "Registrar trabajo" },
+    });
+    expect(destinoDeItem(v, { itemId: 3, estado: "al_dia", incertidumbre: "verificar_en_taller" }, null).href).toBe(
+      "/vehiculos/v1/confirmar?item=3",
+    );
+  });
+  it("vencido o próximo lleva a registrar, aunque tenga un trabajo anterior", () => {
+    expect(destinoDeItem(v, { itemId: 3, estado: "vencido", incertidumbre: null }, "t1")).toEqual({
+      href: "/vehiculos/v1/registrar?item=3",
+      secundario: null,
+    });
+    expect(destinoDeItem(v, { itemId: 3, estado: "proximo", incertidumbre: null }, "t1").href).toBe(
+      "/vehiculos/v1/registrar?item=3",
+    );
+  });
+  it("al día lleva al último trabajo del ítem, o a registrar si no tiene", () => {
+    expect(destinoDeItem(v, { itemId: 3, estado: "al_dia", incertidumbre: null }, "t1").href).toBe(
+      "/vehiculos/v1/historial/t1?desde=ficha",
+    );
+    expect(destinoDeItem(v, { itemId: 3, estado: "al_dia", incertidumbre: null }, null).href).toBe(
+      "/vehiculos/v1/registrar?item=3",
+    );
+  });
+});
+
+describe("ultimosTrabajosPorItem (spec 3.1)", () => {
+  const d = (s: string) => new Date(`${s}T00:00:00Z`);
+  it("elige el de mayor km y, si empatan, el más reciente; ignora los trabajos libres", () => {
+    const m = ultimosTrabajosPorItem([
+      { id: "a", itemId: 1, km: 30000, fecha: d("2026-05-01") },
+      { id: "b", itemId: 1, km: 45000, fecha: d("2026-01-01") },
+      { id: "c", itemId: 2, km: 10000, fecha: d("2026-01-01") },
+      { id: "d", itemId: 2, km: 10000, fecha: d("2026-02-01") },
+      { id: "e", itemId: null, km: 99000, fecha: d("2026-09-01") },
+    ]);
+    expect([...m]).toEqual([
+      [1, "b"],
+      [2, "d"],
+    ]);
   });
 });

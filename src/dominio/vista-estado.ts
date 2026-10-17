@@ -56,3 +56,37 @@ export function textoCambiosTrabajo(cambios: Pick<Cambio, "nombre" | "estado">[]
   if (cambios.length === 0) return null;
   return `Con el trabajo registrado ${frase(cambios)}`;
 }
+
+type TrabajoDeItem = { id: string; itemId: number | null; km: number; fecha: Date };
+
+/** Spec 3.1: el trabajo que el motor toma de referencia es el de mayor km; ante un empate, el más reciente. */
+export function ultimosTrabajosPorItem(trabajos: TrabajoDeItem[]): Map<number, string> {
+  const mejor = new Map<number, TrabajoDeItem>();
+  for (const t of trabajos) {
+    if (t.itemId === null) continue;
+    const a = mejor.get(t.itemId);
+    if (!a || t.km > a.km || (t.km === a.km && t.fecha.getTime() > a.fecha.getTime())) mejor.set(t.itemId, t);
+  }
+  return new Map([...mejor].map(([itemId, t]) => [itemId, t.id]));
+}
+
+export type DestinoItem = { href: string; secundario: { href: string; texto: string } | null };
+
+/**
+ * La fila de la ficha lleva a lo que pide su estado: con duda, a confirmar el dato; vencido o
+ * próximo, a registrar el trabajo; al día, al último trabajo del ítem (o a registrar, si no tiene).
+ */
+export function destinoDeItem(
+  vehiculoId: string,
+  item: Pick<ItemConEstado, "itemId" | "estado" | "incertidumbre">,
+  ultimoTrabajoId: string | null,
+): DestinoItem {
+  const registrar = `/vehiculos/${vehiculoId}/registrar?item=${item.itemId}`;
+  if (item.incertidumbre) {
+    return { href: `/vehiculos/${vehiculoId}/confirmar?item=${item.itemId}`, secundario: { href: registrar, texto: "Registrar trabajo" } };
+  }
+  if (item.estado === "al_dia" && ultimoTrabajoId) {
+    return { href: `/vehiculos/${vehiculoId}/historial/${ultimoTrabajoId}?desde=ficha`, secundario: null };
+  }
+  return { href: registrar, secundario: null };
+}

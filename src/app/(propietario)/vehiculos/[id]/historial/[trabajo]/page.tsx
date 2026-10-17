@@ -16,8 +16,13 @@ import { EliminarTrabajo } from "./eliminar";
 export const metadata: Metadata = { title: "Trabajo · Libreta de service" };
 
 /** Pantalla 17 (CU-13 paso 3, CU-12). */
-export default async function DetalleTrabajoPagina({ params }: PageProps<"/vehiculos/[id]/historial/[trabajo]">) {
+export default async function DetalleTrabajoPagina({
+  params,
+  searchParams,
+}: PageProps<"/vehiculos/[id]/historial/[trabajo]">) {
   const { id, trabajo } = await params;
+  // Desde la fila de un ítem al día, "Volver" regresa a la ficha y no al historial.
+  const { desde } = await searchParams;
   const claims = await exigirClaims();
   const t = await intervencionDelVehiculo(claims, id, trabajo);
   if (!t) notFound();
@@ -33,7 +38,7 @@ export default async function DetalleTrabajoPagina({ params }: PageProps<"/vehic
 
   return (
     <section>
-      <BarraTrabajo volver={`/vehiculos/${id}/historial`} titulo={t.descripcion} />
+      <BarraTrabajo volver={desde === "ficha" ? `/vehiculos/${id}` : `/vehiculos/${id}/historial`} titulo={t.descripcion} />
       <dl className="divide-y divide-border rounded-[14px] border border-border bg-card px-5">
         {datos.map(([etiqueta, valor]) => (
           <div key={etiqueta} className="py-4">
