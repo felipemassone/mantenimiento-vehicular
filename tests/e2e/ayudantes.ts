@@ -1,4 +1,29 @@
+import { expect, type Page } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
+
+/**
+ * RNF-10: con 360 px de ancho la pantalla no se desplaza de costado (el contenido entra en el
+ * ancho visible). Achica la ventana, mide y la deja como estaba; falla al final del recorrido
+ * con el nombre de cada pantalla que no entra.
+ */
+export async function entraEn360(page: Page, pantalla: string): Promise<void> {
+  const original = page.viewportSize();
+  if (!original) throw new Error("La página no tiene un tamaño de ventana fijo.");
+  await page.setViewportSize({ width: 360, height: original.height });
+  const { contenido, visible } = await page.evaluate(
+    () =>
+      new Promise<{ contenido: number; visible: number }>((listo) =>
+        requestAnimationFrame(() =>
+          listo({
+            contenido: document.documentElement.scrollWidth,
+            visible: document.documentElement.clientWidth,
+          }),
+        ),
+      ),
+  );
+  await page.setViewportSize(original);
+  expect.soft(contenido, `${pantalla}: ancho del contenido a 360 px`).toBeLessThanOrEqual(visible);
+}
 
 function admin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;

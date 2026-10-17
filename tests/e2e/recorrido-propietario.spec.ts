@@ -1,9 +1,9 @@
 import { randomUUID } from "node:crypto";
 import { expect, test } from "@playwright/test";
-import { archivosDelUsuario, borrarSiQuedo, enlaceDeConfirmacion, existeUsuario } from "./ayudantes";
+import { archivosDelUsuario, borrarSiQuedo, enlaceDeConfirmacion, entraEn360, existeUsuario } from "./ayudantes";
 
-// Dirección de prueba de Resend: el envío es real, pero no le llega a nadie.
-const email = `delivered+e2e-${Date.now()}@resend.dev`;
+// Dirección de prueba de Resend: el envío es real, pero no le llega a nadie. Una por navegador.
+const email = `delivered+e2e-${Date.now()}-${randomUUID().slice(0, 4)}@resend.dev`;
 const contrasena = `e2e-${randomUUID()}`;
 // PNG de 1×1: alcanza para subirlo como comprobante (CU-11) y ver que se carga.
 const comprobante = {
@@ -27,10 +27,12 @@ test("propietario: cuenta, vehículo, kilometraje, trabajos y baja", async ({ pa
 
   await test.step("CU-01: crear la cuenta y confirmarla", async () => {
     await page.goto("/crear-cuenta");
+    await entraEn360(page, "Crear cuenta");
     await page.getByLabel("Correo electrónico").fill(email);
     await page.getByLabel("Contraseña", { exact: true }).fill(contrasena);
     await page.getByRole("button", { name: "Crear cuenta" }).click();
     await expect(page.getByRole("heading", { name: "Revisá tu correo" })).toBeVisible();
+    await entraEn360(page, "Revisá tu correo");
 
     const enlace = await enlaceDeConfirmacion(email, contrasena);
     usuarioId = enlace.usuarioId;
@@ -40,8 +42,11 @@ test("propietario: cuenta, vehículo, kilometraje, trabajos y baja", async ({ pa
 
   await test.step("CU-02: cerrar sesión e ingresar", async () => {
     await page.getByRole("link", { name: "Mi cuenta" }).click();
+    await expect(page.getByRole("button", { name: "Cerrar sesión" })).toBeVisible();
+    await entraEn360(page, "Mi cuenta");
     await page.getByRole("button", { name: "Cerrar sesión" }).click();
     await expect(page.getByRole("heading", { name: "Ingresar" })).toBeVisible();
+    await entraEn360(page, "Ingresar");
     await page.getByLabel("Correo electrónico").fill(email);
     await page.getByLabel("Contraseña", { exact: true }).fill(contrasena);
     await page.getByRole("button", { name: "Ingresar" }).click();
@@ -51,8 +56,10 @@ test("propietario: cuenta, vehículo, kilometraje, trabajos y baja", async ({ pa
   await test.step("CU-05: agregar un Ford Ka 2014, guiado por ser el primero", async () => {
     // Bienvenida del primer auto (spec 2026-10-16): los tres pasos antes de cargarlo.
     await expect(page.getByRole("heading", { name: "Empecemos por tu auto" })).toBeVisible();
+    await entraEn360(page, "Mis vehículos, sin vehículos");
     await page.getByRole("link", { name: "Cargar mi auto" }).click();
     await expect(page.getByText("Paso 1 de 3 · Tu auto")).toBeVisible();
+    await entraEn360(page, "Agregar vehículo");
     await page.getByLabel("Marca").selectOption({ label: "Ford" });
     await page.getByLabel("Modelo").selectOption({ label: "Ka" });
     await page.getByLabel("Año").selectOption("2014");
@@ -70,12 +77,14 @@ test("propietario: cuenta, vehículo, kilometraje, trabajos y baja", async ({ pa
     // Vista previa calculada con el motor: 30.000 + 15.000 km ya se cumplieron con 45.000.
     const previa = page.getByRole("status").filter({ hasText: "Con ese dato: venció a los 45.000 km." });
     await expect(previa.getByText("Vencido")).toBeVisible();
+    await entraEn360(page, "Confirmar datos");
     await page.getByRole("button", { name: "Sí, se hizo" }).click();
     await expect(page.getByRole("button", { name: /^Neumáticos/ })).toHaveCount(0);
     await page.getByRole("link", { name: "Más tarde" }).click();
     await expect(page.getByRole("heading", { name: "Ford Ka 2014" })).toBeVisible();
     // Paso 3: el aviso explica cómo leer la ficha y "Entendido" lo cierra.
     await expect(page.getByText("Paso 3 de 3 · Tu ficha")).toBeVisible();
+    await entraEn360(page, "Ficha, con el aviso del primer auto");
     await page.getByRole("link", { name: "Entendido" }).click();
     await expect(page.getByText("Paso 3 de 3 · Tu ficha")).toHaveCount(0);
     ficha = new URL(page.url()).pathname;
@@ -95,6 +104,7 @@ test("propietario: cuenta, vehículo, kilometraje, trabajos y baja", async ({ pa
   await test.step("CU-08: actualizar el kilometraje", async () => {
     await page.getByRole("button", { name: "Actualizar kilometraje" }).click();
     await dialogo.getByLabel("Kilometraje actual").fill("82000");
+    await entraEn360(page, "Actualizar kilometraje");
     await dialogo.getByRole("button", { name: "Guardar" }).click();
     await expect(dialogo).toBeHidden();
     await expect(page.getByText("82.000 km", { exact: true })).toBeVisible();
@@ -104,6 +114,7 @@ test("propietario: cuenta, vehículo, kilometraje, trabajos y baja", async ({ pa
         "Con 82.000 km cambió el estado de 2 ítems: Correa auxiliar, ahora próximo; Líquido de enfriamiento, ahora próximo.",
       ),
     ).toBeVisible();
+    await entraEn360(page, "Ficha, con el aviso de cambios");
     await page.reload();
     await expect(page.getByText(/^Con 82\.000 km cambió/)).toHaveCount(0);
   });
@@ -118,6 +129,7 @@ test("propietario: cuenta, vehículo, kilometraje, trabajos y baja", async ({ pa
     await page.getByRole("link", { name: "Volver" }).click();
     await expect(page.getByRole("heading", { name: "Mis vehículos" })).toBeVisible();
     await expect(page.getByText(/^\d+ vencidos?$/)).toBeVisible();
+    await entraEn360(page, "Mis vehículos");
   });
 
   const aceite = page.getByRole("listitem").filter({ hasText: "Aceite y filtro de aceite" });
@@ -146,6 +158,7 @@ test("propietario: cuenta, vehículo, kilometraje, trabajos y baja", async ({ pa
     await page.getByLabel("Costo").fill("45000");
     await page.getByLabel("Comprobante").setInputFiles(comprobante);
     await expect(page.getByText("comprobante.png")).toBeVisible();
+    await entraEn360(page, "Registrar trabajo");
     await page.getByRole("button", { name: "Guardar trabajo" }).click();
     // CU-10 paso 7: el registro reinicia el conteo del ítem (resultado verificable de la Tabla 8).
     await expect(page.getByRole("heading", { name: "Ford Ka 2014" })).toBeVisible();
@@ -160,6 +173,7 @@ test("propietario: cuenta, vehículo, kilometraje, trabajos y baja", async ({ pa
     await aceite.getByRole("link", { name: "Aceite y filtro de aceite", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Aceite y filtro de aceite" })).toBeVisible();
     await expect(page.getByText("Lubricentro e2e")).toBeVisible();
+    await entraEn360(page, "Detalle del trabajo");
     await page.getByRole("link", { name: "Volver" }).click();
     await expect(page.getByRole("heading", { name: "Ford Ka 2014" })).toBeVisible();
   });
@@ -170,6 +184,7 @@ test("propietario: cuenta, vehículo, kilometraje, trabajos y baja", async ({ pa
     await page.getByRole("link", { name: "Historial" }).click();
     await expect(page.getByRole("heading", { name: "Historial" })).toBeVisible();
     await expect(filaAceite.getByRole("img", { name: "Con comprobante" })).toBeVisible();
+    await entraEn360(page, "Historial");
     // El supuesto confirmado en el alta aparece como dato del alta (spec 3.3).
     await expect(
       page.getByRole("link").filter({ hasText: "Neumáticos" }).getByText("Dato del alta, confirmado por vos"),
@@ -181,11 +196,13 @@ test("propietario: cuenta, vehículo, kilometraje, trabajos y baja", async ({ pa
     const imagen = page.getByRole("img", { name: "Comprobante de Aceite y filtro de aceite" });
     await expect(imagen).toBeVisible();
     await expect.poll(() => imagen.evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth)).toBeGreaterThan(0);
+    await entraEn360(page, "Detalle del trabajo, con el comprobante");
   });
 
   await test.step("CU-12: eliminar el trabajo y su comprobante", async () => {
     await page.getByRole("button", { name: "Eliminar trabajo" }).click();
     await expect(dialogo.getByRole("heading", { name: "¿Eliminar este trabajo?" })).toBeVisible();
+    await entraEn360(page, "Eliminar trabajo");
     await dialogo.getByRole("button", { name: "Eliminar trabajo" }).click();
     await expect(page.getByRole("heading", { name: "Historial" })).toBeVisible();
     await expect(filaAceite).toHaveCount(0);
@@ -200,6 +217,7 @@ test("propietario: cuenta, vehículo, kilometraje, trabajos y baja", async ({ pa
     await page.getByRole("link", { name: "Registrar trabajo", exact: true }).click();
     await page.getByRole("button", { name: "Otro trabajo" }).click();
     await page.getByLabel("Descripción").fill("Lavado de tapizados");
+    await entraEn360(page, "Registrar otro trabajo");
     await page.getByLabel("Fecha").fill(hoy);
     await page.getByLabel("Kilometraje").fill("82000");
     await page.getByLabel("Comprobante").setInputFiles(comprobante);
@@ -220,6 +238,7 @@ test("propietario: cuenta, vehículo, kilometraje, trabajos y baja", async ({ pa
     await page.goto("/cuenta");
     await page.getByRole("button", { name: "Eliminar mi cuenta" }).click();
     await dialogo.getByLabel("Ingresá tu contraseña para confirmar").fill(contrasena);
+    await entraEn360(page, "Eliminar cuenta");
     await dialogo.getByRole("button", { name: "Eliminar cuenta" }).click();
     // Borra los comprobantes y después la cuenta en cascada: con la base dev compartida por otro job
     // del CI tardó más de 15 s (main, 15/10/2026).
