@@ -6,11 +6,18 @@ import { Aviso } from "@/components/aviso";
 import { ChipEstado } from "@/components/chip-estado";
 import { Button } from "@/components/ui/button";
 import { estadoDelVehiculo } from "@/datos/estado";
+import { historialDelVehiculo } from "@/datos/intervenciones";
 import { exigirClaims } from "@/datos/sesion";
 import { obtenerVehiculo } from "@/datos/vehiculos";
 import { formatearFecha } from "@/dominio/fechas";
 import { formatearKm } from "@/dominio/kilometraje";
-import { chipsDeItem, textoCambiosTrabajo, textoInciertos } from "@/dominio/vista-estado";
+import {
+  chipsDeItem,
+  destinoDeItem,
+  textoCambiosTrabajo,
+  textoInciertos,
+  ultimosTrabajosPorItem,
+} from "@/dominio/vista-estado";
 import { leerCambios } from "@/dominio/vista-trabajo";
 import { cn } from "@/lib/utils";
 import { AvisoCambios, FilaItem, ProveedorCambios } from "./cambios";
@@ -23,8 +30,13 @@ export default async function FichaVehiculoPagina({ params, searchParams }: Page
   const { id } = await params;
   const { cambios } = await searchParams;
   const claims = await exigirClaims();
-  const [v, estado] = await Promise.all([obtenerVehiculo(claims, id), estadoDelVehiculo(claims, id)]);
+  const [v, estado, historial] = await Promise.all([
+    obtenerVehiculo(claims, id),
+    estadoDelVehiculo(claims, id),
+    historialDelVehiculo(claims, id),
+  ]);
   if (!v) notFound();
+  const ultimos = ultimosTrabajosPorItem(historial ?? []);
 
   const km = v.kilometraje === null ? "sin lecturas" : `${formatearKm(v.kilometraje)} km`;
   const ultima = v.fechaLectura ? `${km}, el ${formatearFecha(v.fechaLectura)}` : km;
@@ -64,40 +76,42 @@ export default async function FichaVehiculoPagina({ params, searchParams }: Page
             )}
             {/* CU-09 / RF-12: ya vienen ordenados por urgencia desde el motor. */}
             <ul className="mt-3 space-y-2">
-              {estado.items.map((i) => (
-                <FilaItem
-                  key={i.itemId}
-                  itemId={i.itemId}
-                  className={cn(
-                    "relative flex items-start justify-between gap-3 rounded-[14px] border bg-card p-4 transition-colors hover:bg-muted",
-                    i.incertidumbre ? "border-dashed border-estado-confirmar-borde" : "border-border",
-                  )}
-                >
-                  <div className="min-w-0">
-                    {/* Toda la fila abre Registrar trabajo con este ítem elegido (CU-10). */}
-                    <Link
-                      href={`/vehiculos/${v.id}/registrar?item=${i.itemId}`}
-                      className="font-medium after:absolute after:inset-0 after:rounded-[14px]"
-                    >
-                      {i.nombre}
-                    </Link>
-                    <p className="text-sm text-muted-foreground tabular-nums">{i.detalle}</p>
-                    {i.incertidumbre && (
-                      <Link
-                        href={`/vehiculos/${v.id}/confirmar?item=${i.itemId}`}
-                        className="relative z-10 mt-2 inline-block text-sm font-medium text-primary underline underline-offset-4"
-                      >
-                        Confirmar dato
-                      </Link>
+              {estado.items.map((i) => {
+                const destino = destinoDeItem(v.id, i, ultimos.get(i.itemId) ?? null);
+                return (
+                  <FilaItem
+                    key={i.itemId}
+                    itemId={i.itemId}
+                    className={cn(
+                      "relative flex items-start justify-between gap-3 rounded-[14px] border bg-card p-4 transition-colors hover:bg-muted",
+                      i.incertidumbre ? "border-dashed border-estado-confirmar-borde" : "border-border",
                     )}
-                  </div>
-                  <div className="flex shrink-0 flex-col items-end gap-1">
-                    {chipsDeItem(i).map((c) => (
-                      <ChipEstado key={c.tipo} {...c} />
-                    ))}
-                  </div>
-                </FilaItem>
-              ))}
+                  >
+                    <div className="min-w-0">
+                      {/* Toda la fila lleva a lo que pide el estado del ítem (destinoDeItem). */}
+                      <Link href={destino.href} className="font-medium after:absolute after:inset-0 after:rounded-[14px]">
+                        {i.nombre}
+                      </Link>
+                      <p className="text-sm text-muted-foreground tabular-nums">{i.detalle}</p>
+                      {destino.secundario && (
+                        <Link
+                          href={destino.secundario.href}
+                          className="relative z-10 mt-2 inline-block text-sm font-medium text-primary underline underline-offset-4"
+                        >
+                          {destino.secundario.texto}
+                          {/* Que el lector de pantalla no lo confunda con el botón general. */}
+                          <span className="sr-only"> de {i.nombre}</span>
+                        </Link>
+                      )}
+                    </div>
+                    <div className="flex shrink-0 flex-col items-end gap-1">
+                      {chipsDeItem(i).map((c) => (
+                        <ChipEstado key={c.tipo} {...c} />
+                      ))}
+                    </div>
+                  </FilaItem>
+                );
+              })}
             </ul>
           </>
         ) : (

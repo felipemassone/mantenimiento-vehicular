@@ -110,8 +110,17 @@ test("propietario: cuenta, vehículo, kilometraje, trabajos y baja", async ({ pa
 
   await test.step("CU-10 y CU-11: registrar el cambio de aceite con su comprobante", async () => {
     await page.goto(ficha);
-    // Tocar el ítem en la ficha abre el formulario con ese ítem ya elegido.
-    await aceite.getByRole("link", { name: "Aceite y filtro de aceite" }).click();
+    // Con el dato a confirmar, la fila lleva a Confirmar datos con ese ítem abierto.
+    await aceite.getByRole("link", { name: "Aceite y filtro de aceite", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Confirmar datos" })).toBeVisible();
+    await expect(page.getByRole("button", { name: /^Aceite y filtro de aceite/ })).toHaveAttribute("aria-expanded", "true");
+    await page.goto(ficha);
+    // Próximo y sin duda (la correa, desde los 82.000 km): la fila lleva a registrar.
+    await expect(
+      page.getByRole("listitem").filter({ hasText: "Correa auxiliar" }).getByRole("link", { name: "Correa auxiliar" }),
+    ).toHaveAttribute("href", /\/registrar\?item=\d+$/);
+    // El enlace secundario abre el formulario con ese ítem ya elegido.
+    await aceite.getByRole("link", { name: "Registrar trabajo de Aceite y filtro de aceite" }).click();
     await expect(page.getByRole("heading", { name: "Registrar trabajo" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Del plan" })).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByLabel("Trabajo", { exact: true }).locator("option:checked")).toHaveText(
@@ -133,6 +142,12 @@ test("propietario: cuenta, vehículo, kilometraje, trabajos y baja", async ({ pa
     await expect(aceite.getByText("Vencido")).toHaveCount(0);
     await expect(aceite.getByText("A confirmar")).toHaveCount(0);
     expect(await archivosDelUsuario(usuarioId)).toBe(1);
+    // Al día: la fila lleva al último trabajo del ítem, y "Volver" regresa a la ficha.
+    await aceite.getByRole("link", { name: "Aceite y filtro de aceite", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Aceite y filtro de aceite" })).toBeVisible();
+    await expect(page.getByText("Lubricentro e2e")).toBeVisible();
+    await page.getByRole("link", { name: "Volver" }).click();
+    await expect(page.getByRole("heading", { name: "Ford Ka 2014" })).toBeVisible();
   });
 
   const filaAceite = page.getByRole("link").filter({ hasText: "Aceite y filtro de aceite" });
@@ -168,7 +183,7 @@ test("propietario: cuenta, vehículo, kilometraje, trabajos y baja", async ({ pa
   });
 
   await test.step("RF-14: registrar otro trabajo con comprobante", async () => {
-    await page.getByRole("link", { name: "Registrar trabajo" }).click();
+    await page.getByRole("link", { name: "Registrar trabajo", exact: true }).click();
     await page.getByRole("button", { name: "Otro trabajo" }).click();
     await page.getByLabel("Descripción").fill("Lavado de tapizados");
     await page.getByLabel("Fecha").fill(hoy);
