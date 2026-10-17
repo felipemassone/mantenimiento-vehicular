@@ -7,7 +7,7 @@ import { catalogoPublicado, obtenerVehiculo } from "@/datos/vehiculos";
 import { editarVehiculo } from "../../acciones";
 import { FormularioVehiculo } from "../../formulario";
 
-export const metadata: Metadata = { title: "Editar vehículo · Libreta de service" };
+export const metadata: Metadata = { title: "Editar vehículo" };
 
 export default async function EditarVehiculoPagina({ params }: PageProps<"/vehiculos/[id]/editar">) {
   const { id } = await params;

@@ -2,7 +2,7 @@
 
 ## Cómo usarlos
 
-1. En Stitch, botón de la paleta → **Empezar con tu diseño** → cargá `app/DESIGN.md` (o pegá su contenido). Hacelo **una sola vez por proyecto** y verificá que Stitch muestre "Libreta de service" como sistema activo.
+1. En Stitch, botón de la paleta → **Empezar con tu diseño** → cargá `app/DESIGN.md` (o pegá su contenido). Hacelo **una sola vez por proyecto** y verificá que Stitch muestre "Km 12" como sistema activo (hasta el 16/10/2026 se llamaba "Libreta de service").
 2. Un prompt por pantalla, en el orden de este archivo. Cada uno indica si va en **Aplicación** (celular) o **Web** (escritorio). Stitch fija el tipo de dispositivo por proyecto: las pantallas Web (9 a 12) van en un **proyecto nuevo** creado en modo Web, con el mismo DESIGN.md importado. Además, esos prompts empiezan aclarando el tamaño de escritorio.
 3. Si Stitch ofrece varios modos de generación, usá el de mayor calidad.
 4. Copiá **solo el bloque del prompt**, sin el título.
@@ -463,3 +463,176 @@ Debajo, una tarjeta blanca con el resultado:
 Colores exactos: fondo #F6F4EF, texto #1B2430, botón principal y enlaces #0B3D91, oro #F2B705 solo en el ícono del logo. Sin degradados, ilustraciones, fotos ni emojis.
 Títulos y botones con mayúscula solo en la primera palabra ("Agregar vehículo", no "Agregar Vehículo"). No agregues textos, avisos, subtítulos ni notas al pie que no estén en este pedido. En las pantallas internas (las que tienen flecha "Volver"), la barra superior no lleva el botón de cuenta.
 ```
+
+---
+
+# Mejoras antes de congelar la interfaz (16/10/2026)
+
+Van en el proyecto **Aplicación** (celular). Son las pantallas de las ideas 1 a 4 (`docs/superpowers/specs/2026-10-16-primer-auto-y-confirmar-design.md`). Ya están programadas con los componentes existentes; con estos diseños se ajusta el código antes de congelar la interfaz (~2/11).
+
+**Antes de empezar:**
+1. El producto ahora se llama **Km 12**. Volvé a cargar `app/DESIGN.md` (tiene el nombre nuevo y la sección "Logo") y verificá que Stitch muestre "Km 12" como sistema activo.
+2. Adjuntá a cada prompt la imagen del logo (`docs/diseno/stitch_km_12_logo_design_system/screen.png`), así Stitch usa el mojón y no vuelve a la llave inglesa.
+3. Pedí **dos variantes** de cada pantalla y quedate con la que mejor cumpla lo de abajo. Los detalles se corrigen en el mismo hilo.
+
+**Qué tienen que resolver estos diseños**, además de lo que pide cada prompt:
+- Que en cada pantalla se vea de un vistazo **qué hay que hacer ahora**: una sola acción principal y el resto en segundo plano.
+- Que el indicador de pasos se lea sin competir con el título.
+- Que la vista previa de Confirmar datos se entienda como la **consecuencia** de la fecha que se carga, no como un dato más.
+
+**Datos de estas pantallas.** Un Ford Ka 2014 cargado el 16/10/2026 con 62.400 km y sin trabajos: los ítems de 15.000 km quedan supuestos a los 60.000 y los de 45.000, a los 45.000 (RF-09). Correa auxiliar y líquido de enfriamiento (90.000 km) no se suponen. Las cuentas de las vistas previas salen del motor real.
+
+**Lo que agregan respecto de lo programado** (se implementa con el diseño elegido): pasos unidos por una línea y chips de muestra en la bienvenida; contador "N por responder" y vista previa en una caja con el chip del estado resultante en Confirmar datos; aviso de la ficha con dos viñetas y flecha en las filas; bajada debajo del logo en Ingresar.
+
+## 19. Bienvenida del primer auto — Aplicación
+
+```
+Pantalla "Mis vehículos" de una cuenta recién creada, que todavía no tiene ningún auto. Es lo primero que ve el usuario después de activar la cuenta.
+
+Barra superior: el logo (mojón de ruta azul con el "12" en blanco y un testigo oro arriba, como en la imagen adjunta) y al lado "Km 12"; a la derecha, un botón redondo con las iniciales "FM".
+Título alineado a la izquierda: "Mis vehículos".
+
+Una tarjeta blanca de bienvenida:
+Título: "Empecemos por tu auto".
+Texto secundario: "En tres pasos te decimos qué mantenimiento le toca."
+Tres pasos en una lista vertical. Cada paso tiene un círculo azul con su número; los círculos están unidos por una línea vertical fina del color de los bordes. A la derecha de cada círculo, un título y una línea de texto secundario:
+1. "Cargá tu auto" — "Marca, modelo, año y los kilómetros que marca el tablero."
+2. "Contanos lo que ya se hizo" — "Si el auto tiene kilómetros, te preguntamos por los últimos services. Lo podés dejar para después."
+3. "Mirá qué te toca" — "La ficha ordena el mantenimiento por urgencia." Debajo, tres chips de muestra en una línea: "Vencido" en rojo, "Próximo" en naranja y "Al día" en verde.
+Separada por una línea fina, al pie de la tarjeta, en texto secundario: "Si tu modelo no figura en la lista, cargalo igual: vas a poder registrar los trabajos que le hagas."
+
+Debajo de la tarjeta, botón principal a lo ancho con un ícono "+": "Cargar mi auto".
+
+Sin ilustración ni foto de autos: la tarjeta es la protagonista.
+
+Colores exactos: fondo #F6F4EF, texto #1B2430, botón principal y enlaces #0B3D91, oro #F2B705 solo en el testigo del logo. Chips: vencido #B42318, próximo #9A3412, al día #1E6B43, a confirmar #4B3FA3, cada uno con su fondo suave. Sin degradados, ilustraciones, fotos ni emojis.
+Títulos y botones con mayúscula solo en la primera palabra ("Cargar mi auto", no "Cargar Mi Auto"). No agregues textos, avisos, subtítulos ni notas al pie que no estén en este pedido.
+```
+
+## 20. Paso 1: tu auto — Aplicación
+
+```
+Dos estados del formulario de alta del primer auto, uno al lado del otro.
+
+Estado 1, modelo de la lista:
+Barra superior con flecha "Volver".
+Indicador de pasos arriba del título: en texto secundario de 13 px "Paso 1 de 3 · Tu auto" y debajo tres segmentos finos de 4 px de alto, el primero azul y los otros dos del color de los bordes.
+Título: "Tu auto".
+Campo desplegable "Marca" con el valor "Ford".
+Campo desplegable "Modelo" con el valor "Ka".
+Campo desplegable "Año" con el valor "2014".
+Campo "Kilometraje actual" con el valor "62.400", el sufijo "km" dentro del campo y la ayuda debajo: "El que marca el tablero hoy. Con el número aproximado alcanza."
+Debajo de los campos, el enlace "Mi modelo no figura en la lista".
+Botón principal al pie, a lo ancho: "Seguir".
+
+Estado 2, modelo que no está en la lista:
+El mismo indicador de pasos y el mismo título.
+Aviso en línea con borde y fondo naranja suave y un ícono de información: "Vamos a guardar tu vehículo, pero todavía no tenemos el plan de mantenimiento de este modelo. Vas a poder registrar los trabajos que le hagas."
+Campo de texto "Marca" con el valor "Peugeot".
+Campo de texto "Modelo" con el valor "208".
+Campo "Año" con el valor "2019".
+Campo "Kilometraje actual" con el valor "41.000", el sufijo "km" y la misma ayuda.
+Enlace "Elegir un modelo de la lista".
+Botón principal al pie: "Seguir".
+
+Colores exactos: fondo #F6F4EF, texto #1B2430, botón principal y enlaces #0B3D91, oro #F2B705 solo en el testigo del logo. Sin degradados, ilustraciones, fotos ni emojis.
+Títulos y botones con mayúscula solo en la primera palabra. No agregues textos, avisos, subtítulos ni notas al pie que no estén en este pedido. En las pantallas internas (las que tienen flecha "Volver"), la barra superior no lleva el botón de cuenta.
+```
+
+## 21. Paso 2: Confirmar datos — Aplicación
+
+```
+Dos estados de la pantalla en la que el usuario confirma cuándo se hicieron por última vez los trabajos que supusimos, uno al lado del otro.
+
+Arriba, en los dos estados:
+Barra superior con flecha "Volver".
+Indicador de pasos: en texto secundario de 13 px "Paso 2 de 3 · Lo que ya se hizo" y tres segmentos finos, los dos primeros azules y el tercero del color de los bordes.
+Título: "Confirmar datos".
+Texto: "Como cargaste el Ford Ka con 62.400 km, supusimos cuándo se hizo por última vez cada uno de estos trabajos. Confirmalo si lo sabés: así el cálculo usa también las fechas."
+En texto secundario, alineado a la izquierda: "6 por responder".
+
+Una tarjeta blanca con una fila por trabajo, separadas por líneas. Cada fila cerrada muestra el nombre, debajo "Supuesto a los … km" en texto secundario, y una flecha hacia abajo a la derecha:
+- "Cintas de freno traseras" — "Supuesto a los 45.000 km".
+- "Líquido de frenos" — "Supuesto a los 45.000 km".
+- "Aceite y filtro de aceite" — "Supuesto a los 60.000 km".
+- "Amortiguadores" — "Supuesto a los 60.000 km".
+- "Neumáticos" — "Supuesto a los 60.000 km".
+- "Pastillas de freno delanteras" — "Supuesto a los 60.000 km".
+Al pie de la pantalla, botón secundario a lo ancho: "Más tarde".
+
+Estado 1, la fila "Cintas de freno traseras" abierta (es una revisión):
+Pregunta en peso medio: "¿Hiciste la revisión cerca de los 45.000 km?"
+Debajo, en texto secundario: "Si lo revisaron y estaba bien, también cuenta."
+Campo de fecha "¿Cuándo se hizo?" con el valor "20/08/2026".
+Debajo del campo, la vista previa: una caja con fondo verde muy suave y borde verde de 1 px, con el chip "Al día" y al lado el texto "Con ese dato: faltan 27.600 km o vence el 20/08/2029." Tiene que leerse como la consecuencia de la fecha cargada.
+Botón principal a lo ancho: "Sí, se hizo".
+Dos enlaces en una línea, separados por una barra fina: "Fue en otro momento" y "No lo sé".
+Debajo, centrado, en texto secundario de 13 px: "Si no lo sabés, seguimos contando desde los 45.000 km y te lo marcamos para verificar en el taller."
+
+Estado 2, la fila "Aceite y filtro de aceite" abierta, después de tocar "Fue en otro momento" (es un cambio):
+Campo "Kilometraje" con el valor "58.000" y el sufijo "km".
+Campo de fecha "Fecha" con el valor "02/01/2025".
+La vista previa, ahora con fondo rojo muy suave y borde rojo de 1 px, con el chip "Vencido" y el texto "Con ese dato: venció el 02/01/2026."
+Botón principal "Guardar" y, en la misma línea, el enlace "Cancelar".
+En este estado el contador dice "5 por responder" y la fila "Cintas de freno traseras" ya no está.
+
+Colores exactos: fondo #F6F4EF, texto #1B2430, botón principal y enlaces #0B3D91, oro #F2B705 solo en el testigo del logo. Chips: vencido #B42318, próximo #9A3412, al día #1E6B43, a confirmar #4B3FA3, cada uno con su fondo suave. Sin degradados, ilustraciones, fotos ni emojis.
+Títulos y botones con mayúscula solo en la primera palabra. No agregues textos, avisos, subtítulos ni notas al pie que no estén en este pedido. En las pantallas internas (las que tienen flecha "Volver"), la barra superior no lleva el botón de cuenta.
+```
+
+## 22. Paso 3: tu ficha — Aplicación
+
+```
+Ficha del primer auto, justo después de terminar los pasos de bienvenida.
+
+Barra superior con flecha "Volver".
+Indicador de pasos: en texto secundario de 13 px "Paso 3 de 3 · Tu ficha" y los tres segmentos finos en azul.
+Título: "Ford Ka 2014".
+
+Aviso de bienvenida en una caja con borde azul suave, fondo azul muy claro y un ícono de información:
+En peso medio: "Listo, este es tu Ford Ka."
+Dos líneas con viñeta:
+- "Tocá un ítem para ver qué hacer con él."
+- "Actualizá el kilometraje cada tanto, por ejemplo cuando cargás nafta: con ese dato calculamos lo que le toca."
+Enlace al pie del aviso: "Entendido".
+
+Bloque del kilometraje sobre el fondo, sin tarjeta: "Kilometraje actual" en texto secundario, "62.400 km" en grande, "Actualizado el 16/10/2026" en texto secundario y el botón secundario "Actualizar kilometraje".
+
+Sección "Mantenimiento". Encima de la lista, en texto secundario: "6 ítems a confirmar. Lo supusimos porque el auto se cargó con más kilómetros que el intervalo."
+Cada ítem es una fila blanca con el nombre, debajo la acción y el dato, y a la derecha el chip. Las filas a confirmar tienen borde punteado violeta y, debajo del dato, el enlace "Registrar trabajo":
+- "Cintas de freno traseras" — "Revisar · supuesto a los 45.000 km" — chip "A confirmar".
+- "Líquido de frenos" — "Cambiar · supuesto a los 45.000 km" — chip "A confirmar".
+- "Aceite y filtro de aceite" — "Cambiar · supuesto a los 60.000 km" — chip "A confirmar".
+- "Amortiguadores" — "Revisar · supuesto a los 60.000 km" — chip "A confirmar".
+- "Correa auxiliar" — "Cambiar · faltan 27.600 km o vence el 16/10/2031" — chip "Al día", borde normal, sin enlace.
+- "Líquido de enfriamiento" — "Cambiar · faltan 27.600 km o vence el 16/10/2029" — chip "Al día", borde normal, sin enlace.
+Toda la fila se puede tocar: mostralo con una flecha chica a la derecha del chip.
+
+Al pie, botón principal a lo ancho "Registrar trabajo" y debajo, botones secundarios "Historial" y "Editar datos".
+
+Colores exactos: fondo #F6F4EF, texto #1B2430, botón principal y enlaces #0B3D91, oro #F2B705 solo en el testigo del logo. Chips: vencido #B42318, próximo #9A3412, al día #1E6B43, a confirmar #4B3FA3, cada uno con su fondo suave. Sin degradados, ilustraciones, fotos ni emojis.
+Títulos y botones con mayúscula solo en la primera palabra. No agregues textos, avisos, subtítulos ni notas al pie que no estén en este pedido. En las pantallas internas (las que tienen flecha "Volver"), la barra superior no lleva el botón de cuenta.
+```
+
+## 23. Ingresar con la marca nueva — Aplicación
+
+Para que las capturas de la Actividad 4 no mezclen marcas: la pantalla 1 con el logo nuevo.
+
+```
+Pantalla de inicio de sesión de Km 12, una app para llevar el mantenimiento del auto.
+
+Arriba, el logo como en la imagen adjunta: el mojón de ruta azul con el "12" en blanco y el testigo oro, y al lado "Km 12" en semibold. Debajo del logo, en texto secundario: "El mantenimiento de tu auto, según el plan del fabricante."
+Título alineado a la izquierda: "Ingresar".
+Campo "Correo electrónico" con el valor propietario@example.com.
+Campo "Contraseña" con el texto oculto y un botón de ojo para mostrarla.
+Enlace "Olvidé mi contraseña", alineado a la derecha, debajo del campo.
+Botón principal a lo ancho: "Ingresar".
+Debajo, en texto secundario: "¿No tenés cuenta?" y el enlace "Crear cuenta".
+
+Sin imágenes ni ilustración.
+
+Colores exactos: fondo #F6F4EF, texto #1B2430, botón principal y enlaces #0B3D91, oro #F2B705 solo en el testigo del logo. Sin degradados, ilustraciones, fotos ni emojis.
+Títulos y botones con mayúscula solo en la primera palabra. No agregues textos, avisos, subtítulos ni notas al pie que no estén en este pedido.
+```
+
+Cuando estén, exportá cada una (código y captura) a `docs/diseno/pantallas/mobile/19` a `23`, como las anteriores, y avisá: el código se ajusta a lo que salga.

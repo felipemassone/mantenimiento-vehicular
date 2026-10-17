@@ -79,3 +79,14 @@ Evidencia:
   cambio de fondo en la ficha del caso de uso.
 
 **La Iteración 3 queda cerrada** con los cinco puntos del criterio de terminado cumplidos.
+
+## Mejoras antes de congelar la interfaz (16/10/2026)
+
+Cuatro ideas aprobadas por Felipe para el seminario, con la regla de que no cambien RF ni CU, lleven un día o menos y lleguen antes de las capturas de la Actividad 4. Spec: `docs/superpowers/specs/2026-10-16-primer-auto-y-confirmar-design.md`.
+
+| Apartado del informe | Dice | Quedó | Ajuste de redacción |
+|---|---|---|---|
+| CU-09 / CU-10 / CU-06, ficha (PR #25) | Tocar un ítem abre Registrar trabajo (PR #23) | La fila lleva a lo que pide su estado: con duda, a Confirmar datos (y "Registrar trabajo" como enlace secundario); vencido o próximo, a registrar; al día, al último trabajo del ítem (o a registrar si no tiene) | Otro punto de entrada a los mismos flujos; sin cambio de fondo |
+| Nombre del producto (PR #26) | El informe no nombra el producto, solo el título del proyecto | La aplicación se llama **Km 12**; logo del mojón de ruta diseñado en Stitch (`docs/diseno/stitch_km_12_logo_design_system`), favicon e íconos para la pantalla de inicio | Si las capturas de 7.1.5 lo muestran, nombrarlo una vez: "la aplicación (Km 12)" |
+| CU-06 (Confirmar datos) | Confirmar, corregir o "No lo sé" | Las mismas tres respuestas y las mismas validaciones. La pregunta dice el km supuesto y si era un cambio o una revisión; antes de guardar, una línea dice cómo quedaría el ítem (calculada con el motor); "No lo sé" explica qué pasa | Sin cambio de fondo; si se muestra la pantalla, describir la vista previa |
+| CU-05 / CU-06 / CU-08 (primer auto) | Alta del vehículo, confirmación optativa (RF-10) y actualización del kilometraje | Con la cuenta sin vehículos, Mis vehículos muestra una bienvenida con los tres pasos; el alta, Confirmar datos y la ficha llevan un indicador "Paso N de 3"; la ficha explica cómo leerla y que el kilometraje se actualiza cada tanto. Confirmar sigue siendo optativo | Mencionar la guía del primer auto en 7.1.5 si se muestra; los CU no cambian |

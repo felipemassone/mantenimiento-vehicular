@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Km 12 — Especificación de Sistema de Identidad y Variantes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            papel: '#F6F4EF',
+            'papel-card': '#FFFFFF',
+            'papel-subtle': '#EFECE5',
+            tinta: '#1B2430',
+            'tinta-suave': '#5A6472',
+            'linea': '#E3DFD6',
+            'borde-campo': '#8A8F98',
+            azul: '#0B3D91',
+            oro: '#F2B705',
+            'oro-focus': '#D89E00'
+          },
+          fontFamily: {
+            sans: ['"Public Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .font-tnum { font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body class="bg-papel text-tinta font-sans min-h-screen antialiased p-6 sm:p-10 lg:p-12">
+  <div class="max-w-[1360px] mx-auto space-y-8">
+
+    <!-- Header Section -->
+    <header class="bg-white border border-linea rounded-xl p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div class="space-y-1.5">
+        <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-blue-50 border border-blue-200 text-xs font-semibold text-azul uppercase tracking-wider">
+          Sistema de Identidad Visual
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-tinta">
+          Km 12 — Libreta de Service Vehicular
+        </h1>
+        <p class="text-sm sm:text-base text-tinta-suave max-w-2xl leading-relaxed">
+          Guía de especificación técnica y variantes de marca basadas en el mojón kilométrico vial argentino. Construcción plana, geométrica, sin degradados ni ornamentos decorativos.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-6 border-t md:border-t-0 md:border-l border-linea pt-4 md:pt-0 md:pl-6 text-xs text-tinta-suave shrink-0">
+        <div>
+          <span class="block font-medium text-tinta">Paleta institucional</span>
+          <span class="font-tnum">Papel #F6F4EF · Azul #0B3D91 · Oro #F2B705</span>
+        </div>
+        <div>
+          <span class="block font-medium text-tinta">Tipografía</span>
+          <span>Public Sans (SemiBold / Bold / tnum)</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Visual Presentation Grid -->
+    <div class="space-y-6">
+
+      <!-- ================= VARIANTE A ================= -->
+      <section class="bg-white border border-linea rounded-xl overflow-hidden">
+        <!-- Variant Header Bar -->
+        <div class="px-6 py-4 bg-papel-subtle border-b border-linea flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <span class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-azul text-white font-bold text-sm">A</span>
+            <div>
+              <h2 class="font-semibold text-base text-tinta">Variante A: Mojón esencial "12"</h2>
+              <p class="text-xs text-tinta-suave">Silueta de poste de ruta clásica con testigo vertical superior en oro y número 12 directo. Máxima síntesis.</p>
+            </div>
+          </div>
+          <span class="px-2.5 py-1 rounded text-xs font-medium bg-emerald-50 text-emerald-800 border border-emerald-200">
+            Variante Principal Recomendada
+          </span>
+        </div>
+
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- 1. Isotipo Solo -->
+          <div class="flex flex-col">
+            <span class="text-xs font-semibold text-tinta-suave uppercase tracking-wider mb-2">1. Isotipo (Icon Alone)</span>
+            <div class="h-56 bg-papel rounded-lg border border-linea flex flex-col items-center justify-center relative p-4">
+              <!-- SVG Icon A -->
+              <svg width="76" height="114" viewBox="0 0 76 114" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Marker Body: semicircular top, flat base -->
+                <path d="M0 114V38C0 17.0132 17.0132 0 38 0C58.9868 0 76 17.0132 76 38V114H0Z" fill="#0B3D91"/>
+                <!-- Gold beacon accent pill at top (pure vertical detail, not horizontal stripe) -->
+                <rect x="34" y="10" width="8" height="16" rx="4" fill="#F2B705"/>
+                <!-- Number 12 in Public Sans Bold tnum -->
+                <text x="38" y="85" fill="#FFFFFF" font-family="'Public Sans', sans-serif" font-weight="700" font-size="44" text-anchor="middle" letter-spacing="-0.03em" font-variant-numeric="tabular-nums">12</text>
+              </svg>
+              <div class="mt-4 text-center">
+                <span class="text-[11px] font-mono text-tinta-suave">76×114 px · Proporción 1:1.5</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Lockup Horizontal -->
+          <div class="flex flex-col">
+            <span class="text-xs font-semibold text-tinta-suave uppercase tracking-wider mb-2">2. Lockup Horizontal</span>
+            <div class="h-56 bg-papel rounded-lg border border-linea flex flex-col items-center justify-center p-4">
+              <div class="flex items-center gap-4">
+                <!-- Scaled Icon A -->
+                <svg width="44" height="66" viewBox="0 0 76 114" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0">
+                  <path d="M0 114V38C0 17.0132 17.0132 0 38 0C58.9868 0 76 17.0132 76 38V114H0Z" fill="#0B3D91"/>
+                  <rect x="34" y="10" width="8" height="16" rx="4" fill="#F2B705"/>
+                  <text x="38" y="85" fill="#FFFFFF" font-family="'Public Sans', sans-serif" font-weight="700" font-size="44" text-anchor="middle" letter-spacing="-0.03em" font-variant-numeric="tabular-nums">12</text>
+                </svg>
+                <div class="flex flex-col justify-center">
+                  <span class="text-3xl font-bold tracking-tight text-tinta leading-none">Km 12</span>
+                  <span class="text-[10px] uppercase font-semibold text-tinta-suave tracking-widest mt-1">Libreta de service</span>
+                </div>
+              </div>
+              <span class="mt-5 text-[11px] font-mono text-tinta-suave">Sobre fondo Papel (#F6F4EF)</span>
+            </div>
+          </div>
+
+          <!-- 3. Versión Monocromática -->
+          <div class="flex flex-col">
+            <span class="text-xs font-semibold text-tinta-suave uppercase tracking-wider mb-2">3. Versión Monocromática</span>
+            <div class="h-56 bg-papel rounded-lg border border-linea flex flex-col items-center justify-center p-4">
+              <div class="flex items-center gap-4">
+                <!-- Monochrome Icon A -->
+                <svg width="44" height="66" viewBox="0 0 76 114" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0">
+                  <path d="M0 114V38C0 17.0132 17.0132 0 38 0C58.9868 0 76 17.0132 76 38V114H0Z" fill="#1B2430"/>
+                  <circle cx="38" cy="18" r="4.5" fill="#1B2430"/>
+                  <text x="38" y="85" fill="#FFFFFF" font-family="'Public Sans', sans-serif" font-weight="700" font-size="44" text-anchor="middle" letter-spacing="-0.03em" font-variant-numeric="tabular-nums">12</text>
+                </svg>
+                <div class="flex flex-col justify-center">
+                  <span class="text-3xl font-bold tracking-tight text-tinta leading-none">Km 12</span>
+                  <span class="text-[10px] uppercase font-semibold text-tinta-suave tracking-widest mt-1">Tinta pura 100%</span>
+                </div>
+              </div>
+              <span class="mt-5 text-[11px] font-mono text-tinta-suave">Para remitos de taller y b&amp;n</span>
+            </div>
+          </div>
+
+          <!-- 4. Favicons 32x32 y 16x16 -->
+          <div class="flex flex-col">
+            <span class="text-xs font-semibold text-tinta-suave uppercase tracking-wider mb-2">4. Favicons (Escala 32×32 y 16×16)</span>
+            <div class="h-56 bg-papel rounded-lg border border-linea flex flex-col items-center justify-center p-4 gap-4">
+              <!-- Favicon Mock Container -->
+              <div class="flex items-end gap-6 bg-white px-5 py-3 rounded border border-linea">
+                <!-- 32x32 display -->
+                <div class="flex flex-col items-center gap-1.5">
+                  <div class="w-8 h-8 rounded bg-azul flex items-center justify-center overflow-hidden">
+                    <svg width="24" height="24" viewBox="0 0 76 114" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M4 110V40C4 20.1178 20.1178 4 40 4C59.8822 4 76 20.1178 76 40V110H4Z" fill="#FFFFFF"/>
+                      <circle cx="40" cy="22" r="6" fill="#F2B705"/>
+                      <text x="40" y="88" fill="#0B3D91" font-family="'Public Sans', sans-serif" font-weight="800" font-size="48" text-anchor="middle" font-variant-numeric="tabular-nums">12</text>
+                    </svg>
+                  </div>
+                  <span class="text-[10px] font-mono text-tinta-suave">32×32 px</span>
+                </div>
+
+                <!-- 16x16 display -->
+                <div class="flex flex-col items-center gap-1.5">
+                  <div class="w-4 h-4 rounded-sm bg-azul flex items-center justify-center overflow-hidden">
+                    <svg width="12" height="12" viewBox="0 0 76 114" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M4 110V40C4 20.1178 20.1178 4 40 4C59.8822 4 76 20.1178 76 40V110H4Z" fill="#FFFFFF"/>
+                      <circle cx="40" cy="24" r="7" fill="#F2B705"/>
+                      <text x="40" y="90" fill="#0B3D91" font-family="'Public Sans', sans-serif" font-weight="900" font-size="52" text-anchor="middle">12</text>
+                    </svg>
+                  </div>
+                  <span class="text-[10px] font-mono text-tinta-suave">16×16 px</span>
+                </div>
+
+                <!-- App Icon preview 48px -->
+                <div class="flex flex-col items-center gap-1.5 pl-2 border-l border-linea">
+                  <div class="w-12 h-12 rounded-xl bg-azul flex items-center justify-center shadow-sm">
+                    <svg width="30" height="30" viewBox="0 0 76 114" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M0 114V38C0 17.0132 17.0132 0 38 0C58.9868 0 76 17.0132 76 38V114H0Z" fill="#FFFFFF"/>
+                      <rect x="34" y="10" width="8" height="16" rx="4" fill="#F2B705"/>
+                      <text x="38" y="85" fill="#0B3D91" font-family="'Public Sans', sans-serif" font-weight="800" font-size="44" text-anchor="middle" font-variant-numeric="tabular-nums">12</text>
+                    </svg>
+                  </div>
+                  <span class="text-[10px] font-mono text-tinta-suave">Home 48px</span>
+                </div>
+              </div>
+              <span class="text-[11px] text-tinta-suave text-center">Alta legibilidad en navegador</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ================= VARIANTE B ================= -->
+      <section class="bg-white border border-linea rounded-xl overflow-hidden">
+        <!-- Variant Header Bar -->
+        <div class="px-6 py-4 bg-papel-subtle border-b border-linea flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <span class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-indigo-700 text-white font-bold text-sm">B</span>
+            <div>
+              <h2 class="font-semibold text-base text-tinta">Variante B: Mojón "Km" + "12"</h2>
+              <p class="text-xs text-tinta-suave">Estructura jerárquica con indicador vial explícito "KM" condensado en la corona y el número "12" debajo.</p>
+            </div>
+          </div>
+          <span class="px-2.5 py-1 rounded text-xs font-medium bg-slate-100 text-tinta-suave border border-linea">
+            Estructura Dual
+          </span>
+        </div>
+
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- 1. Isotipo Solo -->
+          <div class="flex flex-col">
+            <span class="text-xs font-semibold text-tinta-suave uppercase tracking-wider mb-2">1. Isotipo (Icon Alone)</span>
+            <div class="h-56 bg-papel rounded-lg border border-linea flex flex-col items-center justify-center relative p-4">
+              <!-- SVG Icon B -->
+              <svg width="76" height="114" viewBox="0 0 76 114" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 114V38C0 17.0132 17.0132 0 38 0C58.9868 0 76 17.0132 76 38V114H0Z" fill="#0B3D91"/>
+                <!-- Gold dot center pinnacle -->
+                <circle cx="38" cy="14" r="4.5" fill="#F2B705"/>
+                <!-- KM text -->
+                <text x="38" y="44" fill="#E3EAF6" font-family="'Public Sans', sans-serif" font-weight="600" font-size="16" text-anchor="middle" letter-spacing="0.14em">KM</text>
+                <!-- Separator line -->
+                <line x1="22" y1="52" x2="54" y2="52" stroke="#E3EAF6" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+                <!-- Number 12 -->
+                <text x="38" y="96" fill="#FFFFFF" font-family="'Public Sans', sans-serif" font-weight="700" font-size="40" text-anchor="middle" letter-spacing="-0.03em" font-variant-numeric="tabular-nums">12</text>
+              </svg>
+              <div class="mt-4 text-center">
+                <span class="text-[11px] font-mono text-tinta-suave">Indicador vial jerarquizado</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Lockup Horizontal -->
+          <div class="flex flex-col">
+            <span class="text-xs font-semibold text-tinta-suave uppercase tracking-wider mb-2">2. Lockup Horizontal</span>
+            <div class="h-56 bg-papel rounded-lg border border-linea flex flex-col items-center justify-center p-4">
+              <div class="flex items-center gap-4">
+                <!-- Scaled Icon B -->
+                <svg width="44" height="66" viewBox="0 0 76 114" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0">
+                  <path d="M0 114V38C0 17.0132 17.0132 0 38 0C58.9868 0 76 17.0132 76 38V114H0Z" fill="#0B3D91"/>
+                  <circle cx="38" cy="14" r="4.5" fill="#F2B705"/>
+                  <text x="38" y="44" fill="#E3EAF6" font-family="'Public Sans', sans-serif" font-weight="600" font-size="16" text-anchor="middle" letter-spacing="0.14em">KM</text>
+                  <line x1="22" y1="52" x2="54" y2="52" stroke="#E3EAF6" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+                  <text x="38" y="96" fill="#FFFFFF" font-family="'Public Sans', sans-serif" font-weight="700" font-size="40" text-anchor="middle" letter-spacing="-0.03em">12</text>
+                </svg>
+                <div class="flex flex-col justify-center">
+                  <span class="text-3xl font-bold tracking-tight text-tinta leading-none">Km 12</span>
+                  <span class="text-[10px] uppercase font-semibold text-tinta-suave tracking-widest mt-1">Libreta de service</span>
+                </div>
+              </div>
+              <span class="mt-5 text-[11px] font-mono text-tinta-suave">Lockup tipográfico complementario</span>
+            </div>
+          </div>
+
+          <!-- 3. Versión Monocromática -->
+          <div class="flex flex-col">
+            <span class="text-xs font-semibold text-tinta-suave uppercase tracking-wider mb-2">3. Versión Monocromática</span>
+            <div class="h-56 bg-papel rounded-lg border border-linea flex flex-col items-center justify-center p-4">
+              <div class="flex items-center gap-4">
+                <!-- Monochrome Icon B -->
+                <svg width="44" height="66" viewBox="0 0 76 114" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0">
+                  <path d="M0 114V38C0 17.0132 17.0132 0 38 0C58.9868 0 76 17.0132 76 38V114H0Z" fill="#1B2430"/>
+                  <circle cx="38" cy="14" r="4.5" fill="#1B2430"/>
+                  <text x="38" y="44" fill="#FFFFFF" font-family="'Public Sans', sans-serif" font-weight="600" font-size="16" text-anchor="middle" letter-spacing="0.14em">KM</text>
+                  <line x1="22" y1="52" x2="54" y2="52" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+                  <text x="38" y="96" fill="#FFFFFF" font-family="'Public Sans', sans-serif" font-weight="700" font-size="40" text-anchor="middle" letter-spacing="-0.03em">12</text>
+                </svg>
+                <div class="flex flex-col justify-center">
+                  <span class="text-3xl font-bold tracking-tight text-tinta leading-none">Km 12</span>
+                  <span class="text-[10px] uppercase font-semibold text-tinta-suave tracking-widest mt-1">Tinta pura 100%</span>
+                </div>
+              </div>
+              <span class="mt-5 text-[11px] font-mono text-tinta-suave">Tinta negra de alto contraste</span>
+            </div>
+          </div>
+
+          <!-- 4. Favicons 32x32 y 16x16 -->
+          <div class="flex flex-col">
+            <span class="text-xs font-semibold text-tinta-suave uppercase tracking-wider mb-2">4. Favicons (Escala 32×32 y 16×16)</span>
+            <div class="h-56 bg-papel rounded-lg border border-linea flex flex-col items-center justify-center p-4 gap-4">
+              <div class="flex items-end gap-6 bg-white px-5 py-3 rounded border border-linea">
+                <!-- 32x32 display -->
+                <div class="flex flex-col items-center gap-1.5">
+                  <div class="w-8 h-8 rounded bg-azul flex items-center justify-center overflow-hidden">
+                    <svg width="24" height="24" viewBox="0 0 76 114" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M4 110V40C4 20.1178 20.1178 4 40 4C59.8822 4 76 20.1178 76 40V110H4Z" fill="#FFFFFF"/>
+                      <text x="40" y="44" fill="#0B3D91" font-family="'Public Sans', sans-serif" font-weight="700" font-size="18" text-anchor="middle" letter-spacing="0.1em">KM</text>
+                      <line x1="26" y1="50" x2="54" y2="50" stroke="#0B3D91" stroke-width="2"/>
+                      <text x="40" y="92" fill="#0B3D91" font-family="'Public Sans', sans-serif" font-weight="800" font-size="40" text-anchor="middle">12</text>
+                    </svg>
+                  </div>
+                  <span class="text-[10px] font-mono text-tinta-suave">32×32 px</span>
+                </div>
+
+                <!-- 16x16 display -->
+                <div class="flex flex-col items-center gap-1.5">
+                  <div class="w-4 h-4 rounded-sm bg-azul flex items-center justify-center overflow-hidden">
+                    <svg width="12" height="12" viewBox="0 0 76 114" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M4 110V40C4 20.1178 20.1178 4 40 4C59.8822 4 76 20.1178 76 40V110H4Z" fill="#FFFFFF"/>
+                      <text x="40" y="86" fill="#0B3D91" font-family="'Public Sans', sans-serif" font-weight="900" font-size="56" text-anchor="middle">12</text>
+                    </svg>
+                  </div>
+                  <span class="text-[10px] font-mono text-tinta-suave">16×16 px</span>
+                </div>
+
+                <!-- App Icon preview 48px -->
+                <div class="flex flex-col items-center gap-1.5 pl-2 border-l border-linea">
+                  <div class="w-12 h-12 rounded-xl bg-azul flex items-center justify-center shadow-sm">
+                    <svg width="30" height="30" viewBox="0 0 76 114" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M0 114V38C0 17.0132 17.0132 0 38 0C58.9868 0 76 17.0132 76 38V114H0Z" fill="#FFFFFF"/>
+                      <circle cx="38" cy="14" r="4.5" fill="#F2B705"/>
+                      <text x="38" y="44" fill="#0B3D91" font-family="'Public Sans', sans-serif" font-weight="700" font-size="16" text-anchor="middle" letter-spacing="0.12em">KM</text>
+                      <line x1="22" y1="52" x2="54" y2="52" stroke="#0B3D91" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+                      <text x="38" y="96" fill="#0B3D91" font-family="'Public Sans', sans-serif" font-weight="800" font-size="40" text-anchor="middle">12</text>
+                    </svg>
+                  </div>
+                  <span class="text-[10px] font-mono text-tinta-suave">Home 48px</span>
+                </div>
+              </div>
+              <span class="text-[11px] text-tinta-suave text-center">Optimizado para 16px por síntesis</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ================= VARIANTE C ================= -->
+      <section class="bg-white border border-linea rounded-xl overflow-hidden">
+        <!-- Variant Header Bar -->
+        <div class="px-6 py-4 bg-papel-subtle border-b border-linea flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <span class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-amber-700 text-white font-bold text-sm">C</span>
+            <div>
+              <h2 class="font-semibold text-base text-tinta">Variante C: Odómetro en Mojón</h2>
+              <p class="text-xs text-tinta-suave">Dígitos inspirados en el cuentakilómetros analógico con tambores mecánicos independientes dentro del mojón.</p>
+            </div>
+          </div>
+          <span class="px-2.5 py-1 rounded text-xs font-medium bg-amber-50 text-amber-900 border border-amber-200">
+            Estilo Mecánico / Analógico
+          </span>
+        </div>
+
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- 1. Isotipo Solo -->
+          <div class="flex flex-col">
+            <span class="text-xs font-semibold text-tinta-suave uppercase tracking-wider mb-2">1. Isotipo (Icon Alone)</span>
+            <div class="h-56 bg-papel rounded-lg border border-linea flex flex-col items-center justify-center relative p-4">
+              <!-- SVG Icon C -->
+              <svg width="76" height="114" viewBox="0 0 76 114" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 114V38C0 17.0132 17.0132 0 38 0C58.9868 0 76 17.0132 76 38V114H0Z" fill="#0B3D91"/>
+                <!-- Top beacon dot in gold -->
+                <circle cx="38" cy="18" r="4.5" fill="#F2B705"/>
+                <!-- Outer Odometer Bezel -->
+                <rect x="10" y="38" width="56" height="60" rx="6" fill="#061F4A" stroke="#164A96" stroke-width="1.5"/>
+                <!-- Drum 1 with digit 1 -->
+                <rect x="13" y="41" width="23" height="54" rx="3" fill="#0B3D91"/>
+                <text x="24.5" y="80" fill="#FFFFFF" font-family="'Public Sans', sans-serif" font-weight="700" font-size="32" text-anchor="middle" font-variant-numeric="tabular-nums">1</text>
+                <!-- Drum 2 with digit 2 -->
+                <rect x="40" y="41" width="23" height="54" rx="3" fill="#0B3D91"/>
+                <text x="51.5" y="80" fill="#FFFFFF" font-family="'Public Sans', sans-serif" font-weight="700" font-size="32" text-anchor="middle" font-variant-numeric="tabular-nums">2</text>
+                <!-- Subtle drum divider line -->
+                <line x1="38" y1="38" x2="38" y2="98" stroke="#041433" stroke-width="2"/>
+              </svg>
+              <div class="mt-4 text-center">
+                <span class="text-[11px] font-mono text-tinta-suave">Dígitos en tambores mecánicos</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Lockup Horizontal -->
+          <div class="flex flex-col">
+            <span class="text-xs font-semibold text-tinta-suave uppercase tracking-wider mb-2">2. Lockup Horizontal</span>
+            <div class="h-56 bg-papel rounded-lg border border-linea flex flex-col items-center justify-center p-4">
+              <div class="flex items-center gap-4">
+                <!-- Scaled Icon C -->
+                <svg width="44" height="66" viewBox="0 0 76 114" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0">
+                  <path d="M0 114V38C0 17.0132 17.0132 0 38 0C58.9868 0 76 17.0132 76 38V114H0Z" fill="#0B3D91"/>
+                  <circle cx="38" cy="18" r="4.5" fill="#F2B705"/>
+                  <rect x="10" y="38" width="56" height="60" rx="6" fill="#061F4A"/>
+                  <line x1="38" y1="38" x2="38" y2="98" stroke="#041433" stroke-width="2"/>
+                  <text x="24.5" y="80" fill="#FFFFFF" font-family="'Public Sans', sans-serif" font-weight="700" font-size="32" text-anchor="middle">1</text>
+                  <text x="51.5" y="80" fill="#FFFFFF" font-family="'Public Sans', sans-serif" font-weight="700" font-size="32" text-anchor="middle">2</text>
+                </svg>
+                <div class="flex flex-col justify-center">
+                  <span class="text-3xl font-bold tracking-tight text-tinta leading-none">Km 12</span>
+                  <span class="text-[10px] uppercase font-semibold text-tinta-suave tracking-widest mt-1">Libreta de service</span>
+                </div>
+              </div>
+              <span class="mt-5 text-[11px] font-mono text-tinta-suave">Estilo cuentakilómetros</span>
+            </div>
+          </div>
+
+          <!-- 3. Versión Monocromática -->
+          <div class="flex flex-col">
+            <span class="text-xs font-semibold text-tinta-suave uppercase tracking-wider mb-2">3. Versión Monocromática</span>
+            <div class="h-56 bg-papel rounded-lg border border-linea flex flex-col items-center justify-center p-4">
+              <div class="flex items-center gap-4">
+                <!-- Monochrome Icon C -->
+                <svg width="44" height="66" viewBox="0 0 76 114" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0">
+                  <path d="M0 114V38C0 17.0132 17.0132 0 38 0C58.9868 0 76 17.0132 76 38V114H0Z" fill="#1B2430"/>
+                  <circle cx="38" cy="18" r="4.5" fill="#FFFFFF"/>
+                  <rect x="10" y="38" width="56" height="60" rx="6" fill="#000000"/>
+                  <line x1="38" y1="38" x2="38" y2="98" stroke="#333333" stroke-width="1.5"/>
+                  <text x="24.5" y="80" fill="#FFFFFF" font-family="'Public Sans', sans-serif" font-weight="700" font-size="32" text-anchor="middle">1</text>
+                  <text x="51.5" y="80" fill="#FFFFFF" font-family="'Public Sans', sans-serif" font-weight="700" font-size="32" text-anchor="middle">2</text>
+                </svg>
+                <div class="flex flex-col justify-center">
+                  <span class="text-3xl font-bold tracking-tight text-tinta leading-none">Km 12</span>
+                  <span class="text-[10px] uppercase font-semibold text-tinta-suave tracking-widest mt-1">Tinta pura 100%</span>
+                </div>
+              </div>
+              <span class="mt-5 text-[11px] font-mono text-tinta-suave">Tratamiento de alta densidad</span>
+            </div>
+          </div>
+
+          <!-- 4. Favicons 32x32 y 16x16 -->
+          <div class="flex flex-col">
+            <span class="text-xs font-semibold text-tinta-suave uppercase tracking-wider mb-2">4. Favicons (Escala 32×32 y 16×16)</span>
+            <div class="h-56 bg-papel rounded-lg border border-linea flex flex-col items-center justify-center p-4 gap-4">
+              <div class="flex items-end gap-6 bg-white px-5 py-3 rounded border border-linea">
+                <!-- 32x32 display -->
+                <div class="flex flex-col items-center gap-1.5">
+                  <div class="w-8 h-8 rounded bg-azul flex items-center justify-center overflow-hidden">
+                    <svg width="24" height="24" viewBox="0 0 76 114" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M4 110V40C4 20.1178 20.1178 4 40 4C59.8822 4 76 20.1178 76 40V110H4Z" fill="#FFFFFF"/>
+                      <rect x="14" y="44" width="48" height="52" rx="4" fill="#0B3D91"/>
+                      <text x="26" y="82" fill="#FFFFFF" font-family="'Public Sans', sans-serif" font-weight="700" font-size="28" text-anchor="middle">1</text>
+                      <text x="50" y="82" fill="#FFFFFF" font-family="'Public Sans', sans-serif" font-weight="700" font-size="28" text-anchor="middle">2</text>
+                    </svg>
+                  </div>
+                  <span class="text-[10px] font-mono text-tinta-suave">32×32 px</span>
+                </div>
+
+                <!-- 16x16 display -->
+                <div class="flex flex-col items-center gap-1.5">
+                  <div class="w-4 h-4 rounded-sm bg-azul flex items-center justify-center overflow-hidden">
+                    <svg width="12" height="12" viewBox="0 0 76 114" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M4 110V40C4 20.1178 20.1178 4 40 4C59.8822 4 76 20.1178 76 40V110H4Z" fill="#FFFFFF"/>
+                      <text x="40" y="86" fill="#0B3D91" font-family="'Public Sans', sans-serif" font-weight="900" font-size="56" text-anchor="middle">12</text>
+                    </svg>
+                  </div>
+                  <span class="text-[10px] font-mono text-tinta-suave">16×16 px</span>
+                </div>
+
+                <!-- App Icon preview 48px -->
+                <div class="flex flex-col items-center gap-1.5 pl-2 border-l border-linea">
+                  <div class="w-12 h-12 rounded-xl bg-azul flex items-center justify-center shadow-sm">
+                    <svg width="30" height="30" viewBox="0 0 76 114" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M0 114V38C0 17.0132 17.0132 0 38 0C58.9868 0 76 17.0132 76 38V114H0Z" fill="#FFFFFF"/>
+                      <circle cx="38" cy="18" r="4.5" fill="#F2B705"/>
+                      <rect x="14" y="44" width="48" height="52" rx="4" fill="#0B3D91"/>
+                      <text x="26" y="82" fill="#FFFFFF" font-family="'Public Sans', sans-serif" font-weight="800" font-size="28" text-anchor="middle">1</text>
+                      <text x="50" y="82" fill="#FFFFFF" font-family="'Public Sans', sans-serif" font-weight="800" font-size="28" text-anchor="middle">2</text>
+                    </svg>
+                  </div>
+                  <span class="text-[10px] font-mono text-tinta-suave">Home 48px</span>
+                </div>
+              </div>
+              <span class="text-[11px] text-tinta-suave text-center">Fiel a la lectura técnica</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Comparative Specs Footer -->
+    <footer class="bg-white border border-linea rounded-xl p-6">
+      <h3 class="text-xs font-semibold text-tinta-suave uppercase tracking-wider mb-4">Criterios de Aplicación y Lineamientos de Marca</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+        <div class="space-y-1.5 border-l-2 border-azul pl-3">
+          <span class="font-semibold text-tinta">Geometría del Mojón</span>
+          <p class="text-xs text-tinta-suave leading-relaxed">Arco semicircular superior continuo y base plana sin pedestal. No se aplican sombras proyectadas, biseles ni efectos tridimensionales.</p>
+        </div>
+        <div class="space-y-1.5 border-l-2 border-oro pl-3">
+          <span class="font-semibold text-tinta">Uso Restringido del Oro (#F2B705)</span>
+          <p class="text-xs text-tinta-suave leading-relaxed">Exclusivo como detalle puntual (testigo o baliza de hito vial). Nunca en franjas horizontales completas ni en textos de lectura.</p>
+        </div>
+        <div class="space-y-1.5 border-l-2 border-tinta pl-3">
+          <span class="font-semibold text-tinta">Adaptabilidad Favicon</span>
+          <p class="text-xs text-tinta-suave leading-relaxed">En tamaños críticos (16×16 px), el glifo "12" maximiza su grosor sobre silueta invertida blanca con fondo azul para total nitidez en pestañas.</p>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+</body>
+</html>

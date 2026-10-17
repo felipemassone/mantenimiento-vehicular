@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { confirmarSupuesto, corregirSupuesto, marcarAVerificar, supuestosDelVehiculo } from "@/datos/estado";
 import { exigirClaims } from "@/datos/sesion";
+import { listarVehiculos } from "@/datos/vehiculos";
 import { destinoTrasResponder, terminoLaConfirmacion } from "@/dominio/confirmacion";
 import type { ErroresCampo } from "@/dominio/cuenta";
 
@@ -32,6 +33,7 @@ export async function responderSupuesto(
   }
   revalidatePath(`/vehiculos/${vehiculoId}`);
   revalidatePath("/vehiculos");
-  const quedan = await supuestosDelVehiculo(claims, vehiculoId);
-  redirect(destinoTrasResponder(vehiculoId, deAlta, !quedan || terminoLaConfirmacion(quedan.supuestos)));
+  const [quedan, vehiculos] = await Promise.all([supuestosDelVehiculo(claims, vehiculoId), listarVehiculos(claims)]);
+  const termino = !quedan || terminoLaConfirmacion(quedan.supuestos);
+  redirect(destinoTrasResponder(vehiculoId, deAlta, termino, vehiculos.length === 1));
 }

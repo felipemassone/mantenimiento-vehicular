@@ -30,8 +30,14 @@ jobs:
 
   # Integración y punta a punta usan el proyecto de Supabase de desarrollo.
   # Un PR desde un fork no recibe secretos: estos jobs se saltean.
+  # El grupo "base-dev" es común a todas las ramas: de a un job por vez sobre la base. Dos corridas
+  # cruzadas (main tras un merge y el PR siguiente) la saturaban: el 15/10/2026 la baja de la cuenta
+  # de la e2e tardó más de 15 s. GitHub deja uno corriendo y uno en espera por grupo.
   integracion:
     needs: verificar
+    concurrency:
+      group: base-dev
+      cancel-in-progress: false
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     env:
@@ -53,6 +59,9 @@ jobs:
 
   e2e:
     needs: integracion
+    concurrency:
+      group: base-dev
+      cancel-in-progress: false
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     env:

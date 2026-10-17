@@ -9,7 +9,7 @@ import { guardarTrabajo } from "../../../trabajos/acciones";
 import { BarraTrabajo } from "../../../trabajos/barra";
 import { FormularioTrabajo } from "../../../trabajos/formulario-trabajo";
 
-export const metadata: Metadata = { title: "Editar trabajo · Libreta de service" };
+export const metadata: Metadata = { title: "Editar trabajo" };
 
 /** Pantalla 15 en modo edición (CU-12): solo los trabajos registrados. */
 export default async function EditarTrabajoPagina({ params }: PageProps<"/vehiculos/[id]/historial/[trabajo]/editar">) {

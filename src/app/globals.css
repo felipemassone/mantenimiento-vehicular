@@ -2,7 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-/* Tokens del DESIGN.md ("Libreta de service"). Ningún componente escribe colores a mano.
+/* Tokens del DESIGN.md ("Km 12"). Ningún componente escribe colores a mano.
    Sin modo oscuro en esta fase: queda como nota para la tesis final. */
 
 @theme inline {
