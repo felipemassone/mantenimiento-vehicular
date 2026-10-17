@@ -6,7 +6,7 @@ const publicSans = Public_Sans({ subsets: ["latin"], variable: "--font-public-sa
 
 export const metadata: Metadata = {
   title: { default: "Km 12", template: "%s · Km 12" },
-  description: "El mantenimiento de tu auto, según el plan del fabricante.",
+  description: "Sabé qué le toca a tu auto, y cuándo.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

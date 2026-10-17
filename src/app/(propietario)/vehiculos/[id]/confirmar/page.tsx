@@ -2,6 +2,7 @@ import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { BarraVolver } from "@/components/barra-volver";
 import { Pasos } from "@/components/pasos";
 import { Button } from "@/components/ui/button";
 import { supuestosDelVehiculo } from "@/datos/estado";
@@ -30,14 +31,21 @@ export default async function ConfirmarPagina({ params, searchParams }: PageProp
   if (s.supuestos.length === 0) redirect(`/vehiculos/${id}${primero ? "?bienvenida=1" : ""}`);
   const abierta = filaAbierta(s.supuestos, typeof item === "string" ? item : undefined);
   const filas = s.supuestos.map((x) => ({ ...x, km: formatearKm(x.km), kmSupuesto: x.km }));
+  const porResponder = s.supuestos.filter((x) => x.origen === "supuesta_pendiente").length;
   const contexto = { kmActual: s.kmActual, hoy: fechaDeHoy().toISOString().slice(0, 10) };
 
   return (
     <section>
-      <Link href={`/vehiculos/${id}`} className="mb-4 inline-flex items-center gap-1 text-sm">
-        <ArrowLeft className="size-4" aria-hidden="true" /> Volver
-      </Link>
-      {primero && <Pasos actual={2} />}
+      {primero ? (
+        <>
+          <BarraVolver href={`/vehiculos/${id}`} />
+          <Pasos actual={2} />
+        </>
+      ) : (
+        <Link href={`/vehiculos/${id}`} className="mb-4 inline-flex items-center gap-1 text-sm">
+          <ArrowLeft className="size-4" aria-hidden="true" /> Volver
+        </Link>
+      )}
       <h1 className="text-[22px] font-semibold">Confirmar datos</h1>
       {deAlta && (
         <p className="mt-3">
@@ -45,7 +53,11 @@ export default async function ConfirmarPagina({ params, searchParams }: PageProp
           uno de estos trabajos. Confirmalo si lo sabés: así el cálculo usa también las fechas.
         </p>
       )}
-      <div className="mt-6">
+      {/* Pantalla 21: cuántos faltan; "No lo sé" ya es una respuesta. */}
+      {porResponder > 0 && (
+        <p className="mt-4 text-sm text-muted-foreground tabular-nums">{porResponder} por responder</p>
+      )}
+      <div className="mt-2">
         {/* La clave remonta la lista cuando cambia qué falta responder, para abrir la fila que sigue. */}
         <ListaSupuestos
           key={s.supuestos.map((x) => `${x.itemId}:${x.origen}`).join(",")}

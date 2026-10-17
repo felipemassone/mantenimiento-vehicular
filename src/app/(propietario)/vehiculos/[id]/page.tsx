@@ -1,8 +1,9 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ChevronRight } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Aviso } from "@/components/aviso";
+import { BarraVolver } from "@/components/barra-volver";
 import { ChipEstado } from "@/components/chip-estado";
 import { Pasos } from "@/components/pasos";
 import { Button } from "@/components/ui/button";
@@ -50,25 +51,46 @@ export default async function FichaVehiculoPagina({ params, searchParams }: Page
   return (
     <section>
       <ProveedorCambios inicial={inicial}>
-        <Link href="/vehiculos" className="mb-4 inline-flex items-center gap-1 text-sm">
-          <ArrowLeft className="size-4" aria-hidden="true" /> Volver
-        </Link>
-        {bienvenida === "1" && <Pasos actual={3} />}
+        {bienvenida === "1" ? (
+          <>
+            <BarraVolver href="/vehiculos" />
+            <Pasos actual={3} />
+          </>
+        ) : (
+          <Link href="/vehiculos" className="mb-4 inline-flex items-center gap-1 text-sm">
+            <ArrowLeft className="size-4" aria-hidden="true" /> Volver
+          </Link>
+        )}
         <h1 className="text-[22px] font-semibold">
           {v.nombre} {v.anio}
         </h1>
         {bienvenida === "1" && (
-          // Primer auto guiado, paso 3: cómo se lee la ficha. "Entendido" saca el parámetro.
+          // Primer auto guiado, paso 3 (pantalla 22): cómo se lee la ficha. "Entendido" saca el parámetro.
           <div className="mt-4">
             <Aviso tipo="info">
-              <p>
-                {estado?.catalogado
-                  ? "Listo. Tocá un ítem para ver qué hacer con él, y actualizá el kilometraje cada tanto (por ejemplo, cuando cargás nafta): con ese dato calculamos lo que le toca."
-                  : "Listo. Como todavía no tenemos el plan de este modelo, acá vas a registrar los trabajos que le hagas y tenerlos a mano en el historial."}
-              </p>
-              <Link href={`/vehiculos/${v.id}`} className="mt-2 inline-block font-medium underline underline-offset-4">
-                Entendido
-              </Link>
+              <div className="text-foreground">
+                <p className="font-medium">Listo, este es tu {v.nombre}.</p>
+                {estado?.catalogado ? (
+                  <ul className="mt-1 list-disc space-y-0.5 pl-5">
+                    <li>Tocá un ítem para ver qué hacer con él.</li>
+                    <li>
+                      Actualizá el kilometraje cada tanto, por ejemplo cuando cargás nafta: con ese dato calculamos lo
+                      que le toca.
+                    </li>
+                  </ul>
+                ) : (
+                  <p className="mt-1">
+                    Como todavía no tenemos el plan de este modelo, acá vas a registrar los trabajos que le hagas y
+                    tenerlos a mano en el historial.
+                  </p>
+                )}
+                <Link
+                  href={`/vehiculos/${v.id}`}
+                  className="mt-2 inline-block font-medium text-primary underline underline-offset-4"
+                >
+                  Entendido
+                </Link>
+              </div>
             </Aviso>
           </div>
         )}
@@ -121,10 +143,14 @@ export default async function FichaVehiculoPagina({ params, searchParams }: Page
                         </Link>
                       )}
                     </div>
-                    <div className="flex shrink-0 flex-col items-end gap-1">
-                      {chipsDeItem(i).map((c) => (
-                        <ChipEstado key={c.tipo} {...c} />
-                      ))}
+                    {/* Pantalla 22: la flecha dice que toda la fila se puede tocar. */}
+                    <div className="flex shrink-0 items-center gap-1 self-center">
+                      <div className="flex flex-col items-end gap-1">
+                        {chipsDeItem(i).map((c) => (
+                          <ChipEstado key={c.tipo} {...c} />
+                        ))}
+                      </div>
+                      <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
                     </div>
                   </FilaItem>
                 );

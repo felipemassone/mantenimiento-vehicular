@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Km 12",
     short_name: "Km 12",
-    description: "El mantenimiento de tu auto, según el plan del fabricante.",
+    description: "Sabé qué le toca a tu auto, y cuándo.",
     start_url: "/vehiculos",
     display: "standalone",
     background_color: "#f6f4ef",

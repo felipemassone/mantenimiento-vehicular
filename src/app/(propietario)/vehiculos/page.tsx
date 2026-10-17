@@ -11,10 +11,17 @@ import { chipsDeResumen } from "@/dominio/vista-estado";
 
 export const metadata: Metadata = { title: "Mis vehículos" };
 
+/** Pantalla 19: los chips de muestra del paso 3, los mismos de la ficha. */
+const MUESTRA = [
+  { tipo: "vencido", texto: "Vencido" },
+  { tipo: "proximo", texto: "Próximo" },
+  { tipo: "al_dia", texto: "Al día" },
+] as const;
+
 const BIENVENIDA = [
   ["Cargá tu auto", "Marca, modelo, año y los kilómetros que marca el tablero."],
   ["Contanos lo que ya se hizo", "Si el auto tiene kilómetros, te preguntamos por los últimos services. Lo podés dejar para después."],
-  ["Mirá qué te toca", "La ficha ordena el mantenimiento por urgencia: vencido, próximo y al día."],
+  ["Mirá qué te toca", "La ficha ordena el mantenimiento por urgencia."],
 ] as const;
 
 export default async function VehiculosPagina() {
@@ -30,20 +37,32 @@ export default async function VehiculosPagina() {
         <div className="mt-6 rounded-[14px] border border-border bg-card p-5">
           <h2 className="text-[17px] font-semibold">Empecemos por tu auto</h2>
           <p className="mt-1 text-sm text-muted-foreground">En tres pasos te decimos qué mantenimiento le toca.</p>
-          <ol className="mt-4 space-y-3">
+          <ol className="mt-5">
             {BIENVENIDA.map(([titulo, texto], i) => (
-              <li key={titulo} className="flex gap-3">
-                <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-[13px] font-semibold text-primary-foreground tabular-nums">
+              // Pantalla 19: los círculos van unidos por una línea fina del color de los bordes.
+              <li key={titulo} className="relative flex gap-3 pb-5 last:pb-0">
+                <span
+                  className="absolute bottom-0 left-3.5 top-0 w-px -translate-x-1/2 bg-border"
+                  aria-hidden="true"
+                />
+                <span className="relative flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-[13px] font-semibold text-primary-foreground tabular-nums">
                   {i + 1}
                 </span>
-                <span>
+                <span className="min-w-0">
                   <span className="block font-medium">{titulo}</span>
                   <span className="block text-sm text-muted-foreground">{texto}</span>
+                  {i === BIENVENIDA.length - 1 && (
+                    <span className="mt-2 flex flex-wrap gap-1.5">
+                      {MUESTRA.map((c) => (
+                        <ChipEstado key={c.tipo} {...c} />
+                      ))}
+                    </span>
+                  )}
                 </span>
               </li>
             ))}
           </ol>
-          <p className="mt-4 border-t border-border pt-4 text-sm text-muted-foreground">
+          <p className="mt-5 border-t border-border pt-4 text-sm text-muted-foreground">
             Si tu modelo no figura en la lista, cargalo igual: vas a poder registrar los trabajos que le hagas.
           </p>
         </div>

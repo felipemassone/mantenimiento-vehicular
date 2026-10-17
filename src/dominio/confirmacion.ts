@@ -48,13 +48,18 @@ export function textoNoLoSe(km: string): string {
   return `Si no lo sabés, seguimos contando desde los ${km} km y te lo marcamos para verificar en el taller.`;
 }
 
-const ESTADO: Record<Estado, string> = { al_dia: "al día", proximo: "próximo", vencido: "vencido" };
-
 /**
  * Cómo quedaría el ítem con el dato que se está cargando. Usa el motor con una ejecución
- * confirmada, así la vista previa no puede decir otra cosa que la ficha.
+ * confirmada, así la vista previa no puede decir otra cosa que la ficha. El estado va aparte
+ * porque la pantalla 21 lo muestra como chip, arriba del texto.
  */
-export function vistaPrevia(e: { item: ItemDelPlan; km: number; fecha: Date; kmActual: number; hoy: Date }): string {
+export function vistaPrevia(e: {
+  item: ItemDelPlan;
+  km: number;
+  fecha: Date;
+  kmActual: number;
+  hoy: Date;
+}): { estado: Estado; texto: string } {
   const [i] = calcularEstado({
     items: [e.item],
     intervenciones: [{ itemId: e.item.itemId, origen: "supuesta_confirmada", km: e.km, fecha: e.fecha }],
@@ -63,5 +68,5 @@ export function vistaPrevia(e: { item: ItemDelPlan; km: number; fecha: Date; kmA
     kmActual: e.kmActual,
     hoy: e.hoy,
   });
-  return `Con ese dato quedaría ${ESTADO[i.estado]}: ${i.detalle.split(" · ")[1]}.`;
+  return { estado: i.estado, texto: `Con ese dato: ${i.detalle.split(" · ")[1]}.` };
 }
