@@ -37,6 +37,8 @@
   --color-estado-confirmar: var(--estado-confirmar);
   --color-estado-confirmar-fondo: var(--estado-confirmar-fondo);
   --color-estado-confirmar-borde: var(--estado-confirmar-borde);
+  --color-info-fondo: var(--info-fondo);
+  --color-info-borde: var(--info-borde);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -82,6 +84,9 @@
   --estado-confirmar: #4b3fa3;
   --estado-confirmar-fondo: #edebfa;
   --estado-confirmar-borde: #8c82d6;
+  /* Aviso informativo (pantalla 22): celeste, no gris */
+  --info-fondo: #eff4ff;
+  --info-borde: #c4d3f7;
 }
 
 @layer base {

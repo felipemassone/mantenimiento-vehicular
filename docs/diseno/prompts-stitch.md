@@ -621,7 +621,7 @@ Para que las capturas de la Actividad 4 no mezclen marcas: la pantalla 1 con el 
 ```
 Pantalla de inicio de sesión de Km 12, una app para llevar el mantenimiento del auto.
 
-Arriba, el logo como en la imagen adjunta: el mojón de ruta azul con el "12" en blanco y el testigo oro, y al lado "Km 12" en semibold. Debajo del logo, en texto secundario: "El mantenimiento de tu auto, según el plan del fabricante."
+Arriba, el logo como en la imagen adjunta: el mojón de ruta azul con el "12" en blanco y el testigo oro, y al lado "Km 12" en semibold. Debajo del logo, en texto secundario: "Sabé qué le toca a tu auto, y cuándo."
 Título alineado a la izquierda: "Ingresar".
 Campo "Correo electrónico" con el valor propietario@example.com.
 Campo "Contraseña" con el texto oculto y un botón de ojo para mostrarla.

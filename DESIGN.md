@@ -248,7 +248,7 @@ Variante A de la lámina de Stitch (`docs/diseno/stitch_km_12_logo_design_system
 - **Fila de ítem de mantenimiento:** nombre del ítem, debajo la acción ("Cambiar" o "Revisar") y cuánto falta o cuándo venció; a la derecha, el chip de estado.
 - **Chip de estado:** pastilla con ícono y palabra, 13 px.
 - **Chip de versión del plan:** "Borrador" en gris, "Publicado" en azul claro, con el número de versión ("Versión 2").
-- **Aviso en línea:** caja con borde de 1 px del color del estado y fondo del mismo color, ícono a la izquierda y una frase. Para "Este modelo no está en el catálogo" y similares.
+- **Aviso en línea:** caja con borde de 1 px del color del estado y fondo del mismo color, ícono a la izquierda y una frase. Para "Este modelo no está en el catálogo" y similares. El aviso informativo (no es un estado) usa fondo celeste #EFF4FF, borde #C4D3F7 e ícono azul #0B3D91, como el de bienvenida de la ficha (pantalla 22).
 - **Diálogo de confirmación:** título que dice qué va a pasar ("¿Eliminar el Ford Ka?"), una frase con la consecuencia, botón secundario "Cancelar" y botón peligroso con el verbo ("Eliminar vehículo").
 - **Estado vacío:** una frase que invita y un botón ("Todavía no cargaste ningún vehículo." + "Agregar vehículo"). Sin ilustración.
 

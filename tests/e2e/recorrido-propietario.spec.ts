@@ -68,7 +68,8 @@ test("propietario: cuenta, vehículo, kilometraje, trabajos y baja", async ({ pa
     await expect(page.getByText("Si lo revisaron y estaba bien, también cuenta.")).toBeVisible();
     await page.getByLabel("¿Cuándo se hizo?").fill("2026-01-15");
     // Vista previa calculada con el motor: 30.000 + 15.000 km ya se cumplieron con 45.000.
-    await expect(page.getByText("Con ese dato quedaría vencido: venció a los 45.000 km.")).toBeVisible();
+    const previa = page.getByRole("status").filter({ hasText: "Con ese dato: venció a los 45.000 km." });
+    await expect(previa.getByText("Vencido")).toBeVisible();
     await page.getByRole("button", { name: "Sí, se hizo" }).click();
     await expect(page.getByRole("button", { name: /^Neumáticos/ })).toHaveCount(0);
     await page.getByRole("link", { name: "Más tarde" }).click();

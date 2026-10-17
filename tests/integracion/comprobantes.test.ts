@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { conUsuario } from "@/datos/cliente-usuario";
 import {
   borrarCarpeta,
@@ -64,6 +64,10 @@ async function subir(usuario: string, bytes?: number): Promise<string> {
   if (!r.ok) throw new Error(r.error);
   return r.ruta;
 }
+
+// Storage de la base dev a veces tarda (17/10: dos pruebas de este archivo pasaron los 30 s y
+// anduvieron al reintentar). Más margen solo acá, para no esconder lentitud en el resto.
+vi.setConfig({ testTimeout: 90_000, hookTimeout: 90_000 });
 
 describe("bucket comprobantes (spec 4)", () => {
   it("es privado, con 5 MB y JPG/PNG", async () => {

@@ -8,8 +8,9 @@ import { ChipEstado } from "@/components/chip-estado";
 import { Button } from "@/components/ui/button";
 import { aclaracionDelSupuesto, preguntaDelSupuesto, textoNoLoSe, vistaPrevia } from "@/dominio/confirmacion";
 import { leerEnteroConMiles } from "@/dominio/kilometraje";
-import type { ItemDelPlan } from "@/dominio/motor";
+import type { Estado, ItemDelPlan } from "@/dominio/motor";
 import { leerFecha } from "@/dominio/supuestos";
+import { chipsDeItem } from "@/dominio/vista-estado";
 import { responderSupuesto, type EstadoRespuesta } from "./acciones";
 
 export type FilaSupuesto = {
@@ -19,6 +20,12 @@ export type FilaSupuesto = {
   kmSupuesto: number;
   origen: "supuesta_pendiente" | "supuesta_a_verificar";
   item: ItemDelPlan;
+};
+
+const CAJA: Record<Estado, string> = {
+  vencido: "border-estado-vencido/40 bg-estado-vencido-fondo",
+  proximo: "border-estado-proximo/40 bg-estado-proximo-fondo",
+  al_dia: "border-estado-al-dia/40 bg-estado-al-dia-fondo",
 };
 
 /** Lo que la vista previa necesita del vehículo: la lectura actual y el día de hoy (aaaa-mm-dd). */
@@ -105,7 +112,7 @@ function Formulario({
   const [fecha, setFecha] = useState(estado.valores?.fecha ?? "");
   const [km, setKm] = useState(estado.valores?.km ?? "");
   const e = estado.errores;
-  const enlace = "text-sm font-medium text-primary underline-offset-4 hover:underline";
+  const enlace = "text-sm font-medium text-primary underline underline-offset-4";
   const aclaracion = aclaracionDelSupuesto(fila.item.tipo);
 
   // Spec 2026-10-16, apartado 2: cómo quedaría el ítem, apenas el dato es válido.
@@ -149,9 +156,17 @@ function Formulario({
         error={e?.fecha}
         onCambio={setFecha}
       />
-      <p aria-live="polite" className="text-sm tabular-nums empty:hidden">
-        {previa}
-      </p>
+      {/* Pantalla 21: la consecuencia de la fecha cargada, en una caja del color del estado con el chip arriba. */}
+      <div role="status" className="empty:hidden">
+        {previa && (
+          <div className={`space-y-1.5 rounded-[10px] border p-3 ${CAJA[previa.estado]}`}>
+            {chipsDeItem({ estado: previa.estado, incertidumbre: null }).map((c) => (
+              <ChipEstado key={c.tipo} {...c} />
+            ))}
+            <p className="text-sm tabular-nums">{previa.texto}</p>
+          </div>
+        )}
+      </div>
       {modo === "confirmar" ? (
         <>
           <Button type="submit" name="respuesta" value="confirmar" className="h-12 w-full" disabled={enviando}>

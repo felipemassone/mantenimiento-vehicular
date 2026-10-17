@@ -90,18 +90,21 @@ describe("vistaPrevia (calculada con el motor)", () => {
   const aceite = { itemId: 1, nombre: "Aceite", tipo: "reemplazo" as const, km: 15000, meses: 12 };
   const hoy = d("2026-10-16");
   it("con una fecha reciente queda al día y dice cuánto falta", () => {
-    expect(vistaPrevia({ item: aceite, km: 75000, fecha: d("2026-09-01"), kmActual: 80000, hoy })).toBe(
-      "Con ese dato quedaría al día: faltan 10.000 km o vence el 01/09/2027.",
-    );
+    expect(vistaPrevia({ item: aceite, km: 75000, fecha: d("2026-09-01"), kmActual: 80000, hoy })).toEqual({
+      estado: "al_dia",
+      texto: "Con ese dato: faltan 10.000 km o vence el 01/09/2027.",
+    });
   });
   it("cerca del límite queda próximo", () => {
-    expect(vistaPrevia({ item: aceite, km: 66000, fecha: d("2026-09-01"), kmActual: 80000, hoy })).toBe(
-      "Con ese dato quedaría próximo: faltan 1.000 km o vence el 01/09/2027.",
-    );
+    expect(vistaPrevia({ item: aceite, km: 66000, fecha: d("2026-09-01"), kmActual: 80000, hoy })).toEqual({
+      estado: "proximo",
+      texto: "Con ese dato: faltan 1.000 km o vence el 01/09/2027.",
+    });
   });
   it("con una fecha vieja queda vencido", () => {
-    expect(vistaPrevia({ item: aceite, km: 75000, fecha: d("2025-01-10"), kmActual: 80000, hoy })).toBe(
-      "Con ese dato quedaría vencido: venció el 10/01/2026.",
-    );
+    expect(vistaPrevia({ item: aceite, km: 75000, fecha: d("2025-01-10"), kmActual: 80000, hoy })).toEqual({
+      estado: "vencido",
+      texto: "Con ese dato: venció el 10/01/2026.",
+    });
   });
 });

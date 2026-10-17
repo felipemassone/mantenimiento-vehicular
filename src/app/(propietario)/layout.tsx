@@ -7,7 +7,8 @@ export default async function LayoutPropietario({ children }: { children: React.
   const claims = await exigirClaims();
   return (
     <>
-      <header className="border-b border-border bg-background">
+      {/* En el primer auto guiado la página trae su propia barra (BarraVolver) y este encabezado no va. */}
+      <header className="border-b border-border bg-background [body:has([data-sin-encabezado])_&]:hidden">
         <div className="mx-auto flex h-14 w-full max-w-[720px] items-center justify-between px-4">
           <Link href="/vehiculos" aria-label="Mis vehículos">
             <Logo />

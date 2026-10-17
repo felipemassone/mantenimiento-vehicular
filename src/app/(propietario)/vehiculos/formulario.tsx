@@ -18,6 +18,8 @@ type Props = {
   textoBoton: string;
 };
 
+const ENLACE = "block text-sm font-medium text-primary underline underline-offset-4";
+
 /** CU-05 (alta) y CU-07 (edición): catálogo o modelo libre (3a). */
 export function FormularioVehiculo({ catalogo, accion, inicial, conKilometraje, ayudaKilometraje, textoBoton }: Props) {
   const [estado, enviar, enviando] = useActionState(accion, {});
@@ -77,13 +79,6 @@ export function FormularioVehiculo({ catalogo, accion, inicial, conKilometraje, 
             ayuda={rango ? `Este modelo está cargado ${rango}.` : undefined}
             error={e.anio}
           />
-          <button
-            type="button"
-            onClick={() => setModo("libre")}
-            className="text-sm text-primary underline underline-offset-4"
-          >
-            Mi modelo no figura en la lista
-          </button>
         </>
       ) : (
         <>
@@ -107,15 +102,6 @@ export function FormularioVehiculo({ catalogo, accion, inicial, conKilometraje, 
             valorInicial={libreInicial ? String(libreInicial.anio) : undefined}
             error={e.anio}
           />
-          {catalogo.length > 0 && (
-            <button
-              type="button"
-              onClick={() => setModo("catalogo")}
-              className="text-sm text-primary underline underline-offset-4"
-            >
-              Elegir un modelo de la lista
-            </button>
-          )}
         </>
       )}
 
@@ -131,7 +117,20 @@ export function FormularioVehiculo({ catalogo, accion, inicial, conKilometraje, 
         />
       )}
 
-      <Button type="submit" className="h-12 w-full" disabled={enviando}>
+      {/* Pantalla 20: el cambio de modo va debajo de todos los campos, antes del botón. */}
+      {modo === "catalogo" ? (
+        <button type="button" onClick={() => setModo("libre")} className={ENLACE}>
+          Mi modelo no figura en la lista
+        </button>
+      ) : (
+        catalogo.length > 0 && (
+          <button type="button" onClick={() => setModo("catalogo")} className={ENLACE}>
+            Elegir un modelo de la lista
+          </button>
+        )
+      )}
+
+      <Button type="submit" className="mt-4 h-12 w-full" disabled={enviando}>
         {textoBoton}
       </Button>
     </form>
