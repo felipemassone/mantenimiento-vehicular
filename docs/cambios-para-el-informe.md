@@ -100,11 +100,14 @@ Las tres que el plan de pruebas (7.2.1) dejaba como planificadas. Implementadas 
 |---|---|---|---|
 | PS-08 | RNF-09 | `tests/e2e/recorrido-propietario.spec.ts` en cuatro proyectos de Playwright, en serie: celular Pixel 7 (Chromium), Firefox, WebKit (el motor de Safari) y Microsoft Edge estable (`channel: msedge`) | **Pasa** en los cuatro: CI del PR #29 (4 de 4, 7,2 min) y de `main` tras el merge (corrida 39069869057, 4 de 4, 5,1 min); en local (Windows) también, entre 1,7 y 2,0 min por navegador |
 | PS-09 | RNF-10 | En 18 pantallas y diálogos del recorrido (cuenta, ingreso, alta del vehículo, Confirmar datos, ficha con sus avisos, kilometraje, registrar trabajo, detalle, historial, eliminaciones) la ventana pasa a 360 px y se compara el ancho del contenido (`scrollWidth`) con el visible (`clientWidth`) | **Pasa**: ninguna pantalla con desplazamiento horizontal, en los cuatro navegadores (mismas corridas que PS-08) |
-| PS-07 | RNF-02 | Workflow manual "Carga" (corrida 39071531275): vista previa propia con la base de desarrollo, 50 cuentas con un Ford Ka 2014, 50 usuarios virtuales de k6 que piden la ficha de su vehículo una vez por segundo durante 5 minutos | **No cumple**: promedio **547 ms** (umbral 500 ms). 9.710 consultas (32,2 por segundo), **0 % de errores** y todas las respuestas con la ficha; mediana 494 ms, p95 822 ms, mínimo 330 ms, máximo 4.689 ms |
+| PS-07 | RNF-02 | 50 cuentas con un Ford Ka 2014 en la base de desarrollo y 50 usuarios virtuales de k6 que piden la ficha de su vehículo una vez por segundo durante 5 minutos, contra la misma vista previa (`mantenimiento-vehicular-lfne1v931`, compilada desde `main` con la base de desarrollo). Dos corridas con k6 2.3.0: (1) workflow "Carga" desde un runner de GitHub Actions en EE. UU. (corrida 39071531275, 21:40 UTC); (2) desde la máquina del desarrollador en Argentina (22:09 UTC) | **No cumple** en ninguna de las dos (umbral: promedio menor a 500 ms). (1) EE. UU.: promedio **547 ms**, mediana 494, p95 822, mínimo 330, máximo 4.689; 9.710 consultas (32,2 por segundo). (2) Argentina: promedio **805 ms**, mediana 687, p95 1.651, mínimo 197, máximo 6.346; 8.330 consultas (27,5 por segundo). En las dos, **0 % de errores** y todas las respuestas con la ficha calculada |
 
-Sobre PS-07: el generador de carga es un runner de GitHub Actions (EE. UU.) y la aplicación corre
-en Vercel `gru1` (São Paulo), así que cada tiempo incluye ese viaje de red. Ninguna consulta bajó
-de 330 ms, aun siendo una página que en el servidor tarda en promedio 124 ms (PS-02, RNF-01).
+Sobre PS-07: la aplicación corre en Vercel `gru1` (São Paulo). Desde Argentina la consulta más
+rápida tardó 197 ms y desde EE. UU. 330 ms, así que la red sola no explica el resultado: con 50
+usuarios a la vez el promedio sube muy por encima de lo que tarda una consulta aislada (124 ms en
+el servidor, PS-02), y desde Argentina, donde la red está más cerca, el promedio fue peor. En la
+segunda corrida también puede pesar la conexión doméstica, que no se midió. La vista previa usa el plan gratuito de Supabase de desarrollo, el mismo de las
+pruebas; no se midió por separado cuánto aporta cada parte (función, base y red).
 No se ajustó el umbral: el resultado se informa tal cual. Para el informe, PS-07 pasa de
-"Planificada" a "No cumple: promedio 547 ms, 0 % de errores (17/10/2026)", con la aclaración del
-origen de la carga.
+"Planificada" a "No cumple: promedio 547 ms (EE. UU.) y 805 ms (Argentina), 0 % de errores
+(17/10/2026)".

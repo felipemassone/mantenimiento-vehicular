@@ -1,4 +1,4 @@
-# Prompts para Google Stitch
+|# Prompts para Google Stitch
 
 ## Cómo usarlos
 
