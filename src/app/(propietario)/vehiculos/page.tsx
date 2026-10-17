@@ -5,9 +5,8 @@ import { ChipEstado } from "@/components/chip-estado";
 import { Button } from "@/components/ui/button";
 import { resumenesDeMisVehiculos } from "@/datos/estado";
 import { exigirClaims } from "@/datos/sesion";
-import { catalogoPublicado, listarVehiculos } from "@/datos/vehiculos";
+import { listarVehiculos } from "@/datos/vehiculos";
 import { formatearKm } from "@/dominio/kilometraje";
-import { textoModelosConPlan } from "@/dominio/vehiculo";
 import { chipsDeResumen } from "@/dominio/vista-estado";
 
 export const metadata: Metadata = { title: "Mis vehículos" };
@@ -20,19 +19,14 @@ const BIENVENIDA = [
 
 export default async function VehiculosPagina() {
   const claims = await exigirClaims();
-  const [vehiculos, resumenes, catalogo] = await Promise.all([
-    listarVehiculos(claims),
-    resumenesDeMisVehiculos(claims),
-    catalogoPublicado(claims),
-  ]);
+  const [vehiculos, resumenes] = await Promise.all([listarVehiculos(claims), resumenesDeMisVehiculos(claims)]);
   const primero = vehiculos.length === 0;
-  const modelos = textoModelosConPlan(catalogo);
 
   return (
     <section>
       <h1 className="text-[22px] font-semibold">Mis vehículos</h1>
       {primero ? (
-        // Primer auto guiado (spec 2026-10-16, apartado 3, paso 0): qué va a pasar y qué modelos tienen plan.
+        // Primer auto guiado (spec 2026-10-16, apartado 3, paso 0): qué va a pasar en los tres pasos.
         <div className="mt-6 rounded-[14px] border border-border bg-card p-5">
           <h2 className="text-[17px] font-semibold">Empecemos por tu auto</h2>
           <p className="mt-1 text-sm text-muted-foreground">En tres pasos te decimos qué mantenimiento le toca.</p>
@@ -50,8 +44,7 @@ export default async function VehiculosPagina() {
             ))}
           </ol>
           <p className="mt-4 border-t border-border pt-4 text-sm text-muted-foreground">
-            {modelos ? `Por ahora tenemos el plan del fabricante para ${modelos}. ` : ""}Si el tuyo no está, cargalo igual:
-            vas a poder registrar los trabajos que le hagas.
+            Si tu modelo no figura en la lista, cargalo igual: vas a poder registrar los trabajos que le hagas.
           </p>
         </div>
       ) : (

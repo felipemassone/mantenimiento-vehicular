@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
   aniosDelModelo,
-  textoModelosConPlan,
   nombreVehiculo,
   parsearVehiculo,
   validarAnioDelModelo,
@@ -78,23 +77,5 @@ describe("parsearVehiculo: puntos de miles", () => {
   it("rechaza un kilometraje con puntos de miles mal puestos", () => {
     const r = parsearVehiculo({ tipo: "catalogo", modeloId: "3", anio: "2014", kilometraje: "62.4" }, true);
     expect(r).toMatchObject({ ok: false, errores: { kilometraje: "Ingresá un kilometraje válido." } });
-  });
-});
-
-describe("textoModelosConPlan (bienvenida)", () => {
-  const m = (nombre: string, anioDesde: number, anioHasta: number | null) => ({ nombre, anioDesde, anioHasta });
-  it("nombra marca, modelo y años", () => {
-    expect(textoModelosConPlan([{ nombre: "Ford", modelos: [m("Ka", 2014, 2016)] }])).toBe("el Ford Ka, de 2014 a 2016");
-    expect(textoModelosConPlan([{ nombre: "Ford", modelos: [m("Ka", 2014, null)] }])).toBe("el Ford Ka, desde 2014");
-    expect(textoModelosConPlan([{ nombre: "Ford", modelos: [m("Ka", 2014, 2014)] }])).toBe("el Ford Ka 2014");
-  });
-  it("une varios con comas y la última con y; sin catálogo, null", () => {
-    expect(
-      textoModelosConPlan([
-        { nombre: "Fiat", modelos: [m("Cronos", 2018, null)] },
-        { nombre: "Ford", modelos: [m("Ka", 2014, 2016), m("Fiesta", 2011, 2019)] },
-      ]),
-    ).toBe("el Fiat Cronos, desde 2018; el Ford Ka, de 2014 a 2016 y el Ford Fiesta, de 2011 a 2019");
-    expect(textoModelosConPlan([])).toBeNull();
   });
 });

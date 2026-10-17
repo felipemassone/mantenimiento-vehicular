@@ -49,10 +49,8 @@ test("propietario: cuenta, vehículo, kilometraje, trabajos y baja", async ({ pa
   });
 
   await test.step("CU-05: agregar un Ford Ka 2014, guiado por ser el primero", async () => {
-    // Bienvenida del primer auto (spec 2026-10-16): los tres pasos y qué modelos tienen plan.
+    // Bienvenida del primer auto (spec 2026-10-16): los tres pasos antes de cargarlo.
     await expect(page.getByRole("heading", { name: "Empecemos por tu auto" })).toBeVisible();
-    // El catálogo de desarrollo puede tener más modelos: alcanza con que nombre el Ka.
-    await expect(page.getByText(/^Por ahora tenemos el plan del fabricante para .*el Ford Ka 2014/)).toBeVisible();
     await page.getByRole("link", { name: "Cargar mi auto" }).click();
     await expect(page.getByText("Paso 1 de 3 · Tu auto")).toBeVisible();
     await page.getByLabel("Marca").selectOption({ label: "Ford" });
