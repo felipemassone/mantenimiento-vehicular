@@ -10,7 +10,7 @@ import { filaAbierta } from "@/dominio/confirmacion";
 import { formatearKm } from "@/dominio/kilometraje";
 import { ListaSupuestos } from "./supuestos";
 
-export const metadata: Metadata = { title: "Confirmar datos · Libreta de service" };
+export const metadata: Metadata = { title: "Confirmar datos" };
 
 export default async function ConfirmarPagina({ params, searchParams }: PageProps<"/vehiculos/[id]/confirmar">) {
   const { id } = await params;

@@ -24,7 +24,7 @@ import { AvisoCambios, FilaItem, ProveedorCambios } from "./cambios";
 import { EliminarVehiculo } from "./eliminar";
 import { ActualizarKilometraje } from "./kilometraje";
 
-export const metadata: Metadata = { title: "Ficha del vehículo · Libreta de service" };
+export const metadata: Metadata = { title: "Ficha del vehículo" };
 
 export default async function FichaVehiculoPagina({ params, searchParams }: PageProps<"/vehiculos/[id]">) {
   const { id } = await params;

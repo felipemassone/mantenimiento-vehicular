@@ -7,7 +7,7 @@ import { exigirClaims } from "@/datos/sesion";
 import { esAdministrador, nombreDeRol } from "@/dominio/roles";
 import { EliminarCuenta } from "./eliminar";
 
-export const metadata: Metadata = { title: "Mi cuenta · Libreta de service" };
+export const metadata: Metadata = { title: "Mi cuenta" };
 
 export default async function CuentaPagina() {
   const claims = await exigirClaims();

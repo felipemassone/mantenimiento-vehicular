@@ -9,7 +9,7 @@ import { guardarTrabajo } from "../trabajos/acciones";
 import { BarraTrabajo } from "../trabajos/barra";
 import { FormularioTrabajo } from "../trabajos/formulario-trabajo";
 
-export const metadata: Metadata = { title: "Registrar trabajo · Libreta de service" };
+export const metadata: Metadata = { title: "Registrar trabajo" };
 
 /** Pantalla 15 (CU-10). */
 export default async function RegistrarTrabajoPagina({ params, searchParams }: PageProps<"/vehiculos/[id]/registrar">) {

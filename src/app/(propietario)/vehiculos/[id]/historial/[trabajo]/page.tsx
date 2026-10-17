@@ -13,7 +13,7 @@ import { createClient } from "@/lib/supabase/server";
 import { BarraTrabajo } from "../../trabajos/barra";
 import { EliminarTrabajo } from "./eliminar";
 
-export const metadata: Metadata = { title: "Trabajo · Libreta de service" };
+export const metadata: Metadata = { title: "Trabajo" };
 
 /** Pantalla 17 (CU-13 paso 3, CU-12). */
 export default async function DetalleTrabajoPagina({

@@ -1,6 +1,6 @@
 ---
 version: alpha
-name: Libreta de service
+name: Km 12
 description: Sistema visual de la Plataforma Web de Mantenimiento Programado Vehicular. Papel y tinta, azul y oro, semáforo de estado.
 colors:
   background: "#F6F4EF"
@@ -233,6 +233,10 @@ Radios con jerarquía, no todo igual de redondeado:
 - 10 px: botones y campos.
 - 14 px: tarjetas.
 - Pastilla completa: solo los chips de estado.
+
+## Logo
+
+Variante A de la lámina de Stitch (`docs/diseno/stitch_km_12_logo_design_system`): un mojón de ruta azul con el "12" en blanco (Public Sans Bold, cifras tabulares) y un testigo vertical en oro arriba. En la barra superior va "Km 12" solo, sin bajada, porque en el celular no entra legible. El favicon y los íconos para la pantalla de inicio (mojón blanco sobre cuadrado azul) salen de `scripts/generar-iconos.mjs`; en 16 px el mojón crece y pierde el testigo para que el número se lea.
 
 ## Components
 

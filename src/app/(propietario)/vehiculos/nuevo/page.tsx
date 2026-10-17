@@ -6,7 +6,7 @@ import { catalogoPublicado } from "@/datos/vehiculos";
 import { agregarVehiculo } from "../acciones";
 import { FormularioVehiculo } from "../formulario";
 
-export const metadata: Metadata = { title: "Agregar vehículo · Libreta de service" };
+export const metadata: Metadata = { title: "Agregar vehículo" };
 
 export default async function NuevoVehiculoPagina() {
   const claims = await exigirClaims();

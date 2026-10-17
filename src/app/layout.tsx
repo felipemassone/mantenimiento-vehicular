@@ -5,7 +5,7 @@ import "./globals.css";
 const publicSans = Public_Sans({ subsets: ["latin"], variable: "--font-public-sans" });
 
 export const metadata: Metadata = {
-  title: "Libreta de service",
+  title: { default: "Km 12", template: "%s · Km 12" },
   description: "El mantenimiento de tu auto, según el plan del fabricante.",
 };
 

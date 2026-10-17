@@ -9,7 +9,7 @@ import { listarVehiculos } from "@/datos/vehiculos";
 import { formatearKm } from "@/dominio/kilometraje";
 import { chipsDeResumen } from "@/dominio/vista-estado";
 
-export const metadata: Metadata = { title: "Mis vehículos · Libreta de service" };
+export const metadata: Metadata = { title: "Mis vehículos" };
 
 export default async function VehiculosPagina() {
   const claims = await exigirClaims();

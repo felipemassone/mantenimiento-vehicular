@@ -10,7 +10,7 @@ import { formatearFecha } from "@/dominio/fechas";
 import { detalleDelTrabajo, formatearCosto } from "@/dominio/vista-trabajo";
 import { BarraTrabajo } from "../trabajos/barra";
 
-export const metadata: Metadata = { title: "Historial · Libreta de service" };
+export const metadata: Metadata = { title: "Historial" };
 
 /** Pantalla 16 (CU-13, RF-17): del más nuevo al más viejo; sin supuestos pendientes ni a verificar. */
 export default async function HistorialPagina({ params }: PageProps<"/vehiculos/[id]/historial">) {
