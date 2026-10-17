@@ -7,7 +7,9 @@ const enCI = Boolean(process.env.CI);
 
 export default defineConfig({
   testDir: "tests/e2e",
-  timeout: 90_000,
+  // Un solo recorrido largo y en serie (cuenta, vehículo, trabajos y baja): con los pasos del 16/10
+  // pasó los 90 s en el CI y la prueba se cortaba en la baja de la cuenta.
+  timeout: 180_000,
   expect: { timeout: 15_000 },
   fullyParallel: false,
   workers: 1,
