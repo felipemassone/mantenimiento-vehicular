@@ -58,6 +58,15 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           CUENTAS: ${{ inputs.usuarios }}
         run: npx tsx tests/carga/preparar.ts
+      # RNF-02 se mide en el servidor, como RNF-01: lee los logs de la vista previa mientras corre k6.
+      - name: Tiempo en el servidor (en segundo plano)
+        env:
+          BASE_URL: ${{ steps.previa.outputs.url }}
+          DURACION: ${{ inputs.duracion }}
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: nohup npx tsx tests/carga/servidor.ts > tests/carga/servidor.log 2>&1 &
       # v1.2.2
       - uses: grafana/setup-k6-action@43b9fc21641a76002687994433dd586f56e791b1
       - name: k6
@@ -70,6 +79,13 @@ jobs:
         run: k6 run tests/carga/ficha.js
       - if: always()
         run: cat tests/carga/resumen.md >> "$GITHUB_STEP_SUMMARY" || true
+      - name: Resumen del servidor
+        if: always()
+        timeout-minutes: 3
+        run: |
+          until [ -f tests/carga/servidor.md ]; do sleep 5; done
+          cat tests/carga/servidor.log
+          cat tests/carga/servidor.md >> "$GITHUB_STEP_SUMMARY"
       - name: Borrar las cuentas
         if: always()
         env:

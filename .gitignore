@@ -53,3 +53,5 @@ next-env.d.ts
 # Prueba de carga (PS-07): las sesiones tienen tokens
 /tests/carga/sesiones.json
 /tests/carga/resumen.md
+/tests/carga/servidor.md
+/tests/carga/servidor.log
