@@ -82,7 +82,7 @@ Evidencia:
 
 ## Mejoras antes de congelar la interfaz (16/10/2026)
 
-Cuatro ideas aprobadas por Felipe para el seminario, con la regla de que no cambien RF ni CU, lleven un día o menos y lleguen antes de las capturas de la Actividad 4. Spec: `docs/superpowers/specs/2026-10-16-primer-auto-y-confirmar-design.md`.
+Cuatro ideas aprobadas por Felipe para el seminario, con la regla de que no cambien RF ni CU, lleven un día o menos y lleguen antes de las capturas de la Actividad 4.
 
 | Apartado del informe | Dice | Quedó | Ajuste de redacción |
 |---|---|---|---|

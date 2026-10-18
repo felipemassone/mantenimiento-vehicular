@@ -468,7 +468,7 @@ Títulos y botones con mayúscula solo en la primera palabra ("Agregar vehículo
 
 # Mejoras antes de congelar la interfaz (16/10/2026)
 
-Van en el proyecto **Aplicación** (celular). Son las pantallas de las ideas 1 a 4 (`docs/superpowers/specs/2026-10-16-primer-auto-y-confirmar-design.md`). Ya están programadas con los componentes existentes; con estos diseños se ajusta el código antes de congelar la interfaz (~2/11).
+Van en el proyecto **Aplicación** (celular). Son las pantallas de las ideas 1 a 4. Ya están programadas con los componentes existentes; con estos diseños se ajusta el código antes de congelar la interfaz (~2/11).
 
 **Antes de empezar:**
 1. El producto ahora se llama **Km 12**. Volvé a cargar `app/DESIGN.md` (tiene el nombre nuevo y la sección "Logo") y verificá que Stitch muestre "Km 12" como sistema activo.
