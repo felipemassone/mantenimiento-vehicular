@@ -158,3 +158,50 @@ Para cumplir midiendo así, el generador de carga tendría que estar cerca de `g
 servidor, la ficha queda muy por debajo de 500 ms. Para el informe, PS-07 pasa a: "No cumple:
 promedio de 528 ms con la página comprimida y de 562 ms sin comprimir, desde EE. UU.; 0 % de
 errores (18/10/2026)".
+
+### PS-07: corrida 5, medida en el servidor (18/10/2026)
+
+**Punto de medición.** RNF-01 se mide "en el servidor, sin incluir la latencia de red del usuario"
+(apartado de requerimientos no funcionales del informe). El criterio de aprobación del plan de
+pruebas aplica el mismo umbral "también con 50 usuarios simultáneos y sin errores (RNF-02)". Por
+eso RNF-02 se compara con 500 ms en el mismo punto que RNF-01, el servidor. Las corridas 1 a 4
+midieron del lado del cliente, con la red del generador de carga incluida.
+
+**Método** (PR #33; la prueba de k6 no cambió):
+
+- `proxy.ts` anota cuándo llega el pedido.
+- La ficha deja una línea por pedido con `after()`, una vez terminada la respuesta:
+  `[RNF-02] ficha pedido=N ms datos=M ms`.
+- Durante la corrida, `tests/carga/servidor.ts` lee esas líneas en vivo de los logs de la vista
+  previa (API de Vercel) y calcula el promedio, la mediana, el p95 (por rango más cercano), el
+  mínimo y el máximo. El workflow "Carga" lo lanza solo y deja el resumen en la página de la
+  corrida, así que la medición se repite igual en cada corrida.
+
+**Corrida 5.** Workflow "Carga" 39134459892, desde `main` (`00bb3a3`), el 18/10/2026 a las
+14:06 UTC: 50 usuarios durante 5 minutos, página comprimida, k6 2.3.0 en un runner de GitHub
+(EE. UU.), vista previa `mantenimiento-vehicular-bd4jy5l8s`.
+
+| Medición | Pedidos | Promedio | Mediana | p95 | Mín. | Máx. | Errores |
+|---|---|---|---|---|---|---|---|
+| **Servidor, pedido completo** (criterio de RNF-02) | 7.102 registrados de 10.437 | **227 ms** | 207 | 339 | 157 | 1.779 | — |
+| Servidor, datos de la ficha (la transacción) | 7.102 | 58 ms | 52 | 96 | 22 | 535 | — |
+| Cliente, k6 (con la red EE. UU. → `gru1`) | 10.437 (34,6 por segundo) | 438 ms | 392 | 611 | 319 | 3.174 | 0 % |
+
+**Resultado: cumple.** En el servidor el promedio es de 227 ms, por debajo de 500 ms, y no hubo
+errores. El tiempo del lado del cliente es complementario: incluye la red entre el generador de
+carga y São Paulo. En esta corrida también quedó por debajo de 500 ms. En la corrida 3, con la
+misma configuración, había dado 528 ms: la diferencia es la variación de la red del runner.
+
+Limitaciones, para no sobrestimar la cifra:
+
+- El log en vivo de Vercel no entrega todas las líneas: se registró el 68 % de las fichas (7.102
+  de 10.437), con un corte de la API a las 4000 líneas y reconexión.
+- El "pedido completo" es una cota alta del tiempo en el servidor. En la validación desde
+  Argentina, donde el punto de entrada de Vercel también es `gru1`, el mínimo fue de 44 ms y la
+  mediana de 87. Desde EE. UU. el mínimo fue de 157 ms: la medición parece incluir parte del
+  viaje dentro de la red de Vercel entre el punto de entrada y `gru1`. No se verificó en qué
+  región corre el proxy.
+
+No se tocó el umbral. Para el informe, PS-07 pasa a: "Cumple: promedio de 227 ms en el servidor
+con 50 usuarios simultáneos, 0 % de errores; 438 ms del lado del cliente, con la red desde EE. UU.
+(18/10/2026)".
