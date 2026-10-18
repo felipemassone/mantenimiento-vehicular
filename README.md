@@ -63,6 +63,13 @@ k6 run -e BASE_URL=https://<vista-previa>.vercel.app -e VERCEL_AUTOMATION_BYPASS
 npx tsx tests/carga/limpiar.ts
 ```
 
+El criterio de RNF-02 se mide en el servidor, como RNF-01: cada ficha deja en los logs de Vercel
+`[RNF-02] ficha pedido=N ms datos=M ms` (desde que el pedido llega al proxy hasta que termina la
+respuesta), y `tests/carga/servidor.ts`, lanzado antes de k6 con `BASE_URL`, `DURACION` y
+`VERCEL_TOKEN`, `VERCEL_ORG_ID` y `VERCEL_PROJECT_ID`, los lee en vivo y deja el resumen en
+`tests/carga/servidor.md`. El workflow lo hace solo. El promedio de k6 queda como dato
+complementario: incluye la red entre el generador de carga y `gru1`.
+
 k6 pide la página comprimida, como un navegador; `-e COMPRESION=no` (o la opción "compresion" del
 workflow) la pide sin comprimir, como las dos primeras corridas del 17/10/2026.
 `preparar.ts` deja las cookies de sesión en `tests/carga/sesiones.json` (no se versiona);
