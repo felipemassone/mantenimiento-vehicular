@@ -111,3 +111,50 @@ pruebas; no se midió por separado cuánto aporta cada parte (función, base y r
 No se ajustó el umbral: el resultado se informa tal cual. Para el informe, PS-07 pasa de
 "Planificada" a "No cumple: promedio 547 ms (EE. UU.) y 805 ms (Argentina), 0 % de errores
 (17/10/2026)".
+
+### PS-07: diagnóstico, corrección y corridas 3 y 4 (17 y 18/10/2026)
+
+**Diagnóstico.** Se hizo con vistas previas instrumentadas, nunca contra producción: tiempos por tramo
+en los logs de Vercel y k6 local con 50 usuarios durante 1 minuto.
+
+- **Servidor.** Bajo carga, la ficha tarda unos 60 ms en la base (mediana; p95 de 113 a 117 ms).
+  La verificación del token tarda 1 ms (mediana). El servidor no explica el promedio.
+- **Pooler.** La ficha abría tres transacciones en paralelo (27 consultas) y cada instancia de la
+  función mantenía hasta 10 conexiones. Las instancias suspendidas no las soltaban. Con 17
+  instancias, el pooler del plan gratuito de Supabase llegó a su límite de 200 clientes y rechazó
+  el 8,3 % de los pedidos (`EMAXCONN`). Quedó lleno unos 6 minutos: una corrida inmediata falló
+  entera. En las corridas 1 y 2 no hubo errores, pero el margen era ese.
+- **Red.** k6 no pedía la página comprimida, como sí lo hace un navegador: la ficha viajaba con
+  53 KB en lugar de 6,5 KB (brotli). La ida y vuelta al generador de carga pone un piso de unos
+  330 ms desde el runner de EE. UU. y de unos 200 ms desde Argentina, con la red doméstica.
+
+**Corrección** (PR #31; no cambia RF ni CU, y la ficha muestra lo mismo):
+
+- La ficha se arma en una sola transacción por pedido.
+- Los claims y el rol se cargan en una misma consulta.
+- Pool de 5 conexiones por instancia, que cierra las ociosas a los 5 s, con `attachDatabasePool`
+  de `@vercel/functions`: la instancia no se suspende con conexiones abiertas. Con la corrección no
+  hubo errores y el pooler quedó libre al terminar la corrida.
+- Cambio de método: k6 ahora pide la página comprimida, como un navegador. La opción
+  `compresion: no` del workflow repite las condiciones de las corridas 1 y 2.
+
+| Corrida | Desde | Código | Página | Promedio | Mediana | p95 | Mín. | Máx. | Consultas | Errores |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 1 (39071531275, 17/10 21:40 UTC) | Runner de GitHub, EE. UU. | antes del PR #31 | sin comprimir | **547 ms** | 494 | 822 | 330 | 4.689 | 9.710 | 0 % |
+| 2 (local, 17/10 22:09 UTC) | Argentina | antes del PR #31 | sin comprimir | **805 ms** | 687 | 1.651 | 197 | 6.346 | 8.330 | 0 % |
+| 3 (39081678740, 18/10 00:09 UTC) | Runner de GitHub, EE. UU. | con el PR #31 | comprimida | **528 ms** | 483 | 808 | 331 | 3.350 | 9.833 | 0 % |
+| 4 (39082379190, 18/10 00:20 UTC) | Runner de GitHub, EE. UU. | con el PR #31 | sin comprimir | **562 ms** | 490 | 817 | 420 | 3.278 | 9.615 | 0 % |
+
+Las corridas 3 y 4 son del workflow "Carga" desde `main`, de a una, con el grupo `base-dev` libre
+y el pooler vacío entre las dos. Cada corrida usó su propia vista previa
+(`mantenimiento-vehicular-45luiho8l` y `-9rae2vi7f`). Fueron 50 usuarios durante 5 minutos, con
+k6 2.3.0.
+
+**Resultado: sigue sin cumplir** (umbral: promedio menor a 500 ms). No se ajustó el umbral. La
+corrección quitó el riesgo de errores por conexiones agotadas, y la compresión bajó el promedio
+de 562 a 528 ms. Lo que queda es red: con un servidor que responde en unos 60 ms, el promedio medido
+desde EE. UU. no baja del piso de unos 330 ms del viaje a São Paulo, más la variación bajo carga.
+Para cumplir midiendo así, el generador de carga tendría que estar cerca de `gru1`. Medida en el
+servidor, la ficha queda muy por debajo de 500 ms. Para el informe, PS-07 pasa a: "No cumple:
+promedio de 528 ms con la página comprimida y de 562 ms sin comprimir, desde EE. UU.; 0 % de
+errores (18/10/2026)".
