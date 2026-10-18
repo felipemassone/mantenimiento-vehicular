@@ -1,7 +1,9 @@
 import { ArrowLeft, ChevronRight } from "lucide-react";
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { after } from "next/server";
 import { Aviso } from "@/components/aviso";
 import { BarraVolver } from "@/components/barra-volver";
 import { ChipEstado } from "@/components/chip-estado";
@@ -19,6 +21,7 @@ import {
   ultimosTrabajosPorItem,
 } from "@/dominio/vista-estado";
 import { leerCambios } from "@/dominio/vista-trabajo";
+import { INICIO_PEDIDO, medir, msDesde } from "@/lib/tiempo-pedido";
 import { cn } from "@/lib/utils";
 import { AvisoCambios, FilaItem, ProveedorCambios } from "./cambios";
 import { EliminarVehiculo } from "./eliminar";
@@ -29,8 +32,13 @@ export const metadata: Metadata = { title: "Ficha del vehículo" };
 export default async function FichaVehiculoPagina({ params, searchParams }: PageProps<"/vehiculos/[id]">) {
   const { id } = await params;
   const { cambios, bienvenida } = await searchParams;
+  const inicioPedido = (await headers()).get(INICIO_PEDIDO);
   const claims = await exigirClaims();
-  const ficha = await fichaDelVehiculo(claims, id);
+  const [ficha, datos] = await medir(() => fichaDelVehiculo(claims, id));
+  // RNF-01 y RNF-02 (spec 4.4): una línea por ficha en los logs de Vercel, sin datos del usuario.
+  // "datos" es la transacción (incluye el estado, CU-09); "pedido", el pedido entero en el
+  // servidor, desde que llega al proxy hasta que termina la respuesta (sin la red del usuario).
+  after(() => console.info(`[RNF-02] ficha pedido=${msDesde(inicioPedido) ?? "?"} ms datos=${datos} ms`));
   if (!ficha) notFound();
   const { vehiculo: v, estado, historial } = ficha;
   const ultimos = ultimosTrabajosPorItem(historial);

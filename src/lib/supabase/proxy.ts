@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { esRutaDeIngreso, esRutaPublica } from "@/lib/rutas";
+import { INICIO_PEDIDO } from "@/lib/tiempo-pedido";
 
 /**
  * Renueva la sesión y redirige. NO es una barrera de seguridad (CVE-2025-29927):
@@ -8,6 +9,8 @@ import { esRutaDeIngreso, esRutaPublica } from "@/lib/rutas";
  * Basado en el ejemplo oficial vercel/next.js/examples/with-supabase.
  */
 export async function updateSession(request: NextRequest) {
+  // RNF-02: cuándo llegó el pedido al servidor; la ficha registra el tiempo total (ver INICIO_PEDIDO).
+  request.headers.set(INICIO_PEDIDO, String(Date.now()));
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(

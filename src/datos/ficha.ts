@@ -23,14 +23,10 @@ export async function fichaDelVehiculo(
   ahora: Date = new Date(),
 ): Promise<FichaVehiculo | null> {
   if (!UUID.test(vehiculoId)) return null;
-  const inicio = performance.now();
-  const ficha = await conUsuario(claims, async (tx) => {
+  return conUsuario(claims, async (tx) => {
     const vehiculo = await vehiculoEnTx(tx, vehiculoId);
     if (!vehiculo) return null;
     const estado = await calcularEnTx(tx, vehiculoId, fechaDeHoy(ahora));
     return { vehiculo, estado, historial: await historialEnTx(tx, vehiculoId) };
   });
-  // RNF-01 (spec 4.4): incluye el estado (CU-09) y además los datos y el historial de la ficha.
-  console.info(`[RNF-01] fichaDelVehiculo ${Math.round(performance.now() - inicio)} ms`);
-  return ficha;
 }
