@@ -1,0 +1,50 @@
+name: Latido
+
+# Riesgo R1: el plan gratuito de Supabase pausa un proyecto con poca actividad de base durante 7 días.
+# Dos veces por día, una escritura mínima en cada proyecto (operacion.latido, migración 0006), sin
+# depender de que haya commits ni visitas. Si la base no responde, la corrida falla y GitHub avisa.
+on:
+  schedule:
+    # Fuera de la hora en punto, cuando GitHub demora más los programados.
+    - cron: "17 9,21 * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  produccion:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    # Entorno limitado a ramas protegidas: un PR no puede leer estos secretos.
+    environment: produccion
+    steps:
+      - name: Escribir el latido
+        env:
+          URL_BASE: ${{ secrets.PROD_DIRECT_URL }}
+          PGCONNECT_TIMEOUT: 20
+        run: |
+          set -euo pipefail
+          test -n "$URL_BASE"
+          momento=$(psql "$URL_BASE" -X -q -tA -v ON_ERROR_STOP=1 \
+            -c "UPDATE operacion.latido SET momento = now() WHERE id = 1 RETURNING momento")
+          test -n "$momento"
+          echo "Latido de producción: $momento" >> "$GITHUB_STEP_SUMMARY"
+
+  # La base de desarrollo solo tiene actividad cuando corre el CI: sin PR durante una semana se
+  # pausaría y frenaría los checks obligatorios. Fuera del grupo "base-dev": una sola fila no la
+  # carga, y entrar en el grupo podría desplazar a un job del CI que esté en espera.
+  desarrollo:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Escribir el latido
+        env:
+          URL_BASE: ${{ secrets.DIRECT_URL }}
+          PGCONNECT_TIMEOUT: 20
+        run: |
+          set -euo pipefail
+          test -n "$URL_BASE"
+          momento=$(psql "$URL_BASE" -X -q -tA -v ON_ERROR_STOP=1 \
+            -c "UPDATE operacion.latido SET momento = now() WHERE id = 1 RETURNING momento")
+          test -n "$momento"
+          echo "Latido de desarrollo: $momento" >> "$GITHUB_STEP_SUMMARY"
