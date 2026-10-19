@@ -1,8 +1,9 @@
 # OWASP A03: actualizaciones de dependencias de npm y de las acciones de los workflows.
 # Agrupadas para que llegue un PR por ecosistema y por semana, no uno por paquete. Cada PR pasa
 # por el mismo CI que el resto (verificar, integración y punta a punta) antes de mergearse.
-# Los PR de Dependabot no reciben los secretos de Actions: integración y punta a punta necesitan
-# los mismos cargados como secretos de Dependabot (gh secret set --app dependabot).
+# Los PR de Dependabot no reciben los secretos de Actions: integración y punta a punta usan los
+# cinco de Supabase cargados como secretos de Dependabot (solo los del proyecto de desarrollo).
+# La vista previa no corre en estos PR, así que el token de Vercel no se carga.
 version: 2
 updates:
   - package-ecosystem: npm
