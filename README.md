@@ -117,6 +117,24 @@ Para correr la CLI de Prisma o el seed contra producción, con un `.env.producci
 ARCHIVO_ENTORNO=.env.produccion.local npx prisma db seed
 ```
 
+## Latido contra la pausa por inactividad
+
+- El plan gratuito de Supabase pausa un proyecto que muestra poca actividad de base durante 7
+  días; según su documentación, alcanza con algunas consultas por día. Producción tiene poco
+  tráfico, y desarrollo solo recibe el del CI.
+- El workflow `Latido` (`.github/workflows/latido.yml`) corre todos los días a las 09:17 y 21:17
+  UTC y a mano (Actions → Latido → Run workflow). Actualiza la única fila de `operacion.latido`
+  (migración `0006_latido`) en producción y en desarrollo. No toca datos de usuarios ni tablas
+  del negocio; el esquema `operacion` queda fuera del modelo de Prisma, de la API de Supabase y
+  del respaldo.
+- El job `produccion` corre en el entorno `produccion` (secreto `PROD_DIRECT_URL`); el job
+  `desarrollo` usa el secreto `DIRECT_URL` del repositorio.
+- Si la base no responde o la fila no existe, la corrida falla y GitHub la avisa por correo a quien modificó el
+  `cron` por última vez.
+  Un proyecto ya pausado se restaura desde el panel de Supabase.
+- Los programados dependen de que el repositorio tenga actividad: GitHub los apaga después de 60
+  días sin commits (ver Respaldo).
+
 ## Respaldo y restauración (RNF-08)
 
 - El workflow `Respaldo` (`.github/workflows/respaldo.yml`) corre los domingos a las 06:00 UTC y
