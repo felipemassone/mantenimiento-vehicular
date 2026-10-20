@@ -1,0 +1,49 @@
+# OWASP A03: actualizaciones de dependencias de npm y de las acciones de los workflows.
+# Agrupadas para que llegue un PR por ecosistema y por semana, no uno por paquete. Cada PR pasa
+# por el mismo CI que el resto (verificar, integración y punta a punta) antes de mergearse.
+# Los PR de Dependabot no reciben los secretos de Actions: integración y punta a punta usan los
+# cinco de Supabase cargados como secretos de Dependabot (solo los del proyecto de desarrollo).
+# La vista previa no corre en estos PR, así que el token de Vercel no se carga.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/Argentina/Buenos_Aires
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: deps
+    groups:
+      # Menores y parches de todo en un solo PR.
+      menores:
+        update-types: [minor, patch]
+      # Las mayores, que pueden romper, por separado y también agrupadas.
+      mayores:
+        update-types: [major]
+    # Prisma y Next van fijados a mano (cliente, adaptador y CLI en la misma versión; Next con
+    # eslint-config-next): sus mayores se actualizan a propósito, leyendo las notas de la versión.
+    ignore:
+      - dependency-name: "next"
+        update-types: [version-update:semver-major]
+      - dependency-name: "eslint-config-next"
+        update-types: [version-update:semver-major]
+      - dependency-name: "prisma"
+        update-types: [version-update:semver-major]
+      - dependency-name: "@prisma/*"
+        update-types: [version-update:semver-major]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/Argentina/Buenos_Aires
+    commit-message:
+      prefix: ci
+    groups:
+      acciones:
+        patterns: ["*"]

@@ -205,3 +205,29 @@ Limitaciones, para no sobrestimar la cifra:
 No se tocó el umbral. Para el informe, PS-07 pasa a: "Cumple: promedio de 227 ms en el servidor
 con 50 usuarios simultáneos, 0 % de errores; 438 ms del lado del cliente, con la red desde EE. UU.
 (18/10/2026)".
+
+## Seguridad: pendientes del OWASP Top 10:2025 (18/10/2026)
+
+Los tres riesgos que la sección 3.2 del análisis de costos y riesgos dejaba como pendientes,
+cerrados antes de congelar la interfaz (PR #37). No cambian RF ni CU.
+
+| Riesgo | Antes | Quedó |
+|---|---|---|
+| A02 Security Misconfiguration | Sin encabezados de seguridad propios; solo HSTS, que pone Vercel | `next.config.ts` manda en todas las respuestas una política de contenido (CSP) que solo permite el propio origen y, para imágenes y conexiones, el proyecto de Supabase (la subida del comprobante y el enlace firmado salen del navegador); sin `<object>`, sin marcos y sin formularios hacia otros sitios. Además `X-Frame-Options: DENY` y `frame-ancestors 'none'` (contra el enmarcado), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` que apaga cámara, micrófono, ubicación y pagos, y sin `X-Powered-By` |
+| A03 Software Supply Chain Failures | Dependencias fijadas con `package-lock.json`, sin actualizaciones automáticas | `.github/dependabot.yml`: revisión semanal (lunes 6:00, hora argentina) de npm y de las acciones de GitHub Actions, agrupada en un PR de menores y parches y otro de mayores por ecosistema; las mayores de Next y Prisma se actualizan a mano. Cada PR pasa por el mismo CI que el resto, con los secretos del proyecto de desarrollo y sin el token de Vercel (no se arma vista previa). Además, alertas y actualizaciones de seguridad de Dependabot activadas en el repositorio |
+| A10 Mishandling of Exceptional Conditions | Página de error por defecto de Next.js | `src/app/error.tsx` y `src/app/global-error.tsx` (este último, para un error en el layout raíz) muestran una pantalla propia con el estilo de DESIGN.md: "Algo salió mal", "Intentar de nuevo" e "Ir al inicio". No muestra el mensaje ni la pila; solo el código (`digest`) que queda en los logs del servidor |
+
+Decisiones y límites, para no sobrestimar:
+
+- La CSP es sin nonces, así que `script-src` y `style-src` llevan `'unsafe-inline'`: Next.js
+  escribe scripts en línea para hidratar la página, y con nonces todas las páginas pasarían a
+  renderizarse en cada pedido. Mitiga el enmarcado y la carga de recursos de otros orígenes, no
+  un script inyectado en la propia página (para eso está el escape de React). Pasar a nonces
+  queda para la tesis final.
+- Sin `upgrade-insecure-requests`: Safari lo aplica también a `http://localhost`, donde corre la
+  prueba de punta a punta. HTTPS con HSTS lo sigue forzando Vercel (RNF-03).
+- La prueba de punta a punta (RNF-09) siguió pasando en los cuatro navegadores con la política
+  activa, incluida la subida del comprobante y su vista con el enlace firmado.
+
+Para 3.2 del análisis de riesgos: los tres pasan de "pendiente" a "mitigado", con la evidencia
+de esta tabla.
