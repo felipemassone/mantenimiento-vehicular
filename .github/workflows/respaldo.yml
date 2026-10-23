@@ -44,7 +44,7 @@ jobs:
           rm verificar.dump
           echo "NOMBRE=$nombre" >> "$GITHUB_ENV"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ env.NOMBRE }}
           path: ${{ env.NOMBRE }}.dump.gpg
