@@ -5,6 +5,11 @@
 /* Tokens del DESIGN.md ("Km 12"). Ningún componente escribe colores a mano.
    Sin modo oscuro en esta fase: queda como nota para la tesis final. */
 
+/* Los componentes de shadcn traen clases dark:, que en Tailwind 4 siguen al modo oscuro del
+   sistema: en un celular en modo oscuro los campos salían grises. Así solo se activarían con una
+   clase .dark, que la app no usa. */
+@custom-variant dark (&:is(.dark *));
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -49,6 +54,8 @@
 }
 
 :root {
+  /* Controles nativos (fecha, selector, barras) siempre en claro, aunque el sistema esté en oscuro. */
+  color-scheme: light;
   --radius: 0.625rem;
   /* Papel, tinta y línea */
   --background: #f6f4ef;
