@@ -60,6 +60,9 @@ export function Campo({
           aria-describedby={error || ayuda ? idAyuda : undefined}
           className={cn(
             "h-12 bg-card text-base",
+            // Safari de iOS, sin la apariencia nativa (globals.css), deja la fecha arriba: con la
+            // altura de línea igual al alto interior (48 px − 2 de borde − 8 de relleno) queda centrada.
+            tipo === "date" && "leading-[2.375rem]",
             sufijo && "pr-12",
             prefijo && "pl-8",
             error && "border-destructive focus-visible:ring-destructive",
