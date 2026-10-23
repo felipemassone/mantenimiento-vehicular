@@ -95,7 +95,10 @@ La prueba de punta a punta crea una cuenta con una dirección de prueba de Resen
 - `main` solo acepta cambios por pull request con `verificar` (tipos, lint y unitarias),
   `integracion` y `e2e` en verde y con la rama al día, también para administradores.
 - Cada cambio en `main` lo despliega a producción el job `desplegar` del CI, **solo** después de
-  los tres checks, con la CLI de Vercel (`vercel deploy --prod`). Vercel compila con sus variables
+  los tres checks, con la CLI de Vercel (`vercel deploy --prod`). En `main` no se repiten
+  integración y punta a punta (no compiten por la base de desarrollo con los PR): el job
+  `comprobar-pr` exige que el commit sea el merge de un PR, con los mismos archivos que su último
+  commit y los tres checks en verde ahí; `verificar` sí corre sobre el merge. Vercel compila con sus variables
   de Production: el build aplica las migraciones pendientes (`prisma migrate deploy`) y, si no
   compila, no se despliega (RNF-11). El despliegue automático propio de Vercel está apagado en
   `vercel.json` (`git.deploymentEnabled`), porque su conexión con GitHub fallaba con un 403.

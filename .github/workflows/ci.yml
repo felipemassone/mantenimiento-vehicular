@@ -5,10 +5,11 @@ on:
     branches: [main]
   pull_request:
 
-# Un push nuevo a la misma rama cancela la corrida anterior.
+# En un PR, un push nuevo cancela la corrida anterior. En main no se corta una corrida a medias (puede
+# estar desplegando): la que espera la reemplaza la más nueva, que ya incluye a la anterior.
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   verificar:
@@ -28,17 +29,18 @@ jobs:
       # Unitarias con el umbral de cobertura del motor (RNF-12)
       - run: npm run test:cobertura
 
-  # Integración y punta a punta usan el proyecto de Supabase de desarrollo.
+  # Integración y punta a punta usan el proyecto de Supabase de desarrollo, y corren solo en los PR.
   # Un PR desde un fork no recibe secretos: estos jobs se saltean.
   # El grupo "base-dev" es común a todas las ramas: de a un job por vez sobre la base. Dos corridas
   # cruzadas (main tras un merge y el PR siguiente) la saturaban: el 15/10/2026 la baja de la cuenta
-  # de la e2e tardó más de 15 s. GitHub deja uno corriendo y uno en espera por grupo.
+  # de la e2e tardó más de 15 s. GitHub deja uno corriendo y uno en espera por grupo, y el que llega
+  # cancela al que esperaba: por eso main no entra en la cola (ver comprobar-pr).
   integracion:
     needs: verificar
     concurrency:
       group: base-dev
       cancel-in-progress: false
-    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     env:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
@@ -62,7 +64,7 @@ jobs:
     concurrency:
       group: base-dev
       cancel-in-progress: false
-    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     env:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
@@ -89,10 +91,60 @@ jobs:
           path: playwright-report/
           retention-days: 7
 
-  # RNF-13: producción se despliega desde acá, solo en main y con los tres checks en verde.
+  # RNF-13 en main sin volver a la cola de la base dev: integración y punta a punta ya corrieron en
+  # el PR. La protección de main exige el PR al día con main y los tres checks en verde, así que el
+  # merge tiene los mismos archivos que el último commit del PR. Se comprueba igual: si el commit no
+  # es el merge de un PR, si los archivos difieren o si un check no está en verde, falla en rojo.
+  comprobar-pr:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      checks: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      SHA: ${{ github.sha }}
+    steps:
+      - run: |
+          set -euo pipefail
+          # El PR que se mergeó en este commit (la API puede tardar unos segundos en asociarlo)
+          pr=""
+          for intento in 1 2 3; do
+            pr=$(gh api "repos/$REPO/commits/$SHA/pulls" \
+              --jq ".[] | select(.merge_commit_sha == \"$SHA\" and .base.ref == \"main\") | \"\(.number) \(.head.sha)\"")
+            [ -n "$pr" ] && break
+            sleep 10
+          done
+          if [ -z "$pr" ]; then
+            echo "::error::$SHA no es el merge de un PR a main: no se despliega"
+            exit 1
+          fi
+          read -r numero cabeza <<<"$pr"
+          # Mismos archivos que el último commit del PR, el que pasó los checks
+          arbol_main=$(gh api "repos/$REPO/git/commits/$SHA" --jq .tree.sha)
+          arbol_pr=$(gh api "repos/$REPO/git/commits/$cabeza" --jq .tree.sha)
+          if [ "$arbol_main" != "$arbol_pr" ]; then
+            echo "::error::El merge del PR #$numero no tiene los mismos archivos que su último commit ($cabeza): no se despliega"
+            exit 1
+          fi
+          # La última corrida de cada check en ese commit, en verde
+          for check in verificar integracion e2e; do
+            resultado=$(gh api "repos/$REPO/commits/$cabeza/check-runs?check_name=$check&filter=all&per_page=100" \
+              --jq '[.check_runs[] | select(.app.slug == "github-actions")] | sort_by(.started_at) | last | .conclusion // "sin correr"')
+            echo "PR #$numero ($cabeza), $check: $resultado"
+            if [ "$resultado" != "success" ]; then
+              echo "::error::El check $check del PR #$numero no está en verde ($resultado): no se despliega"
+              exit 1
+            fi
+          done
+
+  # RNF-13: producción se despliega desde acá, solo en main, con verificar en verde sobre el merge y
+  # los tres checks en verde sobre los mismos archivos en el PR.
   # Vercel compila con sus variables de Production; no depende de su conexión con GitHub.
   desplegar:
-    needs: [verificar, integracion, e2e]
+    needs: [verificar, comprobar-pr]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
