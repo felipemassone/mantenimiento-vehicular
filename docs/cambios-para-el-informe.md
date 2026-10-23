@@ -231,3 +231,44 @@ Decisiones y límites, para no sobrestimar:
 
 Para 3.2 del análisis de riesgos: los tres pasan de "pendiente" a "mitigado", con la evidencia
 de esta tabla.
+
+## CI: despliegue de `main` fuera de la cola de la base de desarrollo (22/10/2026)
+
+**Problema.** Integración y punta a punta comparten el grupo de concurrencia `base-dev` (un job
+por vez sobre la base de desarrollo; dos a la vez la saturaron el 15/10/2026). GitHub deja un job
+corriendo y uno en espera por grupo, y el que llega cancela al que esperaba. Así se cancelaron las
+corridas de `main` de los merges del PR #35 (39178073406) y del #36 (39180687575): un PR que entró
+a la cola detrás canceló la punta a punta de `main` (en espera), `desplegar` no corrió y
+producción no recibió la migración del latido hasta el merge del #37. Nada quedó en rojo. Con
+Dependabot abriendo PR cada semana, la cola iba a estar más llena.
+
+**Opciones evaluadas.**
+
+| Opción | Por qué no / por qué sí |
+|---|---|
+| Un grupo de concurrencia propio para `main` | `main` dejaría de perder su lugar, pero su integración correría a la vez que la de un PR sobre la misma base: vuelve la saturación del 15/10 |
+| `workflow_run` (desplegar al terminar el CI) | Hereda el resultado de la corrida de `main`: si la cola la cancela, no hay nada que desplegar. No resuelve la cancelación |
+| **`main` despliega sin repetir integración y punta a punta (elegida)** | La protección de `main` exige el PR al día con `main` y los tres checks en verde, también para administradores. Un PR al día no agrega cambios al mergearse: el merge tiene los mismos archivos que el último commit del PR, que es el que pasó los checks. `main` sale de la cola y la base de desarrollo atiende solo a los PR |
+
+**Quedó** (`.github/workflows/ci.yml`):
+
+- `integracion` y `e2e` corren solo en los PR (del propio repositorio o de Dependabot).
+- En `main`, `verificar` (tipos, lint y unitarias con el umbral de RNF-12) sigue corriendo sobre
+  el commit del merge, y un job nuevo, `comprobar-pr`, consulta la API de GitHub y frena el
+  despliegue en rojo si el commit no es el merge de un PR a `main`, si sus archivos (el árbol de
+  git) no son idénticos a los del último commit del PR, o si la última corrida de `verificar`,
+  `integracion` o `e2e` en ese commit no está en verde. `desplegar` necesita los dos.
+- Las corridas de `main` no se cancelan entre sí: una que está desplegando termina, y si llegan
+  varias mientras tanto, despliega la más nueva, que incluye a las anteriores. En los PR, un push
+  nuevo sigue cancelando la corrida anterior.
+
+RNF-13 no se afloja: producción se despliega solo con los tres checks en verde, y el control es
+más preciso que antes, porque se exige que sean sobre los mismos archivos que se despliegan.
+Antes de activarlo, la comprobación se corrió contra los merges de los PR #35, #36 y #37: los
+tres tienen el mismo árbol que el último commit de su PR y los tres checks en verde; un commit
+que no es merge de un PR se rechaza.
+
+Para 6.1.2 ("Infraestructura y despliegue"): "La integración y la prueba de punta a punta corren
+en cada pull request, de a una por vez sobre la base de desarrollo. Al mergearse en `main`, el
+pipeline vuelve a verificar el código, comprueba que sea idéntico al que pasó los tres checks en
+el pull request y recién entonces despliega a producción".
