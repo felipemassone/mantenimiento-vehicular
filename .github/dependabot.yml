@@ -39,6 +39,15 @@ updates:
         update-types: [version-update:semver-major]
       - dependency-name: "@prisma/*"
         update-types: [version-update:semver-major]
+      # Herramientas de compilación y lint: la interfaz se congela antes de la presentación y sus
+      # mayores (TypeScript 6/7, ESLint 10) quedan para la tesis final. @types/node sigue a Node 24,
+      # la versión del CI y de Vercel.
+      - dependency-name: "typescript"
+        update-types: [version-update:semver-major]
+      - dependency-name: "eslint"
+        update-types: [version-update:semver-major]
+      - dependency-name: "@types/node"
+        update-types: [version-update:semver-major]
 
   - package-ecosystem: github-actions
     directory: /
