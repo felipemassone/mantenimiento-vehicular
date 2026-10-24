@@ -18,8 +18,8 @@ jobs:
       # prisma generate lee prisma.config.ts, que exige DIRECT_URL aunque no se conecte
       DIRECT_URL: postgresql://localhost:5432/ci
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
@@ -49,8 +49,8 @@ jobs:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       DIRECT_URL: ${{ secrets.DIRECT_URL }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
@@ -74,8 +74,8 @@ jobs:
       DIRECT_URL: ${{ secrets.DIRECT_URL }}
       APP_ORIGIN: http://localhost:3000
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
@@ -84,7 +84,7 @@ jobs:
       - run: npx playwright install --with-deps chromium firefox webkit msedge
       - run: npm run test:e2e
       # El informe y la traza solo usan la cuenta descartable de la prueba.
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: playwright-report
@@ -155,7 +155,7 @@ jobs:
       VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: npx --yes vercel@63 deploy --prod --yes --token "$VERCEL_TOKEN"
 
   # Vista previa de cada rama (informe, 6.1.2), contra el proyecto de Supabase de desarrollo.
@@ -169,7 +169,7 @@ jobs:
       VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: |
           url=$(npx --yes vercel@63 deploy --yes --token "$VERCEL_TOKEN")
           echo "### Vista previa: $url" >> "$GITHUB_STEP_SUMMARY"

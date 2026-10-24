@@ -23,6 +23,11 @@ updates:
       # Las mayores, que pueden romper, por separado y también agrupadas.
       mayores:
         update-types: [major]
+      # Las de seguridad (alertas) también en un solo PR: sueltas llegaban de a una por paquete y
+      # cada una pedía su ciclo de CI completo sobre la base dev.
+      seguridad:
+        applies-to: security-updates
+        patterns: ["*"]
     # Prisma y Next van fijados a mano (cliente, adaptador y CLI en la misma versión; Next con
     # eslint-config-next): sus mayores se actualizan a propósito, leyendo las notas de la versión.
     ignore:
